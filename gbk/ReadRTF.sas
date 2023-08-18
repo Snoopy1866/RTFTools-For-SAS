@@ -145,13 +145,13 @@ options cmplib = work.func;
 
     
     /*7. 清除中间数据集*/
-    proc datasets library = work nowarn noprint;
-        delete _tmp_outdata
-               _tmp_rtf_data
-               _tmp_rtf_context
-               _tmp_rtf_context_sorted
-               _tmp_rtf_raw
-              ;
-    quit;
+/*    proc datasets library = work nowarn noprint;*/
+/*        delete _tmp_outdata*/
+/*               _tmp_rtf_data*/
+/*               _tmp_rtf_context*/
+/*               _tmp_rtf_context_sorted*/
+/*               _tmp_rtf_raw*/
+/*              ;*/
+/*    quit;*/
 %mend;
 
