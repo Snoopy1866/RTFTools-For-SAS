@@ -5,31 +5,18 @@
 细节：
 1. 单元格内字符串开头的空格将被删除
 */
-
 proc fcmp outlib = work.func.rtf inlib = work.func;
-    function cell_transcode(str $) $;
-        reg_code_id = prxparse("/(?:(\\'[0-9A-F]{2})+)/o");
-        start = 1;
-        position = 1;
-        last_position = 1;
-        str_decoded = "";
-
-        length str_decoded $32767;
-        length _tmp_str $32767;
-        do while(position > 0);
-            call prxnext(reg_code_id, start, -1, str, position, length);
-            if position >= last_position then do; /*下一段字符串存在码点*/
-                _tmp_str = substr(str, position, length);
-                _tmp_str_nomarkup = transtrn(_tmp_str, "\'", "");
-                _tmp_str_decoded = transcode(_tmp_str_nomarkup, "gbk");
-                _tmp_decoded = substr(str, last_position, position - last_position) || _tmp_str_decoded;
-                str_decoded = substr(trim(str_decoded), 1, length(trim(str_decoded)) - 1) || _tmp_decoded || '*';
-                last_position = start;
-            end;
-            else if position = 0 then do; /*下一段字符串不存在码点*/
-                str_decoded = substr(trim(str_decoded), 1, length(trim(str_decoded)) - 1) || substr(str, start);
-            end;
+    function cell_transcode(str $) $5000;
+        reg_code_id = prxparse("/((?:\\\x27[0-9A-F]{2})+)/o");
+        
+        length str_decoded $5000;
+        str_decoded = str;
+        do while(prxmatch(reg_code_id, str_decoded));
+            _tmp_str = prxposn(reg_code_id, 1, str_decoded);
+            _tmp_str_nomarkup = transtrn(_tmp_str, "\'", "");
+            _tmp_str_decoded = transcode(_tmp_str_nomarkup, "gbk");
+            str_decoded = transtrn(str_decoded, strip(_tmp_str), strip(_tmp_str_decoded));
         end;
-        return(left(str_decoded));
+        return(str_decoded);
     endsub;
 quit;
