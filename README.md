@@ -3,8 +3,8 @@
 </p>
 
 <p align="left">
-    <a href="https://github.com/Snoopy1866/LiTiaotiao-Custom-Rules/blob/main/LICENSE">
-        <img src="https://img.shields.io/github/license/Snoopy1866/LiTiaotiao-Custom-Rules">
+    <a href="https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/LICENSE">
+        <img src="https://img.shields.io/github/license/Snoopy1866/RTFTools-For-SAS">
     </a>
 </p>
 
