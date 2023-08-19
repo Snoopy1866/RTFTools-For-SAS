@@ -27,12 +27,18 @@ proc fcmp outlib = work.func.rtf;
 
         is_transcode_success = 0;
         char = "";
-        rc = run_macro('_macro_transcode', code_point, raw_encoding, char, is_transcode_success);
-        if rc = 0 and is_transcode_success = 1 then do;
+        if raw_encoding = "utf8" then do; /*UTF-8 编码直接调用内置函数*/
+            char = unicode(code_point, "NCR");
             return(char);
         end;
         else do;
-            return("ERROR: 转码失败！");
+            rc = run_macro('_macro_transcode', code_point, raw_encoding, char, is_transcode_success); /*其他编码调用 KVCT 函数，由于 KVCT 函数的特殊性，需要在无特定编码的 DATA 步中使用*/
+            if rc = 0 and is_transcode_success = 1 then do;
+                return(char);
+            end;
+            else do;
+                return("ERROR: 转码失败！");
+            end;
         end;
     endsub;
 quit;
