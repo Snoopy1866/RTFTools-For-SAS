@@ -16,7 +16,7 @@
 
 下面是对单个的 SAS 程序的功能介绍：
 
-## [Transcode.sas](./DOCS/Trnascode.md)
+## [Transcode.sas](./DOCS/Transcode.md)
 **功能**：RTF 中的非 ASCII 字符通过转义字符表示，本程序实现了将转义字符解析为当前 SAS 编码环境下的可读字符串。例如：在 RTF 中，某个单元格的字符串为 "\\'CA\\'D4\\'D1\\'E9\\'D7\\'E9"，字符编码为 GBK，本程序将其解析为 “试验组”。
 
 
