@@ -360,7 +360,6 @@ options cmplib = work.func;
 
     %exit:
     /*10. 清除中间数据集*/
-    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete _tmp_outdata
                _tmp_rtf_data
@@ -370,7 +369,6 @@ options cmplib = work.func;
                _tmp_rtf_raw
               ;
     quit;
-    %end;
 
     %put NOTE: 宏 ReadRTF 已结束运行！;
 %mend;
