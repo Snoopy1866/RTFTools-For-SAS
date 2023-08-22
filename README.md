@@ -26,7 +26,7 @@
 
 **依赖**：[Transcode.sas](./DOCS/Transcode.md)
 
-## ReadRTF.sas
+## [ReadRTF.sas](./DOCS/ReadRTF.md)
 **功能**：读取 RTF 文件中的数据，并将其转换为 SAS 数据集，解析速度约为 80KB/s。由于 RTF 文件仅保留了变量标签，没有保留变量名，因此转换后的 SAS 数据集中的变量名用 COLx 表示，其中 x 代表变量出现在 RTF 中的列位置，此外，额外输出了一列观测序号，变量名为 `OBS_SEQ`。
 
 **依赖**：[Cell_Transcode.sas](./DOCS/Cell_Transcode.md)
