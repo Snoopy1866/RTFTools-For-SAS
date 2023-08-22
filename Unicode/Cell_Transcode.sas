@@ -24,7 +24,7 @@
 proc fcmp outlib = work.func.rtf inlib = work.func;
     function cell_transcode(str $) $5000;
         reg_code_gbk_id = prxparse("/((?:\\\x27[0-9A-F]{2})+)/o");
-        reg_code_utf8_id = prxparse("/((?:\\u\d{5};)+)/o");
+        reg_code_utf8_id = prxparse("/((?:\\u\d{1,5};)+)/o");
         
         length str_decoded $5000;
         str_decoded = str;

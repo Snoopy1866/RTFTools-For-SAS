@@ -39,18 +39,55 @@
 options cmplib = work.func;
 
 %macro ReadRTF(file, outdata);
-    /*1. 以纯文本形式读取RTF文件*/
-    data _tmp_rtf_data(compress = yes);
+
+    /*1. 获取文件路径*/
+    %let reg_file_id = %sysfunc(prxparse(%bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|((?:[A-Za-z]:\\)[^\\\/:?"<>|]+(?:\\[^\\\/:?"<>|]+)*))$/)));
+    %if %sysfunc(prxmatch(&reg_file_id, %superq(file))) = 0 %then %do;
+        %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
+        %goto exit;
+    %end;
+    %else %do;
+        %let fileref = %sysfunc(prxposn(&reg_file_id, 1, %superq(file)));
+        %let fileloc = %sysfunc(prxposn(&reg_file_id, 2, %superq(file)));
+
+        /*指定的是文件引用名*/
+        %if %bquote(&fileref) ^= %bquote() %then %do;
+            %if %sysfunc(fileref(&fileref)) > 0 %then %do;
+                %put ERROR: 文件名引用 %upcase(&fileref) 未定义！;
+                %goto exit;
+            %end;
+            %else %if %sysfunc(fileref(&fileref)) < 0 %then %do;
+                %put ERROR: 文件名引用 %upcase(&fileref) 指向的文件不存在！;
+                %goto exit;
+            %end;
+            %else %if %sysfunc(fileref(&fileref)) = 0 %then %do;
+                %let fileloc = %sysfunc(pathname(&fileref, F));
+            %end;
+        %end;
+
+        /*指定的是物理路径*/
+        %if %bquote(&fileloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(&fileloc)) = 0 %then %do;
+                %put ERROR: 文件路径 %bquote(&fileloc) 不存在！;
+                %goto exit;
+            %end;
+        %end;
+    %end;
+
+
+    /*2. 以纯文本形式读取RTF文件*/
+    data _tmp_rtf_data;
         informat line $32767.;
         format line $32767.;
         length line $32767.;
 
-        infile "&file" truncover;
+        infile "&fileloc" truncover;
         input line $char32767.;
     run;
 
-    /*2. 调整表头（解决由于表头内嵌回车导致的 RTF 代码折行问题）*/
-    data _tmp_rtf_data_polish(compress = yes);
+
+    /*3. 调整表头（解决由于表头内嵌回车导致的 RTF 代码折行问题）*/
+    data _tmp_rtf_data_polish;
         set _tmp_rtf_data;
 
         length break_line $32767.;
@@ -85,9 +122,8 @@ options cmplib = work.func;
     run;
 
 
-
-    /*3. 识别表格数据*/
-    data _tmp_rtf_raw(compress = yes);
+    /*4. 识别表格数据*/
+    data _tmp_rtf_raw;
         set _tmp_rtf_data_polish;
         
         /*变量个数*/
@@ -99,8 +135,20 @@ options cmplib = work.func;
         /*是否发现表格标题*/
         retain is_outlinelevel_found 0;
 
-        /*是否第一次发现keepn控制字*/
-        retain is_keepn_first_found 0;
+        /*是否发现表头*/
+        retain is_header_found 0;
+
+        /*是否发现表头单元格边框位置定义*/
+        retain is_header_def_found 0;
+
+        /*表头单元格层数位置(从上往下递增)*/
+        retain header_cell_level 0;
+
+        /*表头单元格左侧边框位置*/
+        retain header_cell_left_padding 0;
+
+        /*表头单元格右侧边框位置*/
+        retain header_cell_right_padding 0;
 
         /*是否发现表格数据*/
         retain is_data_found 0;
@@ -118,69 +166,96 @@ options cmplib = work.func;
 
         /*定义正则表达式筛选表头和数据*/
         reg_outlinelevel_id = prxparse("/\\outlinelevel\d/o");
-        reg_header_line_id = prxparse("/^\\pard\\plain\\intbl\\keepn\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{5};|[[:ascii:]])*)\\cell\}$/o");
-        reg_data_line_id = prxparse("/^\\pard\\plain\\intbl\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{5};|[[:ascii:]])*)\\cell\}$/o");
+        reg_header_line_id = prxparse("/\\trowd\\trkeep\\trhdr\\trq[lcr]/o");
+        reg_header_def_line_id = prxparse("/\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*(?:\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*)*\\cltxlrt[bl]\\clvertal[tcb](?:\\clcbpat\d*)?\\cellx(\d+)/o");
+        reg_data_line_id = prxparse("/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o");
+        reg_sect_line_id = prxparse("/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o");
+
 
         length header_context_raw $1000
                data_context_raw $32767;
 
-        /*开始提取有效数据*/
+        /*发现表格标题*/
         if prxmatch(reg_outlinelevel_id, strip(line)) then do;
             if is_outlinelevel_found = 0 then do;
                 is_outlinelevel_found = 1;
             end;
         end;
 
-        if prxmatch(reg_header_line_id, strip(line)) then do;
-            if is_keepn_first_found = 0 and is_outlinelevel_found = 1 then do; /*首次发现 keepn 控制字，表明这是表头*/
-                var_pointer + 1;
-                var_n = max(var_n, var_pointer);
-                flag_header = "Y";
-                header_context_raw = prxposn(reg_header_line_id, 1, strip(line));
-            end;
-            else do; /*非首次发现 keepn 控制字*/
-                if is_data_found = 0 then do; /*连续发现 keepn 控制字，表明这是表头的第二行文本*/
+        /*发现表头*/
+        else if prxmatch(reg_header_line_id, strip(line)) then do;
+            is_header_found = 1;
+            header_cell_level + 1;
+        end;
+
+        /*发现表头单元格边框位置的定义*/
+        else if prxmatch(reg_header_def_line_id, strip(line)) then do;
+            is_header_def_found = 1;
+            header_cell_left_padding = header_cell_right_padding;
+            header_cell_right_padding = input(prxposn(reg_header_def_line_id, 1, strip(line)), 8.);
+
+            var_pointer + 1;
+            var_n = max(var_n, var_pointer);
+        end;
+
+
+        /*发现数据*/
+        else if prxmatch(reg_data_line_id, strip(line)) then do;
+            if is_outlinelevel_found = 1 then do; /*限定在表格标题后的数据行，排除页眉中的数据*/
+                if is_header_found = 1 then do; /*紧跟在控制字 \trhdr 后的数据行，实际上就是表头*/
+                    if not prxmatch(reg_header_def_line_id, strip(line)) and is_header_def_found = 1 then do; /*表头边框位置定义已结束，将指针重置为 0*/
+                        var_pointer = 0;
+                    end;
+                    flag_header = "Y";
                     var_pointer + 1;
                     var_n = max(var_n, var_pointer);
-                    flag_header = "Y";
-                    header_context_raw = prxposn(reg_header_line_id, 1, strip(line));
+                    header_context_raw = prxposn(reg_data_line_id, 1, strip(line));
                 end;
-                else do; /*再次发现 keepn 控制字，表明这不是表头，而是表格跨页后的第一行数据*/
+                else do; /*数据行*/
                     flag_data = "Y";
+                    is_data_found = 1;
                     obs_var_pointer + 1;
                     if obs_var_pointer = 1 then do;
                         obs_seq + 1;
                     end;
-                    data_context_raw = prxposn(reg_header_line_id, 1, strip(line));
+                    data_context_raw = prxposn(reg_data_line_id, 1, strip(line));
+
+                    header_cell_level = 0;
                 end;
             end;
-        end;
-        else do;
-            if var_n > 0 then do;
-                is_keepn_first_found = 1;
-                var_pointer = 0;
-            end;
-            if obs_var_pointer = var_n then do; /*指针指向了最后一个变量，将指针位置重置为 1*/
-                obs_var_pointer = 0;
-            end;
+
+            is_header_def_found = 0;
+            header_cell_left_padding = 0;
+            header_cell_right_padding = 0;
         end;
 
-        if prxmatch(reg_data_line_id, strip(line)) then do; /*发现数据行*/
-            if is_outlinelevel_found = 1 then do; /*排除页眉文字*/
-                flag_data = "Y";
-                is_data_found = 1;
-                obs_var_pointer + 1;
-                if obs_var_pointer = 1 then do;
-                    obs_seq + 1;
-                end;
-                data_context_raw = prxposn(reg_data_line_id, 1, strip(line));
+        /*发现分节符*/
+        else if prxmatch(reg_sect_line_id, strip(line)) then do;
+            is_outlinelevel_found = 0;
+        end;
+
+        /*其他情况*/
+        else do;
+            if header_cell_right_padding > 0 then do;
+                is_header_def_found = 0;
+                header_cell_left_padding = 0;
+                header_cell_right_padding = 0;
+            end;
+
+            if var_pointer > 0 then do; /*表头定义暂时结束，将指针位置重置为 0*/
+                is_header_found = 0;
+                var_pointer = 0;
+            end;
+
+
+            if obs_var_pointer = var_n then do; /*数据行定义暂时结束，将指针位置重置为 0*/
+                obs_var_pointer = 0;
             end;
         end;
     run;
 
 
-
-    /*4. 开始转码*/
+    /*5. 开始转码*/
     data _tmp_rtf_context;
         set _tmp_rtf_raw;
         if flag_header = "Y" then do;
@@ -193,8 +268,7 @@ options cmplib = work.func;
     run;
 
 
-
-    /*5. 生成SAS数据集*/
+    /*6. 生成SAS数据集*/
     proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted;
         by obs_seq obs_var_pointer;
     run;
@@ -205,27 +279,67 @@ options cmplib = work.func;
         by obs_seq;
     run;
 
-    
 
-    /*6. 修改SAS数据集的属性*/
+    /*7. 处理变量标签*/
+    proc sql noprint;
+        /*获取所有层级的标签*/
+        create table _tmp_rtf_header as
+            select
+                a.header_cell_level,
+                a.var_pointer,
+                a.header_cell_left_padding,
+                a.header_cell_right_padding,
+                b.header_context
+            from _tmp_rtf_context(where = (is_header_def_found = 1)) as a left join _tmp_rtf_context(where = (flag_header = "Y")) as b
+                     on a.header_cell_level = b.header_cell_level and a.var_pointer = b.var_pointer;
+        /*获取标签最大层数*/
+        select max(header_cell_level) into : max_header_level trimmed from _tmp_rtf_header;
+
+        /*合并所有层级的标签*/
+        create table _tmp_rtf_header_expand as
+            select
+                a&max_header_level..var_pointer,
+                catx("|", %unquote(%do i = 1 %to %eval(&max_header_level - 1);
+                                       %bquote(a&i..header_context)%bquote(,)
+                                   %end;)
+                                   a&max_header_level..header_context)
+                    as header_context
+            from _tmp_rtf_header(where = (header_cell_level = &max_header_level)) as a&max_header_level
+                %do i = %eval(&max_header_level - 1) %to 1 %by -1;
+                    left join _tmp_rtf_header(where = (header_cell_level = &i)) as a&i
+                    on a&max_header_level..header_cell_left_padding >= a&i..header_cell_left_padding and a&max_header_level..header_cell_right_padding <= a&i..header_cell_right_padding
+                %end;
+                ;
+    quit;
+
+    /*标签进一步处理*/
+    data _tmp_rtf_header_expand_polish;
+        set _tmp_rtf_header_expand;
+        reg_header_control_word_id = prxparse("s/\\animtext\d*\\ul\d*\\strike\d*\\b\d*\\i\d*\\f\d*\\fs\d*\\cf\d*\s*//o");
+        
+        header_context = prxchange(reg_header_control_word_id, -1, strip(header_context));
+
+        if substr(header_context, 1, 1) = "|" then do;
+            header_context = substr(header_context, 2);
+        end;
+
+        if header_context = "" then do;
+            header_context = "空标签";
+        end;
+    run;
+
+
+    /*8. 修改SAS数据集的属性*/
     proc sql noprint;
         /*获取变量个数*/
         select nvar - 2 into : var_n from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_OUTDATA";
         
         %do i = 1 %to &var_n;
-            /*获取变量字符实际长度最大值*/
+            /*获取变量实际所需长度*/
             select max(length(col&i)) into : var_&i._maxlen from _tmp_outdata;
+
             /*获取变量标签*/
-            select header_context into : var_&i._label separated by "|" from _tmp_rtf_context where flag_header = "Y" and var_pointer = &i;
-                /*标签进一步处理*/
-                %if %superq(var_&i._label) = %nrbquote() %then %do;
-                    %let var_&i._label = %nrbquote(空标签);
-                %end;
-                %else %if %qsubstr(%superq(var_&i._label), 1, 1) = %nrbquote(|) %then %do;
-                    %let var_&i._label = %substr(%superq(var_&i._label), 2);
-                %end;
-                %let reg_header_control_word_id = %sysfunc(prxparse(%nrbquote(s/\\animtext\d+\\ul\d+\\strike\d+\\b\d+\\i\d+\\f\d+\\fs\d+\\cf\d+\s+//o)));
-                %let var_&i._label = %sysfunc(prxchange(&reg_header_control_word_id, -1, %superq(var_&i._label)));
+            select header_context into : var_&i._label from _tmp_rtf_header_expand_polish where var_pointer = &i;
         %end;
 
         alter table _tmp_outdata
@@ -236,17 +350,17 @@ options cmplib = work.func;
         alter table _tmp_outdata
             drop _NAME_;
     quit;
-
     
 
-    /*7. 最终输出*/
+    /*9. 最终输出*/
     data &outdata;
         set _tmp_outdata;
     run;
 
 
-    
-    /*8. 清除中间数据集*/
+    %exit:
+    /*10. 清除中间数据集*/
+    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete _tmp_outdata
                _tmp_rtf_data
@@ -256,5 +370,8 @@ options cmplib = work.func;
                _tmp_rtf_raw
               ;
     quit;
+    %end;
+
+    %put NOTE: 宏 ReadRTF 已结束运行！;
 %mend;
 
