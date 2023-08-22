@@ -368,6 +368,9 @@ options cmplib = work.func;
                _tmp_rtf_data_polish
                _tmp_rtf_context
                _tmp_rtf_context_sorted
+               _tmp_rtf_header
+               _tmp_rtf_header_expand
+               _tmp_rtf_header_expand_polish
                _tmp_rtf_raw
               ;
     quit;
