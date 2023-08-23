@@ -174,8 +174,7 @@ options cmplib = work.func;
         reg_sect_line_id = prxparse("/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o");
 
 
-        length header_context_raw $1000
-               data_context_raw $32767;
+        length context_raw $32767;
 
         /*发现表格标题*/
         if prxmatch(reg_outlinelevel_id, strip(line)) then do;
@@ -211,7 +210,7 @@ options cmplib = work.func;
                     flag_header = "Y";
                     var_pointer + 1;
                     var_n = max(var_n, var_pointer);
-                    header_context_raw = prxposn(reg_data_line_id, 1, strip(line));
+                    context_raw = prxposn(reg_data_line_id, 1, strip(line));
                 end;
                 else do; /*数据行*/
                     flag_data = "Y";
@@ -220,7 +219,7 @@ options cmplib = work.func;
                     if obs_var_pointer = 1 then do;
                         obs_seq + 1;
                     end;
-                    data_context_raw = prxposn(reg_data_line_id, 1, strip(line));
+                    context_raw = prxposn(reg_data_line_id, 1, strip(line));
 
                     header_cell_level = 0;
                 end;
@@ -260,12 +259,8 @@ options cmplib = work.func;
     /*5. 开始转码*/
     data _tmp_rtf_context;
         set _tmp_rtf_raw;
-        if flag_header = "Y" then do;
-            header_context = cell_transcode(header_context_raw); /*调用自定义函数 cell_transcode*/
-        end;
-
-        if flag_data = "Y" then do;
-            data_context = cell_transcode(data_context_raw); /*调用自定义函数 cell_transcode*/
+        if flag_header = "Y" or flag_data = "Y" then do;
+            context = cell_transcode(context_raw);
         end;
     run;
 
@@ -276,7 +271,7 @@ options cmplib = work.func;
     run;
 
     proc transpose data = _tmp_rtf_context_sorted out = _tmp_outdata prefix = COL;
-        var data_context;
+        var context;
         id obs_var_pointer;
         by obs_seq;
     run;
@@ -291,7 +286,7 @@ options cmplib = work.func;
                 a.var_pointer,
                 a.header_cell_left_padding,
                 a.header_cell_right_padding,
-                b.header_context
+                b.context
             from _tmp_rtf_context(where = (is_header_def_found = 1)) as a left join _tmp_rtf_context(where = (flag_header = "Y")) as b
                      on a.header_cell_level = b.header_cell_level and a.var_pointer = b.var_pointer;
         /*获取标签最大层数*/
@@ -302,9 +297,9 @@ options cmplib = work.func;
             select
                 a&max_header_level..var_pointer,
                 catx("|", %unquote(%do i = 1 %to %eval(&max_header_level - 1);
-                                       %bquote(a&i..header_context)%bquote(,)
+                                       %bquote(a&i..context)%bquote(,)
                                    %end;)
-                                   a&max_header_level..header_context)
+                                   a&max_header_level..context)
                     as header_context
             from _tmp_rtf_header(where = (header_cell_level = &max_header_level)) as a&max_header_level
                 %do i = %eval(&max_header_level - 1) %to 1 %by -1;
@@ -362,6 +357,7 @@ options cmplib = work.func;
 
     %exit:
     /*10. 清除中间数据集*/
+    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete _tmp_outdata
                _tmp_rtf_data
@@ -374,6 +370,7 @@ options cmplib = work.func;
                _tmp_rtf_raw
               ;
     quit;
+    %end;
 
     %put NOTE: 宏 ReadRTF 已结束运行！;
 %mend;
