@@ -40,7 +40,7 @@
 
 options cmplib = work.func;
 
-%macro ReadRTF(file, outdata);
+%macro ReadRTF(file, outdata, compress = yes);
 
     /*1. 获取文件路径*/
     %let reg_file_id = %sysfunc(prxparse(%bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|((?:[A-Za-z]:\\)[^\\\/:?"<>|]+(?:\\[^\\\/:?"<>|]+)*))$/)));
@@ -78,7 +78,7 @@ options cmplib = work.func;
 
 
     /*2. 以纯文本形式读取RTF文件*/
-    data _tmp_rtf_data;
+    data _tmp_rtf_data(compress = &compress);
         informat line $32767.;
         format line $32767.;
         length line $32767.;
@@ -89,7 +89,7 @@ options cmplib = work.func;
 
 
     /*3. 调整表头（解决由于表头内嵌换行符导致的 RTF 代码折行问题）*/
-    data _tmp_rtf_data_polish;
+    data _tmp_rtf_data_polish(compress = &compress);
         set _tmp_rtf_data;
 
         length break_line $32767.;
@@ -125,7 +125,7 @@ options cmplib = work.func;
 
 
     /*4. 识别表格数据*/
-    data _tmp_rtf_raw;
+    data _tmp_rtf_raw(compress = &compress);
         set _tmp_rtf_data_polish;
         
         /*变量个数*/
@@ -257,7 +257,7 @@ options cmplib = work.func;
 
 
     /*5. 开始转码*/
-    data _tmp_rtf_context;
+    data _tmp_rtf_context(compress = &compress);
         set _tmp_rtf_raw;
         if flag_header = "Y" or flag_data = "Y" then do;
             context = cell_transcode(context_raw);
@@ -266,7 +266,7 @@ options cmplib = work.func;
 
 
     /*6. 生成SAS数据集*/
-    proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted;
+    proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted(compress = &compress);
         by obs_seq obs_var_pointer;
     run;
 
@@ -357,7 +357,6 @@ options cmplib = work.func;
 
     %exit:
     /*10. 清除中间数据集*/
-    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete _tmp_outdata
                _tmp_rtf_data
@@ -370,7 +369,6 @@ options cmplib = work.func;
                _tmp_rtf_raw
               ;
     quit;
-    %end;
 
     %put NOTE: 宏 ReadRTF 已结束运行！;
 %mend;
