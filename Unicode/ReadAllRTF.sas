@@ -1,5 +1,4 @@
 options cmplib = work.func;
-options cpucount = actual;
 %macro ReadAllRTF(dir, tag = %str(列表 = L|表 = T|清单 = L), dlm = %str(_));
 
     /*1. 使用 DOS 命令获取所有 RTF 文件，存储在 _tmp_rtf_list.txt 中*/
