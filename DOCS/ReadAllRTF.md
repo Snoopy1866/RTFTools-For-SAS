@@ -35,7 +35,9 @@ dir "~\*.rtf" /b/on > "~\_tmp_rtf_list.txt" & exit
 
 在 SAS 中，上述命令改写为：
 
-`X "dir ""~\*.rtf"" /b/on > ""~\_tmp_rtf_list.txt"" & exit"`
+```
+X "dir ""~\*.rtf"" /b/on > ""~\_tmp_rtf_list.txt"" & exit"
+```
 
 将 `~` 替换为宏变量 `&dir`，即可。
 
@@ -43,7 +45,9 @@ dir "~\*.rtf" /b/on > "~\_tmp_rtf_list.txt" & exit
 
 通常情况下，输出的 RTF 文件名都含有一个序号，例如：`表7.1.1 受试者分布 筛选人群.rtf` 中的 `7.1.1`，此外前缀 `表` 也是固定的字符，通过这一规律，可以识别那些通过 SAS 输出的 RTF 文件。因此，可以构建以下正则表达式识别可以处理的 RTF 文件：
 
-`/^((?:列)?表|清单)(\d+(?:\.\d+)*)\s+(.*)\.rtf\s*$/o`
+```
+/^((?:列)?表|清单)(\d+(?:\.\d+)*)\s+(.*)\.rtf\s*$/o
+```
 
 该正则表达式包含 3 个 buffer，各自含义如下：
 - buffer1 : 文件名类型，如：列表、表、清单
@@ -57,7 +61,9 @@ dir "~\*.rtf" /b/on > "~\_tmp_rtf_list.txt" & exit
 在 [#2](#2-如何识别符合命名要求的-rtf-文件) 的临时数据集 `_tmp_rtf_list` 中，筛选变量 `rtf_valid_flag`
 的值为 `Y` 的观测，然后通过使用 `call execute` 调用宏 `%ReadRTF()`，具体如下：
 
-`call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || '(label = "' || ref_label || '"), compress = yes' || '));');`
+```
+call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || '(label = "' || ref_label || '"), compress = yes' || '));');
+```
 
 注意：需要给输出数据集添加标签，因此参数 `outdata` 需要添加数据集选项 `label = "xxx"`。
 
