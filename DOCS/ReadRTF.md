@@ -73,7 +73,7 @@ OUTDATA = t_7_1_1
 
 上述正则表达式包含两个 buffer：
 - buffer1 : 匹配文件引用
-- buffer2 : 匹配 Windows 路径名称，不支持匹配含有环境变量的路径（例如：%TEMP%\~.rtf）
+- buffer2 : 匹配 Windows 路径名称，不支持匹配含有环境变量的路径（例如：`%TEMP%\~.rtf`）
 
 若 buffer 1 的内容不为空，则参数 FILE 指定的可能是一个文件引用
 若 buffer 2 的内容不为空，则参数 FILE 指定的可能是一个 Windows 文件路径
