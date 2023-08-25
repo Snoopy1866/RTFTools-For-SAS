@@ -1,5 +1,5 @@
 options cmplib = work.func;
-%macro ReadAllRTF(dir, tag = %str(列表 = L|表 = T|清单 = L), dlm = %str(_));
+%macro ReadAllRTF(dir);
 
     /*1. 使用 DOS 命令获取所有 RTF 文件，存储在 _tmp_rtf_list.txt 中*/
     X "dir ""&dir\*.rtf"" /b/on > ""&dir\_tmp_rtf_list.txt"" & exit";
@@ -41,8 +41,17 @@ options cmplib = work.func;
     data _null_;
         set _tmp_rtf_list;
         if rtf_valid_flag = "Y" then do;
-            call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || ', compress = yes' || '));');
+            call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || '(label = "' || ref_label || '"), compress = yes' || '));');
         end;
     run;
+
+    /*4. 删除临时数据集*/
+    proc datasets library = work nowarn noprint;
+        delete _tmp_rtf_list
+              ;
+    quit;
+
+    /*5. 删除 _tmp_rtf_list.txt*/
+    X " del ""&dir\_tmp_rtf_list.txt"" & exit";
 %mend;
 
