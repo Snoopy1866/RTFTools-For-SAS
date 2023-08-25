@@ -4,9 +4,6 @@
 
 - 名称：ReadRTF.sas
 - 类型：Macro
-  - 参数数量：2
-    - 参数 1：FILE（待转换的 RTF 文件的物理路径或文件引用，指定文件路径时不加引号，使用 %str() 进行屏蔽）
-    - 参数 2：OUTDATA（转换后的 SAS 数据集名称）
 - 依赖：[Cell_Transcode](./Cell_Transcode.md)
 - 功能：SAS ODS RTF 使用 RTF 1.6 specification 输出 RTF 文件，本程序实现了将输出的 RTF 文件逆向转为 SAS 数据集的功能。
 
