@@ -27,8 +27,9 @@
 使用全局语句 `X ...` 调用 Windows 下的 DOS 命令，使用 `DIR` 命令获取文件夹中后缀为 `.rtf` 的文件列表，并存储在文件夹中的 `_tmp_rtf_list.txt` 中。
 
 在 CMD 中，该命令如下所示：
-
-`dir "~\*.rtf" /b/on > "~\_tmp_rtf_list.txt" & exit`
+```
+dir "~\*.rtf" /b/on > "~\_tmp_rtf_list.txt" & exit
+```
 
 注意，不要忘记使用 exit 退出终端窗口；
 
