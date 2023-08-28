@@ -1,5 +1,5 @@
 options cmplib = work.func;
-%macro ReadAllRTF(dir, outlib = work, vd = X);
+%macro ReadAllRTF(dir, outlib = work, vd = X, compress = yes, del_rtf_ctrl = yes);
 
     /*1. 使用 DOS 命令获取所有 RTF 文件，存储在 _tmp_rtf_list.txt 中*/
     X "subst &vd: ""&dir"" & dir ""&vd:\*.rtf"" /b/on > ""&vd:\_tmp_rtf_list.txt"" & exit";
@@ -42,7 +42,7 @@ options cmplib = work.func;
         set _tmp_rtf_list;
 
         if rtf_valid_flag = "Y" then do;
-            call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || '(label = "' || ref_label || '"), compress = yes' || '));');
+            call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || '(label = "' || ref_label || '"), compress = ' || "&compress" || ', del_rtf_ctrl = ' || &del_rtf_ctrl || '));');
         end;
     run;
 
@@ -56,5 +56,7 @@ options cmplib = work.func;
 
     /*5. 删除 _tmp_rtf_list.txt*/
     X " del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
+
+    %put NOTE: 宏 ReadAllRTF 已结束运行！;
 %mend;
 
