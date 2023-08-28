@@ -35,6 +35,12 @@
 
 默认值 : X
 
+#### COMPRESS
+参见 [COMPRESS](./ReadRTF.md#compress)
+
+#### DEL_RTF_CTRL
+参见 [DEL_RTF_CTRL](./ReadRTF.md#del_rtf_ctrl)
+
 ### 细节
 #### 1. 如何获取文件夹中所有 RTF 文件
 
@@ -117,4 +123,8 @@ libname qc "D:\qc";
 %ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc);
 
 %ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X);
+
+%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X, compress = yes);
+
+%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X, compress = yes, del_rtf_ctrl = yes);
 ```
