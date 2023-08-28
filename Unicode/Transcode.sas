@@ -1,4 +1,5 @@
 /*
+详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 ## Transcode
 
 ### 程序信息
