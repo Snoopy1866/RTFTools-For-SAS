@@ -21,13 +21,27 @@
 
 取值 : 指定 RTF 文件所在文件夹名称，必须是一个合法的 Windows 文件夹路径，例如：`C:\Windows\Temp`
 
+#### OUTLIB
+类型 : 可选参数
+
+取值 : 指定输出数据集存放的逻辑库，该逻辑库必须事先定义，且逻辑库对应的物理路径必须存在
+
+默认值 : WORK
+
+#### VD
+类型 : 可选参数
+
+取值 : 指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被使用的一个字符
+
+默认值 : X
+
 ### 细节
 #### 1. 如何获取文件夹中所有 RTF 文件
 
 使用全局语句 `X ...` 调用 Windows 下的 DOS 命令，使用 `DIR` 命令获取文件夹中后缀为 `.rtf` 的文件列表，并存储在文件夹中的 `_tmp_rtf_list.txt` 中。
 
 在 CMD 中，该命令如下所示：
-```
+```cmd
 dir "~\*.rtf" /b/on > "~\_tmp_rtf_list.txt" & exit
 ```
 
@@ -35,11 +49,25 @@ dir "~\*.rtf" /b/on > "~\_tmp_rtf_list.txt" & exit
 
 在 SAS 中，上述命令改写为：
 
-```
+```sas
 X "dir ""~\*.rtf"" /b/on > ""~\_tmp_rtf_list.txt"" & exit"
 ```
 
 将 `~` 替换为宏变量 `&dir`，即可。
+
+⚠ 在 Unicode 环境下，SAS 对于含中文字符的超长路径（超过262字符）支持不够友好，为了防止部分 RTF 文件因路径过长导致无法读取，可以使用命令 `subst` 临时建立虚拟磁盘映射，从而缩短文件路径，以便 SAS 能够正确读取 RTF 文件。
+
+因此，在 SAS 中，上述命令进一步改写为：
+
+```sas
+X "subst &vd: ""&dir"" & dir ""&vd:\*.rtf"" /b/on > ""&vd:\_tmp_rtf_list.txt"" & exit";
+```
+
+所有 RTF 文件读取完成后，记得删除虚拟磁盘映射：
+
+```sas
+X " del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
+```
 
 #### 2. 如何识别符合命名要求的 RTF 文件
 
@@ -84,4 +112,9 @@ buffer3 的内容将作为输出数据集的标签。
 
 ```sas
 %ReadAllRTF(dir = %str(D:\~\TFL\table));
+
+libname qc "D:\qc";
+%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc);
+
+%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X);
 ```
