@@ -1,13 +1,11 @@
 /*
+详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 ## ReadRTF
 
 ### 程序信息
 
 - 名称：ReadRTF.sas
 - 类型：Macro
-  - 参数数量：2
-    - 参数 1：FILE（待转换的 RTF 文件的物理路径）
-    - 参数 2：OUTDATA（转换后的 SAS 数据集名称）
 - 依赖：[Cell_Transcode](./Cell_Transcode.md)
 - 功能：SAS ODS RTF 使用 RTF 1.6 specification 输出 RTF 文件，本程序实现了将输出的 RTF 文件逆向转为 SAS 数据集的功能。
 
@@ -28,19 +26,52 @@
 9. 输出至参数 `OUTDATA` 指定的数据集中
 10. 删除中间步骤产生的数据集
 
-### 细节
-- 由于 ODS RTF 输出至外部 RTF 文件时，丢失了变量名称，因此转换回 SAS 数据集时，变量名称根据变量出现的顺序，依次为 `COL1`, `COL2`, `COL3`, ...
-- 输出数据集中额外新增一列变量 `OBS_SEQ`，表示观测序号
-- 对于单元格内的控制字，本程序将其当做普通 ASCII 字符处理，不会进行解析。例如：`\super` 将保留在 SAS 数据中
-- 对于单元格内的转义字符，目前支持的编码有：GBK、UTF-8
-- RTF 文件对单行文本长度没有限制，但是 SAS 数据集的变量长度有限制，尽管本程序使用了 32767 长度的变量用于存储 RTF 单行字符串的值，但仍然存在潜在的截断问题，此问题受限于 SAS 自身限制，无法修复
-- 由于部分 RTF 表格的表头存在单元格合并，因此转换后的 SAS 数据集标签可能会错位，但不影响数据集的观测
+### 参数
+#### FILE
+类型 : 必选参数
+
+取值 : 指定 RTF 文件路径或引用。指定的文件路径或者引用的文件路径必须是一个合法的 Windows 路径。您应当使用 `%str()` 函数将路径包围，路径不包含引号；当指定的 Windows 路径太长时，应当使用 filename 语句建议文件引用，否则会导致 SAS 无法正确读取。
+
+举例 : 
+```
+FILE = %str(D:\~\表7.1.1 受试者分布 筛选人群.rtf)
+```
+
+```
+filename ref "D:\~\表7.1.1 受试者分布 筛选人群.rtf";
+FILE = ref;
+```
+
+#### OUTDATA
+类型 : 必选参数
+
+取值 : 指定输出数据集名称。
+
+举例 :
+
+```
+OUTDATA = t_7_1_1
+```
+
+#### COMPRESS
+类型 : 可选参数
+
+取值 : 指定临时数据集是否压缩，可选 YES | NO
+
+默认值 : YES
+
+#### DEL_RTF_CTRL
+类型 : 可选参数
+
+取值 : 指定是否删除单元格中的控制字
+
+默认值 : YES
 */
 
 
 options cmplib = work.func;
 
-%macro ReadRTF(file, outdata);
+%macro ReadRTF(file, outdata, compress = yes, del_rtf_ctrl = yes);
 
     /*1. 获取文件路径*/
     %let reg_file_id = %sysfunc(prxparse(%bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|((?:[A-Za-z]:\\)[^\\\/:?"<>|]+(?:\\[^\\\/:?"<>|]+)*))$/)));
@@ -78,7 +109,7 @@ options cmplib = work.func;
 
 
     /*2. 以纯文本形式读取RTF文件*/
-    data _tmp_rtf_data;
+    data _tmp_rtf_data(compress = &compress);
         informat line $32767.;
         format line $32767.;
         length line $32767.;
@@ -89,7 +120,7 @@ options cmplib = work.func;
 
 
     /*3. 调整表头（解决由于表头内嵌换行符导致的 RTF 代码折行问题）*/
-    data _tmp_rtf_data_polish;
+    data _tmp_rtf_data_polish(compress = &compress);
         set _tmp_rtf_data;
 
         length break_line $32767.;
@@ -125,7 +156,7 @@ options cmplib = work.func;
 
 
     /*4. 识别表格数据*/
-    data _tmp_rtf_raw;
+    data _tmp_rtf_raw(compress = &compress);
         set _tmp_rtf_data_polish;
         
         /*变量个数*/
@@ -174,8 +205,7 @@ options cmplib = work.func;
         reg_sect_line_id = prxparse("/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o");
 
 
-        length header_context_raw $1000
-               data_context_raw $32767;
+        length context_raw $32767;
 
         /*发现表格标题*/
         if prxmatch(reg_outlinelevel_id, strip(line)) then do;
@@ -211,7 +241,7 @@ options cmplib = work.func;
                     flag_header = "Y";
                     var_pointer + 1;
                     var_n = max(var_n, var_pointer);
-                    header_context_raw = prxposn(reg_data_line_id, 1, strip(line));
+                    context_raw = prxposn(reg_data_line_id, 1, strip(line));
                 end;
                 else do; /*数据行*/
                     flag_data = "Y";
@@ -220,7 +250,7 @@ options cmplib = work.func;
                     if obs_var_pointer = 1 then do;
                         obs_seq + 1;
                     end;
-                    data_context_raw = prxposn(reg_data_line_id, 1, strip(line));
+                    context_raw = prxposn(reg_data_line_id, 1, strip(line));
 
                     header_cell_level = 0;
                 end;
@@ -256,33 +286,57 @@ options cmplib = work.func;
         end;
     run;
 
+    /*5. 删除 RTF 控制字*/
+    %if %upcase(&del_rtf_ctrl) = YES %then %do;
+        /*控制字-空的分组*/
+        %let reg_ctrl_1 = %bquote({\s*}|(?<!\\)[{}]);
+        /*控制字-缩进*/
+        %let reg_ctrl_2 = %bquote(\\li\d+);
+        /*控制字-上标*/
+        %let reg_ctrl_3 = %bquote({\\super.*?}|\\super[^\\]+);
+        /*控制字-取消上下标*/
+        %let reg_ctrl_4 = %bquote(\\nosupersub);
 
-    /*5. 开始转码*/
-    data _tmp_rtf_context;
-        set _tmp_rtf_raw;
-        if flag_header = "Y" then do;
-            header_context = cell_transcode(header_context_raw); /*调用自定义函数 cell_transcode*/
-        end;
+        /*合并reg_ctrl_1 ~ reg_ctrl_n*/
+        %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 4; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
 
-        if flag_data = "Y" then do;
-            data_context = cell_transcode(data_context_raw); /*调用自定义函数 cell_transcode*/
+        data _tmp_rtf_raw_del_ctrl(compress = &compress);
+            set _tmp_rtf_raw;
+            reg_rtf_del_ctrl_id = prxparse("s/(?:&reg_ctrl)\s*//o");
+            if flag_header = "Y" or flag_data = "Y" then do;
+                context_raw = prxchange(reg_rtf_del_ctrl_id, -1, strip(context_raw));
+            end;
+        run;
+    %end;
+    %else %do;
+        data _tmp_rtf_raw_del_ctrl(compress = &compress);
+            set _tmp_rtf_raw;
+        run;
+    %end;
+
+
+    /*6. 开始转码*/
+    data _tmp_rtf_context(compress = &compress);
+        set _tmp_rtf_raw_del_ctrl;
+        if flag_header = "Y" or flag_data = "Y" then do;
+            context = cell_transcode(context_raw);
         end;
     run;
 
 
-    /*6. 生成SAS数据集*/
-    proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted;
+    /*7. 生成SAS数据集*/
+    proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted(compress = &compress);
         by obs_seq obs_var_pointer;
     run;
 
     proc transpose data = _tmp_rtf_context_sorted out = _tmp_outdata prefix = COL;
-        var data_context;
+        var context;
         id obs_var_pointer;
         by obs_seq;
     run;
 
 
-    /*7. 处理变量标签*/
+    /*8. 处理变量标签*/
     proc sql noprint;
         /*获取所有层级的标签*/
         create table _tmp_rtf_header as
@@ -291,7 +345,7 @@ options cmplib = work.func;
                 a.var_pointer,
                 a.header_cell_left_padding,
                 a.header_cell_right_padding,
-                b.header_context
+                b.context
             from _tmp_rtf_context(where = (is_header_def_found = 1)) as a left join _tmp_rtf_context(where = (flag_header = "Y")) as b
                      on a.header_cell_level = b.header_cell_level and a.var_pointer = b.var_pointer;
         /*获取标签最大层数*/
@@ -302,9 +356,9 @@ options cmplib = work.func;
             select
                 a&max_header_level..var_pointer,
                 catx("|", %unquote(%do i = 1 %to %eval(&max_header_level - 1);
-                                       %bquote(a&i..header_context)%bquote(,)
+                                       %bquote(a&i..context)%bquote(,)
                                    %end;)
-                                   a&max_header_level..header_context)
+                                   a&max_header_level..context)
                     as header_context
             from _tmp_rtf_header(where = (header_cell_level = &max_header_level)) as a&max_header_level
                 %do i = %eval(&max_header_level - 1) %to 1 %by -1;
@@ -331,7 +385,7 @@ options cmplib = work.func;
     run;
 
 
-    /*8. 修改SAS数据集的属性*/
+    /*9. 修改SAS数据集的属性*/
     proc sql noprint;
         /*获取变量个数*/
         select nvar - 2 into : var_n from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_OUTDATA";
@@ -354,21 +408,25 @@ options cmplib = work.func;
     quit;
     
 
-    /*9. 最终输出*/
+    /*10. 最终输出*/
     data &outdata;
         set _tmp_outdata;
     run;
 
 
     %exit:
-    /*10. 清除中间数据集*/
+    /*11. 清除中间数据集*/
     proc datasets library = work nowarn noprint;
         delete _tmp_outdata
                _tmp_rtf_data
                _tmp_rtf_data_polish
                _tmp_rtf_context
                _tmp_rtf_context_sorted
+               _tmp_rtf_header
+               _tmp_rtf_header_expand
+               _tmp_rtf_header_expand_polish
                _tmp_rtf_raw
+               _tmp_rtf_raw_del_ctrl
               ;
     quit;
 
