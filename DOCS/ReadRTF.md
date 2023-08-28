@@ -207,4 +207,5 @@ filename rtf "D:\~\表6.4.1 生命体征汇总 安全性分析集.rtf";
 
 %ReadRTF(file = %str(D:\~\表6.4.1 生命体征汇总 安全性分析集.rtf), outdata = t_6_4_1);
 
+%ReadRTF(file = %str(D:\~\表6.4.1 生命体征汇总 安全性分析集.rtf), outdata = t_6_4_1, del_rtf_ctrl = yes);
 ```
