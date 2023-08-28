@@ -40,7 +40,7 @@
 
 options cmplib = work.func;
 
-%macro ReadRTF(file, outdata, compress = yes);
+%macro ReadRTF(file, outdata, compress = yes, del_rtf_ctrl = yes);
 
     /*1. 获取文件路径*/
     %let reg_file_id = %sysfunc(prxparse(%bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|((?:[A-Za-z]:\\)[^\\\/:?"<>|]+(?:\\[^\\\/:?"<>|]+)*))$/)));
@@ -255,17 +255,45 @@ options cmplib = work.func;
         end;
     run;
 
+    /*5. 删除 RTF 控制字*/
+    %if %upcase(&del_rtf_ctrl) = YES %then %do;
+        /*控制字-空的分组*/
+        %let reg_ctrl_1 = %bquote({\s*}|(?<!\\)[{}]);
+        /*控制字-缩进*/
+        %let reg_ctrl_2 = %bquote(\\li\d+);
+        /*控制字-上标*/
+        %let reg_ctrl_3 = %bquote({\\super.*?}|\\super[^\\]+);
+        /*控制字-取消上下标*/
+        %let reg_ctrl_4 = %bquote(\\nosupersub);
 
-    /*5. 开始转码*/
+        /*合并reg_ctrl_1 ~ reg_ctrl_n*/
+        %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 4; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
+
+        data _tmp_rtf_raw_del_ctrl(compress = &compress);
+            set _tmp_rtf_raw;
+            reg_rtf_del_ctrl_id = prxparse("s/(?:&reg_ctrl)\s*//o");
+            if flag_header = "Y" or flag_data = "Y" then do;
+                context_raw = prxchange(reg_rtf_del_ctrl_id, -1, strip(context_raw));
+            end;
+        run;
+    %end;
+    %else %do;
+        data _tmp_rtf_raw_del_ctrl(compress = &compress);
+            set _tmp_rtf_raw;
+        run;
+    %end;
+
+
+    /*6. 开始转码*/
     data _tmp_rtf_context(compress = &compress);
-        set _tmp_rtf_raw;
+        set _tmp_rtf_raw_del_ctrl;
         if flag_header = "Y" or flag_data = "Y" then do;
             context = cell_transcode(context_raw);
         end;
     run;
 
 
-    /*6. 生成SAS数据集*/
+    /*7. 生成SAS数据集*/
     proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted(compress = &compress);
         by obs_seq obs_var_pointer;
     run;
@@ -277,7 +305,7 @@ options cmplib = work.func;
     run;
 
 
-    /*7. 处理变量标签*/
+    /*8. 处理变量标签*/
     proc sql noprint;
         /*获取所有层级的标签*/
         create table _tmp_rtf_header as
@@ -326,7 +354,7 @@ options cmplib = work.func;
     run;
 
 
-    /*8. 修改SAS数据集的属性*/
+    /*9. 修改SAS数据集的属性*/
     proc sql noprint;
         /*获取变量个数*/
         select nvar - 2 into : var_n from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_OUTDATA";
@@ -349,14 +377,14 @@ options cmplib = work.func;
     quit;
     
 
-    /*9. 最终输出*/
+    /*10. 最终输出*/
     data &outdata;
         set _tmp_outdata;
     run;
 
 
     %exit:
-    /*10. 清除中间数据集*/
+    /*11. 清除中间数据集*/
     proc datasets library = work nowarn noprint;
         delete _tmp_outdata
                _tmp_rtf_data
@@ -367,6 +395,7 @@ options cmplib = work.func;
                _tmp_rtf_header_expand
                _tmp_rtf_header_expand_polish
                _tmp_rtf_raw
+               _tmp_rtf_raw_del_ctrl
               ;
     quit;
 
