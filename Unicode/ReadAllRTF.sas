@@ -1,3 +1,49 @@
+/*
+详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
+## ReadAllRTF
+
+### 程序信息
+
+- 名称：ReadAllRTF.sas
+- 类型：Macro
+- 依赖：[ReadRTF](./ReadRTF.md)
+- 功能：将指定文件夹中的所有 RTF 文件转换为 SAS 数据集。
+
+### 程序执行流程
+1. 使用 DOS 命令获取指定文件夹中的所有 RTF 文件，将 RTF 文件列表存储在 `_tmp_rtf_list.txt` 中；
+2. 读取 `_tmp_rtf_list.txt` 文件，获取 RTF 文件名称，构建并执行 filename 语句；
+3. 调用宏 `%ReadRTF()`，将 RTF 文件转换为 SAS 数据集
+4. 删除临时数据集
+5. 删除 `_tmp_rtf_list.txt`
+
+### 参数
+
+#### DIR
+类型 : 必选参数
+
+取值 : 指定 RTF 文件所在文件夹名称，必须是一个合法的 Windows 文件夹路径，例如：`C:\Windows\Temp`
+
+#### OUTLIB
+类型 : 可选参数
+
+取值 : 指定输出数据集存放的逻辑库，该逻辑库必须事先定义，且逻辑库对应的物理路径必须存在
+
+默认值 : WORK
+
+#### VD
+类型 : 可选参数
+
+取值 : 指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被使用的一个字符
+
+默认值 : X
+
+#### COMPRESS
+参见 [COMPRESS](./ReadRTF.md#compress)
+
+#### DEL_RTF_CTRL
+参见 [DEL_RTF_CTRL](./ReadRTF.md#del_rtf_ctrl)
+*/
+
 options cmplib = work.func;
 %macro ReadAllRTF(dir, outlib = work, vd = X, compress = yes, del_rtf_ctrl = yes);
 
