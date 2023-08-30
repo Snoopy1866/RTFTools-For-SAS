@@ -80,6 +80,7 @@ OUTDATA = t_7_1_1
 - buffer2 : 匹配 Windows 路径名称，不支持匹配含有环境变量的路径（例如：`%TEMP%\~.rtf`）
 
 若 buffer 1 的内容不为空，则参数 FILE 指定的可能是一个文件引用
+
 若 buffer 2 的内容不为空，则参数 FILE 指定的可能是一个 Windows 文件路径
 
 在 buffer1 的内容不为空的前提下，使用 SAS 函数 `fileref()` 判断文件引用是否存在：
