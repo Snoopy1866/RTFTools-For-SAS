@@ -44,7 +44,7 @@
 参见 [DEL_RTF_CTRL](./ReadRTF.md#del_rtf_ctrl)
 */
 
-options cmplib = work.func;
+options cmplib = sasuser.func;
 %macro ReadAllRTF(dir, outlib = work, vd = X, compress = yes, del_rtf_ctrl = yes);
 
     /*1. 使用 DOS 命令获取所有 RTF 文件，存储在 _tmp_rtf_list.txt 中*/
