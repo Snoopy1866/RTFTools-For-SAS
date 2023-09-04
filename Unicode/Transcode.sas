@@ -53,7 +53,7 @@
 
 
 
-proc fcmp outlib = work.func.rtf;
+proc fcmp outlib = sasuser.func.rtf;
     function transcode(code_point $, raw_encoding $) $ 32767;
         length char $32767;
 

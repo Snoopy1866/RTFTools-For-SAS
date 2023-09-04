@@ -32,7 +32,7 @@
 取值 : RTF 单元格内的字符串，例如：`\'CA\'D4\'D1\'E9\'D7\'E9`, `\u35797;\u39564;\u32452;`
 */
 
-proc fcmp outlib = work.func.rtf inlib = work.func;
+proc fcmp outlib = sasuser.func.rtf inlib = sasuser.func;
     function cell_transcode(str $) $5000;
         reg_code_gbk_id = prxparse("/((?:\\\x27[0-9A-F]{2})+)/o");
         reg_code_utf8_id = prxparse("/((?:\\u\d{1,5};)+)/o");

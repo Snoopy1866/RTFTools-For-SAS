@@ -69,7 +69,7 @@ OUTDATA = t_7_1_1
 */
 
 
-options cmplib = work.func;
+options cmplib = sasuser.func;
 
 %macro ReadRTF(file, outdata, compress = yes, del_rtf_ctrl = yes);
 
