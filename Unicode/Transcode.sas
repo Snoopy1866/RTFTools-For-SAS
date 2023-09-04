@@ -8,7 +8,7 @@
 - 类型：PROC FCMP function
 - 依赖：[%_MACRO_TRANSCODE](#_macro_transcode)
 - 功能：不同编码格式的字符串可能互不兼容，例如：GBK 格式编码的字符串在 Unicode 环境下会显示乱码，本程序实现了将不同编码格式的码点转换为当前 SAS 环境下的字符串的功能。例如：将字符串 `CAD4D1E9D7E9` 转为 `试验组`；将字符串 `&#35797;&#39564;&#32452;` 转为 `试验组`。
-- 存储位置：WORK.FUNC.RTF
+- 存储位置：SASUSER.FUNC.RTF
 
 ### 程序执行流程
 1. 判断参数 RAW_ENCODING 的值，若为 UTF8，则调用 SAS 自带函数 `UNICODE()` 进行转换；若为其他值，则调用 `RUN_MACRO` 函数；
@@ -53,7 +53,7 @@
 
 
 
-proc fcmp outlib = sasuser.func.rtf;
+proc fcmp outlib = .func.rtf;
     function transcode(code_point $, raw_encoding $) $ 32767;
         length char $32767;
 
