@@ -6,7 +6,7 @@
 - 类型：PROC FCMP function
 - 依赖：[Transcode()](./Transcode.md)
 - 功能：RTF Specification 规定只能使用 7 位 ASCII 字符，若要显示非 ASCII 字符，必须使用转义符，对于 GBK 编码格式的字符串，使用类似 `\'CA\'D4` 的形式表示，对于 Unicode 字符，使用 `\u21015;` 进行表示，本程序实现了将这些非 ASCII 字符转为原始字符串的功能
-- 存储位置：WORK.FUNC.RTF
+- 存储位置：SASUSER.FUNC.RTF
 
 ### 程序执行流程
 1. 使用正则表达式判断参数 `STR` 的编码格式，具体如下：
