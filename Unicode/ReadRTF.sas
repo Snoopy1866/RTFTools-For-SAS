@@ -400,7 +400,7 @@ options cmplib = sasuser.func;
 
         alter table _tmp_outdata
             modify %do i = 1 %to &var_n;
-                       COL&i char(&&var_&i._maxlen) label = "(%superq(var_&i._label)",
+                       COL&i char(&&var_&i._maxlen) label = "%superq(var_&i._label)",
                    %end;
                        OBS_SEQ label = "序号";
         alter table _tmp_outdata
