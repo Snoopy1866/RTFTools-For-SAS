@@ -395,12 +395,12 @@ options cmplib = sasuser.func;
             select max(length(col&i)) into : var_&i._maxlen from _tmp_outdata;
 
             /*获取变量标签*/
-            select header_context into : var_&i._label from _tmp_rtf_header_expand_polish where var_pointer = &i;
+            select header_context into : var_&i._label trimmed from _tmp_rtf_header_expand_polish where var_pointer = &i;
         %end;
 
         alter table _tmp_outdata
             modify %do i = 1 %to &var_n;
-                       COL&i char(&&var_&i._maxlen) label = "%sysfunc(strip(%superq(var_&i._label)))",
+                       COL&i char(&&var_&i._maxlen) label = "(%superq(var_&i._label)",
                    %end;
                        OBS_SEQ label = "序号";
         alter table _tmp_outdata
