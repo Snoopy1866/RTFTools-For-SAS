@@ -57,7 +57,7 @@ options cmplib = sasuser.func;
         rtf_path = cats("&vd:\", rtf_name);
 
         /*识别表格和清单*/
-        reg_table_id = prxparse("/^((?:列)?表|清单)(\d+(?:\.\d+)*)\s+(.*)\.rtf\s*$/o");
+        reg_table_id = prxparse("/^((?:列)?表|清单)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf\s*$/o");
 
         if prxmatch(reg_table_id, rtf_name) then do;
             rtf_type = prxposn(reg_table_id, 1, rtf_name);
