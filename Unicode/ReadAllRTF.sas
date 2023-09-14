@@ -142,12 +142,10 @@ options cmplib = sasuser.func;
     run;
 
     /*4. 删除临时数据集*/
-    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete _tmp_rtf_list
               ;
     quit;
-    %end;
 
     /*5. 删除 _tmp_rtf_list.txt*/
     X " del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
