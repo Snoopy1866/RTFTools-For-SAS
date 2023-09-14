@@ -39,6 +39,7 @@
 - IS_TRANSCODE_SUCCESS = 0，转码失败
 */
 
+/*内置宏，仅供函数 run_macro() 使用*/
 %macro _macro_transcode;
     %let code_point = %sysfunc(dequote(&code_point));
     %let raw_encoding = %sysfunc(dequote(&raw_encoding));
@@ -52,7 +53,13 @@
 %mend;
 
 
+/*删除数据集 SASUSER.FUNC*/
+proc datasets library = sasuser noprint nowarn;
+    delete func;
+quit;
 
+
+/*自定义函数，用于解码*/
 proc fcmp outlib = sasuser.func.rtf;
     function transcode(code_point $, raw_encoding $) $ 32767;
         length char $32767;

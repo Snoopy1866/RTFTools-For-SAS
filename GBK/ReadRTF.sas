@@ -30,9 +30,15 @@
 #### FILE
 类型 : 必选参数
 
-取值 : 指定 RTF 文件路径或引用。指定的文件路径或者引用的文件路径必须是一个合法的 Windows 路径。您应当使用 `%str()` 函数将路径包围，路径不包含引号；当指定的 Windows 路径太长时，应当使用 filename 语句建议文件引用，否则会导致 SAS 无法正确读取。
+取值 : 指定 RTF 文件路径或引用。指定的文件路径或者引用的文件路径必须是一个合法的 Windows 路径。
+- 指定物理路径时，可以传入带引号的路径或不带引号的路径，若传入不带引号的路径，建议使用 `%str()` 将路径包围
+- 当指定的物理路径太长时，应当使用 filename 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
 
 举例 : 
+```
+FILE = "D:\~\表7.1.1 受试者分布 筛选人群.rtf"
+```
+
 ```
 FILE = %str(D:\~\表7.1.1 受试者分布 筛选人群.rtf)
 ```
@@ -60,21 +66,35 @@ OUTDATA = t_7_1_1
 
 默认值 : YES
 
+? 绝大部分情况下，参数 COMPRESS 都应当保持默认值，这虽然会增加一点点 CPU 时间，但可以节省大量磁盘占用空间，特别是在读取的 RTF 文件数据量特别大的情况下。经过测试，使用 COMPRESS = YES 平均可节省 95% 以上的磁盘占用空间。
+
+? 宏程序为保证读取的变量值不会被截断，读取时采用了 SAS 支持的最大变量长度 32767，在未指定 COMPRESS = YES 的情况下，几乎每张表格读取后所占用的磁盘空间都将超过 1G，这非常容易导致磁盘可用空间的急剧下滑，甚至会导致磁盘空间不足而报错，同时频繁大量读写也会迅速减少磁盘寿命。使用 COMPRESS = YES 通过略微牺牲 CPU 时间，获得低负载的磁盘读写，延长使用寿命。
+
 #### DEL_RTF_CTRL
 类型 : 可选参数
 
 取值 : 指定是否删除单元格中的控制字
 
 默认值 : YES
+
+#### DEL_TEMP_DATA
+类型：可选参数
+
+取值：指定是否删除宏程序运行过程产生的临时数据集，可选 YES|NO
+
+默认值：YES
+
+? 该参数通常用于调试，用户无需关注。
 */
 
 
 options cmplib = sasuser.func;
 
-%macro ReadRTF(file, outdata, compress = yes, del_rtf_ctrl = yes);
+%macro ReadRTF(file, outdata, compress = yes, del_rtf_ctrl = yes, del_temp_data = yes);
 
     /*1. 获取文件路径*/
-    %let reg_file_id = %sysfunc(prxparse(%bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|((?:[A-Za-z]:\\)[^\\\/:?"<>|]+(?:\\[^\\\/:?"<>|]+)*))$/)));
+    %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
+    %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
     %if %sysfunc(prxmatch(&reg_file_id, %superq(file))) = 0 %then %do;
         %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
         %goto exit;
@@ -416,19 +436,21 @@ options cmplib = sasuser.func;
 
     %exit:
     /*11. 清除中间数据集*/
-    proc datasets library = work nowarn noprint;
-        delete _tmp_outdata
-               _tmp_rtf_data
-               _tmp_rtf_data_polish
-               _tmp_rtf_context
-               _tmp_rtf_context_sorted
-               _tmp_rtf_header
-               _tmp_rtf_header_expand
-               _tmp_rtf_header_expand_polish
-               _tmp_rtf_raw
-               _tmp_rtf_raw_del_ctrl
-              ;
-    quit;
+    %if %upcase(&del_temp_data) = YES %then %do;
+        proc datasets library = work nowarn noprint;
+            delete _tmp_outdata
+                   _tmp_rtf_data
+                   _tmp_rtf_data_polish
+                   _tmp_rtf_context
+                   _tmp_rtf_context_sorted
+                   _tmp_rtf_header
+                   _tmp_rtf_header_expand
+                   _tmp_rtf_header_expand_polish
+                   _tmp_rtf_raw
+                   _tmp_rtf_raw_del_ctrl
+                  ;
+        quit;
+    %end;
 
     %put NOTE: 宏 ReadRTF 已结束运行！;
 %mend;
