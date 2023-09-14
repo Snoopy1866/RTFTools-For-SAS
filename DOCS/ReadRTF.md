@@ -28,9 +28,15 @@
 #### FILE
 类型 : 必选参数
 
-取值 : 指定 RTF 文件路径或引用。指定的文件路径或者引用的文件路径必须是一个合法的 Windows 路径。您应当使用 `%str()` 函数将路径包围，路径不包含引号；当指定的 Windows 路径太长时，应当使用 filename 语句建议文件引用，否则会导致 SAS 无法正确读取。
+取值 : 指定 RTF 文件路径或引用。指定的文件路径或者引用的文件路径必须是一个合法的 Windows 路径。
+- 指定物理路径时，可以传入带引号的路径或不带引号的路径，若传入不带引号的路径，建议使用 `%str()` 将路径包围
+- 当指定的物理路径太长时，应当使用 filename 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
 
 举例 : 
+```
+FILE = "D:\~\表7.1.1 受试者分布 筛选人群.rtf"
+```
+
 ```
 FILE = %str(D:\~\表7.1.1 受试者分布 筛选人群.rtf)
 ```
@@ -69,6 +75,15 @@ OUTDATA = t_7_1_1
 
 默认值 : YES
 
+#### DEL_TEMP_DATA
+类型：可选参数
+
+取值：指定是否删除宏程序运行过程产生的临时数据集，可选 YES|NO
+
+默认值：YES
+
+⚠ 该参数通常用于调试，用户无需关注。
+
 ### 细节
 
 #### 1. 如何根据参数 FILE 的值获取文件的物理路径
@@ -76,7 +91,7 @@ OUTDATA = t_7_1_1
 首先，SAS 文件引用名称不超过 8 个字符，且必须是一个合法的 SAS 名称；可根据下列正则表达式初步判断是文件路径还是文件引用：
 
 ```
-/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|((?:[A-Za-z]:\\)[^\\\/:?"<>|]+(?:\\[^\\\/:?"<>|]+)*))$/
+/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/
 ```
 
 上述正则表达式包含两个 buffer：
@@ -199,18 +214,16 @@ s/(?:<reg_ctrl>)\s*//o
 ### 示例程序
 
 ```sas
-/*GBK*/
-filename rtf "D:\~\表7.1.1 受试者分布 筛选人群.rtf";
-%ReadRTF(file = rtf, outdata = t_7_1_1);
+%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1);
+
+%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = yes);
+
+%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = yes, del_rtf_ctrl = yes);
+
+%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = yes, del_rtf_ctrl = yes, del_temp_data = yes);
 
 %ReadRTF(file = %str(D:\~\表7.1.1 受试者分布 筛选人群.rtf), outdata = t_7_1_1);
 
-/*Unicode*/
-filename rtf "D:\~\表6.4.1 生命体征汇总 安全性分析集.rtf";
-
-%ReadRTF(file = rtf, outdata = t_6_4_1);
-
-%ReadRTF(file = %str(D:\~\表6.4.1 生命体征汇总 安全性分析集.rtf), outdata = t_6_4_1);
-
-%ReadRTF(file = %str(D:\~\表6.4.1 生命体征汇总 安全性分析集.rtf), outdata = t_6_4_1, del_rtf_ctrl = yes);
+filename rtfref "D:\~\表7.1.1 受试者分布 筛选人群.rtf";
+%ReadRTF(file = rtfref, outdata = t_7_1_1);
 ```

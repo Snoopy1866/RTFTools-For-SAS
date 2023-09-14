@@ -19,7 +19,23 @@
 #### DIR
 类型 : 必选参数
 
-取值 : 指定 RTF 文件所在文件夹名称，必须是一个合法的 Windows 文件夹路径，例如：`C:\Windows\Temp`
+取值 : 指定 RTF 文件所在目录路径或引用。指定的目录路径或者引用的目录路径必须是一个合法的 Windows 路径。
+- 指定物理路径时，可以传入带引号的路径或不带引号的路径，若传入不带引号的路径，建议使用 `%str()` 将路径包围
+- 当指定的物理路径太长时，应当使用 filename 语句建立目录引用，然后传入目录引用，否则会导致 SAS 无法正确读取。
+
+举例 : 
+```
+DIR = "D:\~\01 table"
+```
+
+```
+DIR = %str(D:\~\01 table)
+```
+
+```
+filename ref "D:\~\01 table";
+DIR = ref;
+```
 
 #### OUTLIB
 类型 : 可选参数
@@ -117,14 +133,19 @@ buffer3 的内容将作为输出数据集的标签。
 ### 示例程序
 
 ```sas
-%ReadAllRTF(dir = %str(D:\~\TFL\table));
+%ReadAllRTF(dir = "D:\~\TFL\table");
 
 libname qc "D:\qc";
-%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc);
+%ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc);
 
-%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X);
+%ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc, vd = X);
 
-%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X, compress = yes);
+%ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc, vd = X, compress = yes);
+
+%ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc, vd = X, compress = yes, del_rtf_ctrl = yes);
 
 %ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X, compress = yes, del_rtf_ctrl = yes);
+
+filename dirref "D:\~\TFL\table";
+%ReadAllRTF(dir = dirref, outlib = qc, vd = X, compress = yes, del_rtf_ctrl = yes);
 ```
