@@ -4,7 +4,7 @@
 
 - 名称：ReadAllRTF.sas
 - 类型：Macro
-- 依赖：[ReadRTF](./ReadRTF.md)
+- 依赖：[Transcode](./Transcode.md) -> [Cell_Transcode](./Cell_Transcode.md) -> [ReadRTF](./ReadRTF.md) -> [ReadAllRTF](./ReadAllRTF.md)
 - 功能：将指定文件夹中的所有 RTF 文件转换为 SAS 数据集。
 
 ### 程序执行流程

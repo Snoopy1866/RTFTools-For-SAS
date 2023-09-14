@@ -4,7 +4,7 @@
 
 - 名称：ReadRTF.sas
 - 类型：Macro
-- 依赖：[Cell_Transcode](./Cell_Transcode.md)
+- 依赖：[Transcode](./Transcode.md) -> [Cell_Transcode](./Cell_Transcode.md) -> [ReadRTF](./ReadRTF.md)
 - 功能：SAS ODS RTF 使用 RTF 1.6 specification 输出 RTF 文件，本程序实现了将输出的 RTF 文件逆向转为 SAS 数据集的功能。
 
 ### 程序执行流程
