@@ -71,10 +71,11 @@ OUTDATA = t_7_1_1
 
 options cmplib = sasuser.func;
 
-%macro ReadRTF(file, outdata, compress = yes, del_rtf_ctrl = yes);
+%macro ReadRTF(file, outdata, compress = yes, del_rtf_ctrl = yes, del_temp_data = yes);
 
     /*1. 获取文件路径*/
-    %let reg_file_id = %sysfunc(prxparse(%bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|((?:[A-Za-z]:\\)[^\\\/:?"<>|]+(?:\\[^\\\/:?"<>|]+)*))$/)));
+    %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
+    %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
     %if %sysfunc(prxmatch(&reg_file_id, %superq(file))) = 0 %then %do;
         %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
         %goto exit;
@@ -416,19 +417,21 @@ options cmplib = sasuser.func;
 
     %exit:
     /*11. 清除中间数据集*/
-    proc datasets library = work nowarn noprint;
-        delete _tmp_outdata
-               _tmp_rtf_data
-               _tmp_rtf_data_polish
-               _tmp_rtf_context
-               _tmp_rtf_context_sorted
-               _tmp_rtf_header
-               _tmp_rtf_header_expand
-               _tmp_rtf_header_expand_polish
-               _tmp_rtf_raw
-               _tmp_rtf_raw_del_ctrl
-              ;
-    quit;
+    %if %upcase(&del_temp_data) = YES %then %do;
+        proc datasets library = work nowarn noprint;
+            delete _tmp_outdata
+                   _tmp_rtf_data
+                   _tmp_rtf_data_polish
+                   _tmp_rtf_context
+                   _tmp_rtf_context_sorted
+                   _tmp_rtf_header
+                   _tmp_rtf_header_expand
+                   _tmp_rtf_header_expand_polish
+                   _tmp_rtf_raw
+                   _tmp_rtf_raw_del_ctrl
+                  ;
+        quit;
+    %end;
 
     %put NOTE: 宏 ReadRTF 已结束运行！;
 %mend;
