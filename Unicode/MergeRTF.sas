@@ -269,7 +269,7 @@
 
     /*11. 输出 rtf 文件*/
     %if %qupcase(&out) = #AUTO %then %do;
-        %let date = %sysfunc(putn(%sysfunc(today()), yymmdd.));
+        %let date = %sysfunc(putn(%sysfunc(today()), yyyymmdd.));
         %let time = %sysfunc(time());
         %let hour = %sysfunc(putn(%sysfunc(hour(&time)), z2.));
         %let minu = %sysfunc(putn(%sysfunc(minute(&time)), z2.));
