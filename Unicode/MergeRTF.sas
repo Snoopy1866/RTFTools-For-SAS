@@ -3,7 +3,7 @@
 
 */
 
-%macro MergeRTF(dir, out = #auto, depth = 2, order = #auto, vd = X, exclude = #null, prev_rm_sect = yes, merge = yes);
+%macro MergeRTF(dir, out = #auto, depth = 2, order = #auto, vd = X, exclude = #null, merge = yes);
     /*1. 获取目录路径*/
     %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
