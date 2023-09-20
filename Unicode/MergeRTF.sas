@@ -1,6 +1,116 @@
 /*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 
+## MergeRTF
+
+### 程序信息
+
+- 名称：MergeRTF.sas
+- 类型：Macro
+- 依赖：无
+- 功能：合并文件夹中的 RTF 文件。
+
+### 程序执行流程
+
+1. 根据参数 DIR 的值获取文件夹的物理路径
+2. 使用 DOS 命令 `dir` 获取所有 RTF 文件，将文件路径存储在参数 DIR 指定的文件夹下的 `_tmp_rtf_list.txt` 中
+3. 读取 `_tmp_rtf_list.txt`，识别、筛选符合要求的 RTF 文件
+4. 对 RTF 文件进行排序
+5. 对 RTF 文件建立文件引用（`filename` 语句）
+6. 读取 RTF 文件
+7. 检测 RTF 文件是否由 SAS 生成，且未被其他应用程序修改
+8. 获取可以合并的 RTF 文件的引用列表
+9. 处理 RTF 文件
+10. 合并 RTF 文件
+11. 输出合并后的 RTF 文件
+
+### 参数
+
+#### DIR
+
+类型 : 必选参数
+
+取值 : 指定 RTF 文件夹路径或引用。指定的文件夹路径或者引用的文件夹路径必须是一个合法的 Windows 路径。
+
+- 指定物理路径时，可以传入带引号的路径或不带引号的路径，若传入不带引号的路径，建议使用 `%str()` 将路径包围
+- 当指定的物理路径太长时，应当使用 filename 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
+
+举例 :
+
+```
+DIR = "D:\~\TFL"
+```
+
+```
+FILE = %str(D:\~\TFL)
+```
+
+```
+filename ref "D:\~\TFL";
+FILE = ref;
+```
+
+#### OUT
+
+类型 : 可选参数
+
+取值 : 指定合并后的 RTF 文件名称
+
+默认值 : `merged-yyyy-mm-dd hh-mm-ss.rtf`，其中 `yyyy-mm-dd` 表示当前系统日期，`hh-mm-ss` 表示当前系统时间。
+
+举例 :
+
+```
+out = "合并表格.rtf"
+
+out = #auto
+```
+
+#### DEPTH
+
+类型 : 可选参数
+
+取值 : 指定读取子文件夹中 RTF 文件的递归深度
+
+默认值 : 2
+
+该参数适用于 `DIR` 指定的文件夹根目录没有任何 RTF 文件，但其子文件夹存在文件的情况。
+
+例如：某项目的 RTF 文件按照其类型，存储在 `~\TFL` 目录下的 `table`, `figure`, `listing` 中，此时指定 `depth = 2`，宏程序将读取根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 中的所有 RTF 文件，但不会读取 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 下的子文件夹中的 RTF 文件。
+
+#### ORDER
+
+类型 : 可选参数
+
+取值 : 指定排列顺序，暂无作用
+
+默认值 : #auto
+
+#### VD
+
+类型：可选参数
+
+取值：指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被使用的一个字符
+
+默认值：X
+
+#### EXCLUDE
+
+类型：可选参数
+
+取值：指定排除名单，暂无作用
+
+默认值：#null
+
+#### MERGE
+
+类型：可选参数
+
+取值：指定是否执行合并，可选 `YES|NO`
+
+默认值：yes
+
+💡 这个参数通常用于对宏程序的调试，不过如果你需要合并的 RTF 文件过多，或者你不确定指定的参数是否正确（尤其是参数 `DEPTH`），可以先指定参数 `MERGE = NO`，此时宏程序将不会执行合并操作，但会输出数据集 `WORK.RTF_LIST`，你可以查看此数据集，了解具体将会被合并的 RTF 文件。在该数据集中，仅当变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 同时为 `Y` 时，对应路径上的 RTF 文件才会被合并。
 */
 
 %macro MergeRTF(dir, out = #auto, depth = 2, order = #auto, vd = X, exclude = #null, merge = yes);
