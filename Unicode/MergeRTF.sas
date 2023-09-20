@@ -107,11 +107,15 @@
     %end;
 
     /*仅列出而不合并 rtf 文件，用于调试和试运行*/
-    %if %qupcase(&merge) = NO %then %do;
+    %if %upcase(&merge) = NO %then %do;
         data rtf_list;
             set _tmp_rtf_list_add_lv_sorted;
+            label rtf_path = "路径"
+                  rtf_filename_valid_flag = "文件名是否规范"
+                  rtf_depth_valid_flag = "文件是否在指定深度内";
+            keep rtf_path rtf_filename_valid_flag rtf_depth_valid_flag;
         run;
-        %goto exit;
+        %goto exit_with_no_merge;
     %end;
 
     /*----------------临时关闭日志输出------------------*/
@@ -291,7 +295,7 @@
 
 
     /*11. 输出 rtf 文件*/
-    %if %qupcase(&out) = #AUTO %then %do;
+    %if %upcase(&out) = #AUTO %then %do;
         %let date = %sysfunc(putn(%sysfunc(today()), yymmdd10.));
         %let time = %sysfunc(time());
         %let hour = %sysfunc(putn(%sysfunc(hour(&time)), z2.));
@@ -330,27 +334,38 @@
     proc printto log=_null_;
     run;
 
-    /*13. 删除临时数据集*/
+    /*删除临时数据集*/
+    proc datasets library = work nowarn noprint;
+        delete %do i = 1 %to &rtf_ref_max;
+                   _tmp_rtf&i
+               %end;
+              ;
+    quit;
+
+    %exit_with_no_merge:
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_;
+    run;
+
+    /*删除临时数据集*/
     proc datasets library = work nowarn noprint;
         delete _tmp_rtf_list
                _tmp_rtf_list_add_lv
                _tmp_rtf_list_add_lv_sorted
                _tmp_rtf_list_fnst
                _tmp_rtf_merged
-               %do i = 1 %to &rtf_ref_max;
-                   _tmp_rtf&i
-               %end;
               ;
     quit;
+
 
     /*----------------恢复日志输出------------------*/
     proc printto log=log;
     run;
 
-    /*14. 删除 _tmp_rtf_list.txt*/
+    /*删除 _tmp_rtf_list.txt*/
     X "del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
 
-    /*15. 删除 _null_.log 文件*/
+    /*删除 _null_.log 文件*/
     X "del _null_.log & exit";
 
     %put NOTE: 宏 MergeRTF 已结束运行！;
