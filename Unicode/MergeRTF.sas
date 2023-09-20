@@ -329,6 +329,7 @@ out = #auto
 
       结尾的 rtf 文件，保留末尾的 }
     */
+    options symbolgen mlogic mprint;
     %let mergeable_rtf_ref_max = %sysfunc(countw(&mergeable_rtf_list, %bquote( )));
     %do i = 1 %to &mergeable_rtf_ref_max;
         %let mergeable_rtf_&i._start_time = %sysfunc(time()); /*记录单个 rtf 文件处理开始时间*/
@@ -345,7 +346,7 @@ out = #auto
                 %end;
 
                 /*分节符处理*/
-                reg_sectd_id = prxparse("/^\\sectd\\linex\d\\endnhere\\pgwsxn\d+\\pghsxn\d+\\lndscpsxn\\headery\d+\\footery\d+\\marglsxn\d+\\margrsxn\d+\\margtsxn\d+\\margbsxn\d+$/o");
+                reg_sectd_id = prxparse("/^\\sectd\\linex\d\\endnhere\\pgwsxn\d+\\pghsxn\d+\\lndscpsxn(?:\\pgnrestart\\pgnstarts\d)?\\headery\d+\\footery\d+\\marglsxn\d+\\margrsxn\d+\\margtsxn\d+\\margbsxn\d+$/o");
                 if fst_sectd_found = 0 then do; /*首次发现 \sectd，在\sectd 前面添加 \sect，以便生成 rtf 文件之间的分节符*/
                     if prxmatch(reg_sectd_id, strip(line)) then do;
                         line = cats("\sect", strip(line)); 
@@ -359,12 +360,15 @@ out = #auto
                 /*大纲级别标记处理*/
                 length former_outlinelevel_text latter_outlinelevel_text $32.;
                 retain former_outlinelevel_text ""; /*用于比较的大纲级别文本*/
-                reg_outlinelevel_id = prxparse("/\\outlinelevel\d{(.*)}/o");
-                reg_outlinelevel_change_id = prxparse("s/\\outlinelevel\d//o");
+                reg_outlinelevel_id = prxparse("/{\\\*\\bkmkstart\sIDX\d*}.*{\\\*\\bkmkend\sIDX\d*}/o");
+                reg_outlinelevel_change_id = prxparse("s/{\\\*\\bkmkstart\sIDX\d*}.*{\\\*\\bkmkend\sIDX\d*}//o");
+                reg_outlinelevel_delmark_id = prxparse("s/\\outlinelevel|\\s\d+//o");
                 if prxmatch(reg_outlinelevel_id, strip(line)) then do;
-                    latter_outlinelevel_text = hashing('MD5', prxposn(reg_outlinelevel_id, 1, strip(line)));
+                    latter_outlinelevel_text = hashing('MD5', prxchange(reg_outlinelevel_change_id, 1, strip(line)));
+
+/*                    latter_outlinelevel_text = hashing('MD5', prxposn(reg_outlinelevel_id, 1, strip(line)));*/
                     if former_outlinelevel_text = latter_outlinelevel_text then do;
-                        line = prxchange(reg_outlinelevel_change_id, 1, strip(line)); /*删除重复的大纲级别标记*/
+                        line = prxchange(reg_outlinelevel_delmark_id, 1, strip(line)); /*删除重复的大纲级别标记*/
                     end;
                     else do;
                         former_outlinelevel_text = latter_outlinelevel_text; /*更新用于比较的大纲级别文本*/
@@ -373,8 +377,13 @@ out = #auto
  
                 drop fst_sectd_found reg_sectd_id;
 
+
             %if %sysevalf(&i < &mergeable_rtf_ref_max) %then %do; /*删除末尾的 }（结尾的 rtf 文件保留 }）*/
-                if end then delete;
+                /*
+                  防止空表导致下一张表跑到前一张表的结尾，加上这么一段控制字，正好要删掉结尾的 }，所以就直接修改了，
+                  具体为什么这么写我也忘记了，最后一张表是空表的情况无需加上这段，因为没必要，后面也没有表了
+                */
+                if end then line = "\pard\pard\b0\i0\chcbpat8\qc\f1\fs21\cf1{}\ql\cf0\chcbpat0";
             %end;
         run;
 
@@ -383,8 +392,9 @@ out = #auto
             select rtf_path into : rtf_path_&i trimmed from _tmp_rtf_list_fnst where fileref = "&mergeable_rtf_ref";
         quit;
         %let mergeable_rtf_&i._end_time = %sysfunc(time()); /*记录单个 rtf 文件处理结束时间*/
-        %let mergeable_rtf_&i._spend_time = %sysfunc(putn(%sysevalf(&mergeable_rtf_&i._end_time - &mergeable_rtf_&i._start_time), 8.2)); /*计算单个 rtf 文件处理耗时*/
+        %let mergeable_rtf_&i._spend_time = %sysfunc(putn(%sysevalf(&&mergeable_rtf_&i._end_time - &&mergeable_rtf_&i._start_time), 8.2)); /*计算单个 rtf 文件处理耗时*/
     %end;
+    options nosymbolgen nomlogic nomprint;
 
 
     /*10. 合并 rtf 文件*/
@@ -445,12 +455,14 @@ out = #auto
     run;
 
     /*删除临时数据集*/
+    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete %do i = 1 %to &rtf_ref_max;
                    _tmp_rtf&i
                %end;
               ;
     quit;
+    %end;
 
     %exit_with_no_merge:
     /*----------------临时关闭日志输出------------------*/
@@ -458,6 +470,7 @@ out = #auto
     run;
 
     /*删除临时数据集*/
+    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete _tmp_rtf_list
                _tmp_rtf_list_add_lv
@@ -466,6 +479,7 @@ out = #auto
                _tmp_rtf_merged
               ;
     quit;
+    %end;
 
 
     /*----------------恢复日志输出------------------*/
@@ -475,8 +489,10 @@ out = #auto
     /*删除 _tmp_rtf_list.txt*/
     X "del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
 
+    %if 1 > 2 %then %do;
     /*删除 _null_.log 文件*/
     X "del _null_.log & exit";
+    %end;
 
     %put NOTE: 宏 MergeRTF 已结束运行！;
 %mend;
