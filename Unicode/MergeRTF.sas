@@ -455,14 +455,12 @@ out = #auto
     run;
 
     /*删除临时数据集*/
-    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete %do i = 1 %to &rtf_ref_max;
                    _tmp_rtf&i
                %end;
               ;
     quit;
-    %end;
 
     %exit_with_no_merge:
     /*----------------临时关闭日志输出------------------*/
@@ -470,7 +468,6 @@ out = #auto
     run;
 
     /*删除临时数据集*/
-    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete _tmp_rtf_list
                _tmp_rtf_list_add_lv
@@ -479,7 +476,6 @@ out = #auto
                _tmp_rtf_merged
               ;
     quit;
-    %end;
 
 
     /*----------------恢复日志输出------------------*/
@@ -489,10 +485,8 @@ out = #auto
     /*删除 _tmp_rtf_list.txt*/
     X "del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
 
-    %if 1 > 2 %then %do;
     /*删除 _null_.log 文件*/
     X "del _null_.log & exit";
-    %end;
 
     %put NOTE: 宏 MergeRTF 已结束运行！;
 %mend;
