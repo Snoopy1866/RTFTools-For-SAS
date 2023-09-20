@@ -114,7 +114,8 @@
         %goto exit;
     %end;
 
-    proc printto log=_null_; /*临时关闭日志输出*/
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_; 
     run;
 
     /*5. 构造 filename 语句，建立文件引用*/
@@ -168,30 +169,38 @@
     %end;
 
 
-    proc printto log=log; /*恢复日志输出*/
-    run;
 
     /*8. 获取可合并的 rtf 文件引用列表*/
     %let mergeable_rtf_list = %bquote(); 
+    %let unmergeable_rtf_index = 0;
     %do i = 1 %to &rtf_ref_max;
         %if &&rtf&i._modified_flag = N %then %do;
             %let mergeable_rtf_list = &mergeable_rtf_list rtf&i;
         %end;
         %else %do;
+            %let unmergeable_rtf_index = %eval(&unmergeable_rtf_index + 1);
             proc sql noprint;
-                select rtf_path into : rtf_path trimmed from _tmp_rtf_list_fnst where fileref = "rtf&i";
+                select rtf_path into : rtf_path_&unmergeable_rtf_index trimmed from _tmp_rtf_list_fnst where fileref = "rtf&i";
             quit;
-            %put ERROR: 文件 %superq(rtf_path) 似乎被修改了，已跳过该文件！;
         %end;
     %end;
+    %let unmergeable_rtf_sum = &unmergeable_rtf_index;
+
+    /*----------------恢复日志输出------------------*/
+    proc printto log=log;
+    run;
 
     %if &mergeable_rtf_list = %bquote() %then %do;
         %put ERROR: 文件夹 &dirloc 内没有可以合并的 rtf 文件！;
         %goto exit;
     %end;
 
+    %do i = 1 %to &unmergeable_rtf_sum;
+        %put ERROR: 文件 %superq(rtf_path_&i) 似乎被修改了，已跳过该文件！;
+    %end;
 
-    proc printto log=_null_; /*临时关闭日志输出*/
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_;
     run;
 
     /*9. 处理 rtf 文件*/
@@ -208,9 +217,11 @@
     */
     %let mergeable_rtf_ref_max = %sysfunc(countw(&mergeable_rtf_list, %bquote( )));
     %do i = 1 %to &mergeable_rtf_ref_max;
-        %let mid_mergeable_rtf_ref = %scan(&mergeable_rtf_list, &i, %bquote( ));
-        data _tmp_&mid_mergeable_rtf_ref(compress = yes);
-            set _tmp_&mid_mergeable_rtf_ref end = end;
+        %let mergeable_rtf_&i._start_time = %sysfunc(time()); /*记录单个 rtf 文件处理开始时间*/
+
+        %let mergeable_rtf_ref = %scan(&mergeable_rtf_list, &i, %bquote( ));
+        data _tmp_&mergeable_rtf_ref(compress = yes);
+            set _tmp_&mergeable_rtf_ref end = end;
             
                 %if %sysevalf(&i = 1) %then %do;
                     retain fst_sectd_found 1; /*开头的 rtf 文件不需要考虑是否已经找到第一行 \sectd，因此赋值为 1*/
@@ -252,6 +263,13 @@
                 if end then delete;
             %end;
         run;
+
+        /*获取可合并的 rtf 文件名*/
+        proc sql noprint;
+            select rtf_path into : rtf_path_&i trimmed from _tmp_rtf_list_fnst where fileref = "&mergeable_rtf_ref";
+        quit;
+        %let mergeable_rtf_&i._end_time = %sysfunc(time()); /*记录单个 rtf 文件处理结束时间*/
+        %let mergeable_rtf_&i._spend_time = %sysfunc(putn(%sysevalf(&mergeable_rtf_&i._end_time - &mergeable_rtf_&i._start_time), 8.2)); /*计算单个 rtf 文件处理耗时*/
     %end;
 
 
@@ -263,13 +281,18 @@
             ;
     run;
 
-
-    proc printto log=log; /*恢复日志输出*/
+    /*----------------恢复日志输出------------------*/
+    proc printto log=log;
     run;
+
+    %do i = 1 %to &mergeable_rtf_ref_max;
+        %put NOTE: 文件 %superq(rtf_path_&i) 合并完成，耗时 &&mergeable_rtf_&i._spend_time s！;
+    %end;
+
 
     /*11. 输出 rtf 文件*/
     %if %qupcase(&out) = #AUTO %then %do;
-        %let date = %sysfunc(putn(%sysfunc(today()), yyyymmdd.));
+        %let date = %sysfunc(putn(%sysfunc(today()), yymmdd10.));
         %let time = %sysfunc(time());
         %let hour = %sysfunc(putn(%sysfunc(hour(&time)), z2.));
         %let minu = %sysfunc(putn(%sysfunc(minute(&time)), z2.));
@@ -277,7 +300,11 @@
         %let out = %bquote(merged-&date &hour-&minu-&secd..rtf);
     %end;
     %else %do;
-        %let out = %sysfunc(compress(%superq(out), %bquote(%nrstr(%"%'))));
+        %let reg_out_id = %sysfunc(prxparse(%bquote(/^[%str(%"%')]?(.+?)[%str(%"%')]?$/o)));
+        %if %sysfunc(prxmatch(&reg_out_id, %superq(out))) %then %do;
+            %let out = %bquote(%sysfunc(prxposn(&reg_out_id, 1, %superq(out))));
+        %end;
+        %put &=out;
     %end;
     data _null_;
         set _tmp_rtf_merged;
@@ -299,6 +326,9 @@
 
 
     %exit:
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_;
+    run;
 
     /*13. 删除临时数据集*/
     proc datasets library = work nowarn noprint;
@@ -312,6 +342,10 @@
                %end;
               ;
     quit;
+
+    /*----------------恢复日志输出------------------*/
+    proc printto log=log;
+    run;
 
     /*14. 删除 _tmp_rtf_list.txt*/
     X "del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
