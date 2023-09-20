@@ -1,9 +1,119 @@
 /*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 
+## MergeRTF
+
+### 程序信息
+
+- 名称：MergeRTF.sas
+- 类型：Macro
+- 依赖：无
+- 功能：合并文件夹中的 RTF 文件。
+
+### 程序执行流程
+
+1. 根据参数 DIR 的值获取文件夹的物理路径
+2. 使用 DOS 命令 `dir` 获取所有 RTF 文件，将文件路径存储在参数 DIR 指定的文件夹下的 `_tmp_rtf_list.txt` 中
+3. 读取 `_tmp_rtf_list.txt`，识别、筛选符合要求的 RTF 文件
+4. 对 RTF 文件进行排序
+5. 对 RTF 文件建立文件引用（`filename` 语句）
+6. 读取 RTF 文件
+7. 检测 RTF 文件是否由 SAS 生成，且未被其他应用程序修改
+8. 获取可以合并的 RTF 文件的引用列表
+9. 处理 RTF 文件
+10. 合并 RTF 文件
+11. 输出合并后的 RTF 文件
+
+### 参数
+
+#### DIR
+
+类型 : 必选参数
+
+取值 : 指定 RTF 文件夹路径或引用。指定的文件夹路径或者引用的文件夹路径必须是一个合法的 Windows 路径。
+
+- 指定物理路径时，可以传入带引号的路径或不带引号的路径，若传入不带引号的路径，建议使用 `%str()` 将路径包围
+- 当指定的物理路径太长时，应当使用 filename 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
+
+举例 :
+
+```
+DIR = "D:\~\TFL"
+```
+
+```
+FILE = %str(D:\~\TFL)
+```
+
+```
+filename ref "D:\~\TFL";
+FILE = ref;
+```
+
+#### OUT
+
+类型 : 可选参数
+
+取值 : 指定合并后的 RTF 文件名称
+
+默认值 : `merged-yyyy-mm-dd hh-mm-ss.rtf`，其中 `yyyy-mm-dd` 表示当前系统日期，`hh-mm-ss` 表示当前系统时间。
+
+举例 :
+
+```
+out = "合并表格.rtf"
+
+out = #auto
+```
+
+#### DEPTH
+
+类型 : 可选参数
+
+取值 : 指定读取子文件夹中 RTF 文件的递归深度
+
+默认值 : 2
+
+该参数适用于 `DIR` 指定的文件夹根目录没有任何 RTF 文件，但其子文件夹存在文件的情况。
+
+例如：某项目的 RTF 文件按照其类型，存储在 `~\TFL` 目录下的 `table`, `figure`, `listing` 中，此时指定 `depth = 2`，宏程序将读取根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 中的所有 RTF 文件，但不会读取 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 下的子文件夹中的 RTF 文件。
+
+#### ORDER
+
+类型 : 可选参数
+
+取值 : 指定排列顺序，暂无作用
+
+默认值 : #auto
+
+#### VD
+
+类型：可选参数
+
+取值：指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被使用的一个字符
+
+默认值：X
+
+#### EXCLUDE
+
+类型：可选参数
+
+取值：指定排除名单，暂无作用
+
+默认值：#null
+
+#### MERGE
+
+类型：可选参数
+
+取值：指定是否执行合并，可选 `YES|NO`
+
+默认值：yes
+
+?? 这个参数通常用于对宏程序的调试，不过如果你需要合并的 RTF 文件过多，或者你不确定指定的参数是否正确（尤其是参数 `DEPTH`），可以先指定参数 `MERGE = NO`，此时宏程序将不会执行合并操作，但会输出数据集 `WORK.RTF_LIST`，你可以查看此数据集，了解具体将会被合并的 RTF 文件。在该数据集中，仅当变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 同时为 `Y` 时，对应路径上的 RTF 文件才会被合并。
 */
 
-%macro MergeRTF(dir, out = #auto, depth = 2, order = #auto, vd = X, exclude = #null, prev_rm_sect = yes, merge = yes);
+%macro MergeRTF(dir, out = #auto, depth = 2, order = #auto, vd = X, exclude = #null, merge = yes);
     /*1. 获取目录路径*/
     %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
@@ -107,14 +217,19 @@
     %end;
 
     /*仅列出而不合并 rtf 文件，用于调试和试运行*/
-    %if %qupcase(&merge) = NO %then %do;
+    %if %upcase(&merge) = NO %then %do;
         data rtf_list;
             set _tmp_rtf_list_add_lv_sorted;
+            label rtf_path = "路径"
+                  rtf_filename_valid_flag = "文件名是否规范"
+                  rtf_depth_valid_flag = "文件是否在指定深度内";
+            keep rtf_path rtf_filename_valid_flag rtf_depth_valid_flag;
         run;
-        %goto exit;
+        %goto exit_with_no_merge;
     %end;
 
-    proc printto log=_null_; /*临时关闭日志输出*/
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_; 
     run;
 
     /*5. 构造 filename 语句，建立文件引用*/
@@ -168,30 +283,38 @@
     %end;
 
 
-    proc printto log=log; /*恢复日志输出*/
-    run;
 
     /*8. 获取可合并的 rtf 文件引用列表*/
     %let mergeable_rtf_list = %bquote(); 
+    %let unmergeable_rtf_index = 0;
     %do i = 1 %to &rtf_ref_max;
         %if &&rtf&i._modified_flag = N %then %do;
             %let mergeable_rtf_list = &mergeable_rtf_list rtf&i;
         %end;
         %else %do;
+            %let unmergeable_rtf_index = %eval(&unmergeable_rtf_index + 1);
             proc sql noprint;
-                select rtf_path into : rtf_path trimmed from _tmp_rtf_list_fnst where fileref = "rtf&i";
+                select rtf_path into : rtf_path_&unmergeable_rtf_index trimmed from _tmp_rtf_list_fnst where fileref = "rtf&i";
             quit;
-            %put ERROR: 文件 %superq(rtf_path) 似乎被修改了，已跳过该文件！;
         %end;
     %end;
+    %let unmergeable_rtf_sum = &unmergeable_rtf_index;
+
+    /*----------------恢复日志输出------------------*/
+    proc printto log=log;
+    run;
 
     %if &mergeable_rtf_list = %bquote() %then %do;
         %put ERROR: 文件夹 &dirloc 内没有可以合并的 rtf 文件！;
         %goto exit;
     %end;
 
+    %do i = 1 %to &unmergeable_rtf_sum;
+        %put ERROR: 文件 %superq(rtf_path_&i) 似乎被修改了，已跳过该文件！;
+    %end;
 
-    proc printto log=_null_; /*临时关闭日志输出*/
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_;
     run;
 
     /*9. 处理 rtf 文件*/
@@ -208,9 +331,11 @@
     */
     %let mergeable_rtf_ref_max = %sysfunc(countw(&mergeable_rtf_list, %bquote( )));
     %do i = 1 %to &mergeable_rtf_ref_max;
-        %let mid_mergeable_rtf_ref = %scan(&mergeable_rtf_list, &i, %bquote( ));
-        data _tmp_&mid_mergeable_rtf_ref(compress = yes);
-            set _tmp_&mid_mergeable_rtf_ref end = end;
+        %let mergeable_rtf_&i._start_time = %sysfunc(time()); /*记录单个 rtf 文件处理开始时间*/
+
+        %let mergeable_rtf_ref = %scan(&mergeable_rtf_list, &i, %bquote( ));
+        data _tmp_&mergeable_rtf_ref(compress = yes);
+            set _tmp_&mergeable_rtf_ref end = end;
             
                 %if %sysevalf(&i = 1) %then %do;
                     retain fst_sectd_found 1; /*开头的 rtf 文件不需要考虑是否已经找到第一行 \sectd，因此赋值为 1*/
@@ -252,6 +377,13 @@
                 if end then delete;
             %end;
         run;
+
+        /*获取可合并的 rtf 文件名*/
+        proc sql noprint;
+            select rtf_path into : rtf_path_&i trimmed from _tmp_rtf_list_fnst where fileref = "&mergeable_rtf_ref";
+        quit;
+        %let mergeable_rtf_&i._end_time = %sysfunc(time()); /*记录单个 rtf 文件处理结束时间*/
+        %let mergeable_rtf_&i._spend_time = %sysfunc(putn(%sysevalf(&mergeable_rtf_&i._end_time - &mergeable_rtf_&i._start_time), 8.2)); /*计算单个 rtf 文件处理耗时*/
     %end;
 
 
@@ -263,13 +395,18 @@
             ;
     run;
 
-
-    proc printto log=log; /*恢复日志输出*/
+    /*----------------恢复日志输出------------------*/
+    proc printto log=log;
     run;
 
+    %do i = 1 %to &mergeable_rtf_ref_max;
+        %put NOTE: 文件 %superq(rtf_path_&i) 合并完成，耗时 &&mergeable_rtf_&i._spend_time s！;
+    %end;
+
+
     /*11. 输出 rtf 文件*/
-    %if %qupcase(&out) = #AUTO %then %do;
-        %let date = %sysfunc(putn(%sysfunc(today()), yymmdd.));
+    %if %upcase(&out) = #AUTO %then %do;
+        %let date = %sysfunc(putn(%sysfunc(today()), yymmdd10.));
         %let time = %sysfunc(time());
         %let hour = %sysfunc(putn(%sysfunc(hour(&time)), z2.));
         %let minu = %sysfunc(putn(%sysfunc(minute(&time)), z2.));
@@ -277,7 +414,11 @@
         %let out = %bquote(merged-&date &hour-&minu-&secd..rtf);
     %end;
     %else %do;
-        %let out = %sysfunc(compress(%superq(out), %bquote(%nrstr(%"%'))));
+        %let reg_out_id = %sysfunc(prxparse(%bquote(/^[%str(%"%')]?(.+?)[%str(%"%')]?$/o)));
+        %if %sysfunc(prxmatch(&reg_out_id, %superq(out))) %then %do;
+            %let out = %bquote(%sysfunc(prxposn(&reg_out_id, 1, %superq(out))));
+        %end;
+        %put &=out;
     %end;
     data _null_;
         set _tmp_rtf_merged;
@@ -299,24 +440,42 @@
 
 
     %exit:
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_;
+    run;
 
-    /*13. 删除临时数据集*/
+    /*删除临时数据集*/
+    proc datasets library = work nowarn noprint;
+        delete %do i = 1 %to &rtf_ref_max;
+                   _tmp_rtf&i
+               %end;
+              ;
+    quit;
+
+    %exit_with_no_merge:
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_;
+    run;
+
+    /*删除临时数据集*/
     proc datasets library = work nowarn noprint;
         delete _tmp_rtf_list
                _tmp_rtf_list_add_lv
                _tmp_rtf_list_add_lv_sorted
                _tmp_rtf_list_fnst
                _tmp_rtf_merged
-               %do i = 1 %to &rtf_ref_max;
-                   _tmp_rtf&i
-               %end;
               ;
     quit;
 
-    /*14. 删除 _tmp_rtf_list.txt*/
+
+    /*----------------恢复日志输出------------------*/
+    proc printto log=log;
+    run;
+
+    /*删除 _tmp_rtf_list.txt*/
     X "del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
 
-    /*15. 删除 _null_.log 文件*/
+    /*删除 _null_.log 文件*/
     X "del _null_.log & exit";
 
     %put NOTE: 宏 MergeRTF 已结束运行！;
