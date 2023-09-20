@@ -28,7 +28,7 @@
 
 **功能**：RTF 中某个单元格可能混杂 ASCII 字符和以转义字符存在的非 ASCII 字符，本程序对单个单元格内的字符串进行解析，ASCII 字符保持不变，非 ASCII 的转义字符解析为可读字符串。
 
-**依赖**：[Transcode.sas](./DOCS/Transcode.md)
+**依赖**：[Transcode.sas](./DOCS/Transcode.md) -> [Cell_Transcode.sas](./DOCS/Cell_Transcode.md)
 
 ## 实用程序
 
@@ -38,13 +38,13 @@
 
 **功能**：读取 RTF 文件中的数据，并将其转换为 SAS 数据集。由于 RTF 文件仅保留了变量标签，没有保留变量名，因此转换后的 SAS 数据集中的变量名用 COLx 表示，其中 x 代表变量出现在表格中的第 x 列。
 
-**依赖**：[Cell_Transcode.sas](./DOCS/Cell_Transcode.md)
+**依赖**：[Transcode.sas](./DOCS/Transcode.md) -> [Cell_Transcode.sas](./DOCS/Cell_Transcode.md) -> [ReadRTF.sas](./DOCS/ReadRTF.md)
 
 ### [ReadAllRTF.sas](./DOCS/ReadAllRTF.md)
 
 **功能**：读取单个文件夹中的所有 RTF 文档，并转化为 SAS 数据集。
 
-**依赖**：[ReadRTF.sas](./DOCS/ReadRTF.md)
+**依赖**：[Transcode.sas](./DOCS/Transcode.md) -> [Cell_Transcode.sas](./DOCS/Cell_Transcode.md) -> [ReadRTF.sas](./DOCS/ReadRTF.md) -> [ReadAllRTF.sas](./DOCS/ReadAllRTF.md)
 
 ### [MergeRTF.sas](./DOCS/MergeRTF.md)
 
