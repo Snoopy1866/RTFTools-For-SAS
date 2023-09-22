@@ -51,3 +51,19 @@
 **功能**：合并文件夹内的 RTF 文件，支持递归检索子文件夹
 
 **依赖**：无
+
+### [CompareRTF.sas](./DOCS/CompareRTF.md)
+
+**功能**：比较两个 RTF 文件
+
+**依赖**：无
+
+### [CompareRTFWithDataset](./DOCS/CompareRTFWithDataset.md)
+
+**功能**：比较 RTF 文件与 SAS 数据集
+
+**依赖**：[Transcode.sas](./DOCS/Transcode.md) -> [Cell_Transcode.sas](./DOCS/Cell_Transcode.md) -> [ReadRTF.sas](./DOCS/ReadRTF.md) -> [CompareRTFWithDataset](./DOCS/CompareRTFWithDataset.md)
+
+### [DeletePicInHeader](./DOCS/assets/DeletePicInHeader.md)
+
+**功能**：去除 RTF 文件页眉 logo
