@@ -66,9 +66,9 @@ OUTDATA = t_7_1_1
 
 默认值 : YES
 
-⚠ 绝大部分情况下，参数 COMPRESS 都应当保持默认值，这虽然会增加一点点 CPU 时间，但可以节省大量磁盘占用空间，特别是在读取的 RTF 文件数据量特别大的情况下。经过测试，使用 COMPRESS = YES 平均可节省 95% 以上的磁盘占用空间。
+? 绝大部分情况下，参数 COMPRESS 都应当保持默认值，这虽然会增加一点点 CPU 时间，但可以节省大量磁盘占用空间，特别是在读取的 RTF 文件数据量特别大的情况下。经过测试，使用 COMPRESS = YES 平均可节省 95% 以上的磁盘占用空间。
 
-⚠ 宏程序为保证读取的变量值不会被截断，读取时采用了 SAS 支持的最大变量长度 32767，在未指定 COMPRESS = YES 的情况下，几乎每张表格读取后所占用的磁盘空间都将超过 1G，这非常容易导致磁盘可用空间的急剧下滑，甚至会导致磁盘空间不足而报错，同时频繁大量读写也会迅速减少磁盘寿命。使用 COMPRESS = YES 通过略微牺牲 CPU 时间，获得低负载的磁盘读写，延长使用寿命。
+? 宏程序为保证读取的变量值不会被截断，读取时采用了 SAS 支持的最大变量长度 32767，在未指定 COMPRESS = YES 的情况下，几乎每张表格读取后所占用的磁盘空间都将超过 1G，这非常容易导致磁盘可用空间的急剧下滑，甚至会导致磁盘空间不足而报错，同时频繁大量读写也会迅速减少磁盘寿命。使用 COMPRESS = YES 通过略微牺牲 CPU 时间，获得低负载的磁盘读写，延长使用寿命。
 
 #### DEL_RTF_CTRL
 类型 : 可选参数
@@ -84,7 +84,7 @@ OUTDATA = t_7_1_1
 
 默认值：YES
 
-⚠ 该参数通常用于调试，用户无需关注。
+? 该参数通常用于调试，用户无需关注。
 */
 
 
@@ -140,7 +140,7 @@ options cmplib = sasuser.func;
 
 
     /*3. 调整表头（解决由于表头内嵌换行符导致的 RTF 代码折行问题）*/
-    data _tmp_rtf_data_polish(compress = &compress);
+    data _tmp_rtf_data_polish_header(compress = &compress);
         set _tmp_rtf_data;
 
         length break_line $32767.;
@@ -175,9 +175,56 @@ options cmplib = sasuser.func;
     run;
 
 
+    /*5. 调整数据行（解决由于超长字符串导致的 RTF 代码折行问题）*/
+    data _tmp_rtf_data_polish_body(compress = &compress);
+        set _tmp_rtf_data_polish_header;
+
+        length line_data_part $32767 line_data_part_buffer $32767;
+
+        reg_data_line_start_id = prxparse("/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)$/o");
+        reg_data_line_mid_id   = prxparse("/^((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)$/o");
+        reg_data_line_end_id   = prxparse("/^((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o");
+
+        retain line_data_part "";
+        retain line_data_part_found 0;
+
+        if prxmatch(reg_data_line_start_id, strip(line)) then do;
+            line_data_part_buffer = prxposn(reg_data_line_start_id, 1, strip(line));
+            /*正则表达式使用了ASCII字符集合，导致某些非数据行被错误地匹配，需要进一步筛选*/
+            if find(line_data_part_buffer, "\cell}") = 0 then do; /*控制字\cell}不可能出现在数据行开头*/
+                line_data_part_found = 1;
+                line_data_part = strip(line);
+                delete;
+            end;
+        end;
+
+        if prxmatch(reg_data_line_mid_id, strip(line)) then do;
+            line_data_part_buffer = prxposn(reg_data_line_mid_id, 1, strip(line));
+            /*正则表达式使用了ASCII字符集合，导致某些非数据行被错误地匹配，需要进一步筛选*/
+            if find(line_data_part_buffer, "\cell}") = 0 and substr(line_data_part_buffer, 1, 5) ^= "\pard" then do; /*控制字\cell}、\pard不可能出现在数据行中间*/
+                if line_data_part_found = 1 then do;
+                    line_data_part = cats(line_data_part, line_data_part_buffer);
+                    delete;
+                end;
+            end;
+        end;
+
+        if prxmatch(reg_data_line_end_id, strip(line)) then do;
+            line_data_part_buffer = prxposn(reg_data_line_end_id, 1, strip(line));
+            if line_data_part_found = 1 then do;
+                line_data_part = cats(line_data_part, line_data_part_buffer, "\cell}");
+                line = line_data_part;
+
+                line_data_part_found = 0;
+                line_data_part = "";
+            end;
+        end;
+    run;
+
+
     /*4. 识别表格数据*/
     data _tmp_rtf_raw(compress = &compress);
-        set _tmp_rtf_data_polish;
+        set _tmp_rtf_data_polish_body;
         
         /*变量个数*/
         retain var_n 0;
@@ -218,11 +265,11 @@ options cmplib = sasuser.func;
 
 
         /*定义正则表达式筛选表头和数据*/
-        reg_outlinelevel_id = prxparse("/\\outlinelevel\d/o");
-        reg_header_line_id = prxparse("/\\trowd\\trkeep\\trhdr\\trq[lcr]/o");
+        reg_outlinelevel_id    = prxparse("/\\outlinelevel\d/o");
+        reg_header_line_id     = prxparse("/\\trowd\\trkeep\\trhdr\\trq[lcr]/o");
         reg_header_def_line_id = prxparse("/\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*(?:\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*)*\\cltxlrt[bl]\\clvertal[tcb](?:\\clcbpat\d*)?\\cellx(\d+)/o");
-        reg_data_line_id = prxparse("/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o");
-        reg_sect_line_id = prxparse("/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o");
+        reg_data_line_id       = prxparse("/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o");
+        reg_sect_line_id       = prxparse("/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o");
 
 
         length context_raw $32767;
@@ -440,7 +487,8 @@ options cmplib = sasuser.func;
         proc datasets library = work nowarn noprint;
             delete _tmp_outdata
                    _tmp_rtf_data
-                   _tmp_rtf_data_polish
+                   _tmp_rtf_data_polish_header
+                   _tmp_rtf_data_polish_body
                    _tmp_rtf_context
                    _tmp_rtf_context_sorted
                    _tmp_rtf_header
