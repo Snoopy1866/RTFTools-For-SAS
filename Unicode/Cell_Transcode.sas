@@ -1,50 +1,21 @@
 /*
-详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
-## Cell_Transcode
-
-### 程序信息
-
-- 名称：Cell_Transcode.sas
-- 类型：PROC FCMP function
-- 依赖：[Transcode()](./Transcode.md)
-- 功能：RTF Specification 规定只能使用 7 位 ASCII 字符，若要显示非 ASCII 字符，必须使用转义符，对于 GBK 编码格式的字符串，使用类似 `\'CA\'D4` 的形式表示，对于 Unicode 字符，使用 `\u21015;` 进行表示，本程序实现了将这些非 ASCII 字符转为原始字符串的功能
-- 存储位置：SASUSER.FUNC.RTF
-
-### 程序执行流程
-1. 使用正则表达式判断参数 `STR` 的编码格式，具体如下：
-  - GBK 编码格式：`/((?:\\\x27[0-9A-F]{2})+)/o`
-  - UTF-8 编码格式：`/((?:\\u\d{1,5};)+)/o`
-2. 根据编码格式，先对 RTF 中的非 ASCII 字符进行处理，对于 GBK 编码格式的转义字符，去除转义字符 `\'`；对于 UTF-8 编码格式的转义字符，将转义字符 `\u` 替换为 `&#`
-3. 调用 PROC FCMP 函数 `Transcode()`，将返回值存储在变量 `STR_DECODED` 中
-4. 返回变量 `STR_DECODED` 的值至调用环境
-
-### 返回值
-#### STR_DECODED
-类型 : 字符
-
-取值 : 以当前 SAS 环境下的编码格式重新存储的字符串，ASCII 编码的字符可兼容大多数编码格式，因此未进行转码
-
-### 参数
-
-#### STR
-类型 : 字符
-
-取值 : RTF 单元格内的字符串，例如：`\'CA\'D4\'D1\'E9\'D7\'E9`, `\u35797;\u39564;\u32452;`
+ĎęĎ¸ÎÄľľÇëÇ°Íů Github ˛éÔÄ: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-proc fcmp outlib = sasuser.func.rtf inlib = sasuser.func;
-    function cell_transcode(str $) $5000;
+proc fcmp outlib = sasuser.func.rtf inlib = sasuser.func flow;
+    function cell_transcode(str $) $32767;
         reg_code_gbk_id = prxparse("/((?:\\\x27[0-9A-F]{2})+)/o");
         reg_code_utf8_id = prxparse("/((?:\\u\d{1,5};)+)/o");
         
-        length str_decoded $5000;
+        length str_decoded $32767 _tmp_str $32767 _tmp_str_nomarkup $32767 _tmp_str_decoded $32767;
         str_decoded = str;
         if prxmatch(reg_code_gbk_id, str_decoded) then do;
             do while(prxmatch(reg_code_gbk_id, str_decoded));
                 _tmp_str = prxposn(reg_code_gbk_id, 1, str_decoded);
                 _tmp_str_nomarkup = compress(_tmp_str, "\'");
                 _tmp_str_decoded = transcode(_tmp_str_nomarkup, "gbk");
-                str_decoded = transtrn(str_decoded, strip(_tmp_str), strip(_tmp_str_decoded));
+                reg_code_gbk_chg_id = prxparse("s/((?:\\\x27[0-9A-F]{2})+)/"||trim(_tmp_str_decoded)||"/");
+                str_decoded = prxchange(reg_code_gbk_chg_id, 1, strip(str_decoded));
             end;
         end;
         else if prxmatch(reg_code_utf8_id, str_decoded) then do;
@@ -52,7 +23,8 @@ proc fcmp outlib = sasuser.func.rtf inlib = sasuser.func;
                 _tmp_str = prxposn(reg_code_utf8_id, 1, str_decoded);
                 _tmp_str_nomarkup = transtrn(_tmp_str, "\u", "&#");
                 _tmp_str_decoded = transcode(_tmp_str_nomarkup, "utf8");
-                str_decoded = transtrn(str_decoded, strip(_tmp_str), strip(_tmp_str_decoded));
+                reg_code_utf8_chg_id = prxparse("s/((?:\\u\d{1,5};)+)/"||trim(_tmp_str_decoded)||"/");
+                str_decoded = prxchange(reg_code_utf8_chg_id, 1, strip(str_decoded));
             end;
         end;
         return(str_decoded);
