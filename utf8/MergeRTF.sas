@@ -8,7 +8,9 @@
                 autoorder = yes,
                 vd = X,
                 exclude = #null,
-                merge = yes)
+                merge = yes,
+                merged_file_show = short,
+                del_temp_data = yes)
                 /des = "合并RTF文件" parmbuff;
 
     /*打开帮助文档*/
@@ -71,14 +73,18 @@
         infile "&vd:\_tmp_rtf_list.txt" truncover encoding = 'gbke';
         input rtf_path $char1000.;
 
+        /*真实路径*/
+        rtf_path_real = cats("&dirloc", substr(rtf_path, 3));
+
         /*识别表格和清单*/
-        reg_table_id = prxparse("/^.*((?:列)?表|清单|图)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf\s*$/o");
+        reg_table_id = prxparse("/^.*(((?:列)?表|清单|图)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf)\s*$/o");
 
         /*筛选命名规范的 rtf 文件*/
         if prxmatch(reg_table_id, rtf_path) then do;
-            rtf_type = prxposn(reg_table_id, 1, rtf_path);
-            rtf_seq = prxposn(reg_table_id, 2, rtf_path);
-            ref_label = prxposn(reg_table_id, 3, rtf_path);
+            rtf_name  = prxposn(reg_table_id, 1, rtf_path); /*RTF 文件名*/
+            rtf_type  = prxposn(reg_table_id, 2, rtf_path); /*RTF 类型*/
+            rtf_seq   = prxposn(reg_table_id, 3, rtf_path); /*RTF 编号*/
+            ref_label = prxposn(reg_table_id, 4, rtf_path); /*RTF 描述文字*/
  
             rtf_filename_valid_flag = "Y";
         end;
@@ -139,7 +145,7 @@
             label rtf_path = "路径"
                   rtf_filename_valid_flag = "文件名是否规范"
                   rtf_depth_valid_flag = "文件是否在指定深度内";
-            keep rtf_path rtf_filename_valid_flag rtf_depth_valid_flag;
+            keep rtf_name rtf_path rtf_path_real rtf_filename_valid_flag rtf_depth_valid_flag;
         run;
         %goto exit_with_no_merge;
     %end;
@@ -296,7 +302,16 @@
 
         /*获取可合并的 rtf 文件名*/
         proc sql noprint;
-            select rtf_path into : rtf_path_&i trimmed from _tmp_rtf_list_fnst where fileref = "&mergeable_rtf_ref";
+            select %if %upcase(&merged_file_show) = SHORT %then %do;
+                       rtf_name
+                   %end;
+                   %else %if %upcase(&merged_file_show) = FULL %then %do;
+                       rtf_path_real
+                   %end;
+                   %else %if %upcase(&merged_file_show) = VIRTUAL %then %do;
+                       rtf_path
+                   %end;
+                   into : merged_rtf_file_&i trimmed from _tmp_rtf_list_fnst where fileref = "&mergeable_rtf_ref";
         quit;
         %let mergeable_rtf_&i._end_time = %sysfunc(time()); /*记录单个 rtf 文件处理结束时间*/
         %let mergeable_rtf_&i._spend_time = %sysfunc(putn(%sysevalf(&mergeable_rtf_&i._end_time - &mergeable_rtf_&i._start_time), 8.2)); /*计算单个 rtf 文件处理耗时*/
@@ -316,7 +331,7 @@
     run;
 
     %do i = 1 %to &mergeable_rtf_ref_max;
-        %put NOTE: 文件 %superq(rtf_path_&i) 合并完成，耗时 &&mergeable_rtf_&i._spend_time s！;
+        %put NOTE: 文件 %superq(merged_rtf_file_&i) 合并完成，耗时 &&mergeable_rtf_&i._spend_time s！;
     %end;
 
 
@@ -374,14 +389,16 @@
     run;
 
     /*删除临时数据集*/
-    proc datasets library = work nowarn noprint;
-        delete _tmp_rtf_list
-               _tmp_rtf_list_add_lv
-               _tmp_rtf_list_add_lv_sorted
-               _tmp_rtf_list_fnst
-               _tmp_rtf_merged
-              ;
-    quit;
+    %if %upcase(&del_temp_data) = YES %then %do;
+        proc datasets library = work nowarn noprint;
+            delete _tmp_rtf_list
+                   _tmp_rtf_list_add_lv
+                   _tmp_rtf_list_add_lv_sorted
+                   _tmp_rtf_list_fnst
+                   _tmp_rtf_merged
+                  ;
+        quit;
+    %end;
     
 
 
