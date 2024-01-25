@@ -47,6 +47,8 @@ filename ref "D:\~\TFL";
 FILE = ref;
 ```
 
+---
+
 #### OUT
 
 类型 : 可选参数
@@ -63,6 +65,8 @@ out = "合并表格.rtf"
 out = #auto
 ```
 
+---
+
 #### DEPTH
 
 类型 : 可选参数
@@ -75,13 +79,22 @@ out = #auto
 
 例如：某项目的 RTF 文件按照其类型，存储在 `~\TFL` 目录下的 `table`, `figure`, `listing` 中，此时指定 `depth = 2`，宏程序将读取根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 中的所有 RTF 文件，但不会读取 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 下的子文件夹中的 RTF 文件。
 
-#### ORDER
+---
+
+#### AUTOORDER
 
 类型 : 可选参数
 
-取值 : 指定排列顺序，暂无作用
+取值 : 指定是否自动排序
 
-默认值 : #auto
+默认值 : yes
+
+- `AUTOORDER = yes` 时，宏程序根据 RTF 文件名自动排序，排序的具体细节见 [#2](#2-如何对-rtf-文件进行排序)
+- `AUTOORDER = no` 时，宏程序将弹出提示框，提示用户进行手动排序，同时打开一个包含当前目录下所有 RTF 文档名称的 .txt 文件，用户可调整此 .txt 文件中 RTF 文档名称显示的顺序，通过这种方式完成手动排序，保存此 .txt 文件后，点击确定，宏程序将会继续运行。
+
+![](./assets/MergeRTF-autoorder-no.png)
+
+---
 
 #### VD
 
@@ -91,6 +104,8 @@ out = #auto
 
 默认值：X
 
+---
+
 #### EXCLUDE
 
 类型：可选参数
@@ -98,6 +113,8 @@ out = #auto
 取值：指定排除名单，暂无作用
 
 默认值：#null
+
+---
 
 #### MERGE
 
