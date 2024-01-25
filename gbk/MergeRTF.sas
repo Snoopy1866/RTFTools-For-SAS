@@ -8,7 +8,8 @@
                 autoorder = yes,
                 vd = X,
                 exclude = #null,
-                merge = yes)
+                merge = yes,
+                del_temp_data = yes)
                 /des = "合并RTF文件" parmbuff;
 
     /*打开帮助文档*/
@@ -374,14 +375,16 @@
     run;
 
     /*删除临时数据集*/
-    proc datasets library = work nowarn noprint;
-        delete _tmp_rtf_list
-               _tmp_rtf_list_add_lv
-               _tmp_rtf_list_add_lv_sorted
-               _tmp_rtf_list_fnst
-               _tmp_rtf_merged
-              ;
-    quit;
+    %if %upcase(&del_temp_data) = YES %then %do;
+        proc datasets library = work nowarn noprint;
+            delete _tmp_rtf_list
+                   _tmp_rtf_list_add_lv
+                   _tmp_rtf_list_add_lv_sorted
+                   _tmp_rtf_list_fnst
+                   _tmp_rtf_merged
+                  ;
+        quit;
+    %end;
     
 
 
