@@ -113,31 +113,41 @@ options cmplib = sasuser.func;
             end;
         end;
 
-        if prxmatch(reg_data_line_mid_id, strip(line)) then do;
-            line_data_part_buffer = prxposn(reg_data_line_mid_id, 1, strip(line));
-            /*正则表达式使用了ASCII字符集合，导致某些非数据行被错误地匹配，需要进一步筛选*/
-            if find(line_data_part_buffer, "\cell}") = 0 and substr(line_data_part_buffer, 1, 5) ^= "\pard" then do; /*控制字\cell}、\pard不可能出现在数据行中间*/
-                if line_data_part_found = 1 then do;
-                    line_data_part = cats(line_data_part, line_data_part_buffer);
-                    delete;
+        if line_data_part_found = 1 then do;
+            if prxmatch(reg_data_line_mid_id, strip(line)) then do;
+                if find(strip(line), "\shppict") > 0 then do; /*控制字 \shppict 指定 Word 97 图片，它通常出现在页眉 logo 中，不可能在数据行中出现*/
+                    line_data_part_found = 0;
+                    line_data_part = "";
+                end;
+                else do;
+                    line_data_part_buffer = prxposn(reg_data_line_mid_id, 1, strip(line));
+                    /*正则表达式使用了ASCII字符集合，导致某些非数据行被错误地匹配，需要进一步筛选*/
+                    if find(line_data_part_buffer, "\cell}") = 0 and substr(line_data_part_buffer, 1, 5) ^= "\pard" then do; /*控制字 \cell}, \pard 不可能出现在数据行中间*/
+                        if line_data_part_found = 1 then do;
+                            line_data_part = cats(line_data_part, line_data_part_buffer);
+                            delete;
+                        end;
+                    end;
                 end;
             end;
-        end;
 
-        if prxmatch(reg_data_line_end_id, strip(line)) then do;
-            line_data_part_buffer = prxposn(reg_data_line_end_id, 1, strip(line));
-            if line_data_part_found = 1 then do;
-                line_data_part = cats(line_data_part, line_data_part_buffer, "\cell}");
-                line = line_data_part;
+            if prxmatch(reg_data_line_end_id, strip(line)) then do;
+                line_data_part_buffer = prxposn(reg_data_line_end_id, 1, strip(line));
+                if line_data_part_found = 1 then do;
+                    line_data_part = cats(line_data_part, line_data_part_buffer, "\cell}");
+                    line = line_data_part;
 
-                line_data_part_found = 0;
-                line_data_part = "";
+                    line_data_part_found = 0;
+                    line_data_part = "";
+                end;
             end;
         end;
     run;
 
 
     /*4. 识别表格数据*/
+    %let is_outlinelevel_found = 0;
+
     data _tmp_rtf_raw(compress = &compress);
         set _tmp_rtf_data_polish_body;
         
@@ -193,6 +203,7 @@ options cmplib = sasuser.func;
         if prxmatch(reg_outlinelevel_id, strip(line)) then do;
             if is_outlinelevel_found = 0 then do;
                 is_outlinelevel_found = 1;
+                call symputx("is_outlinelevel_found", 1);
             end;
         end;
 
@@ -268,6 +279,11 @@ options cmplib = sasuser.func;
         end;
     run;
 
+    %if &is_outlinelevel_found = 0 %then %do;
+        %put ERROR: 在 RTF 文件中未发现大纲级别的标题，请使用控制字 \outlinelevel 生成 RTF 文件的标题！;
+        %goto exit;
+    %end;
+
     /*5. 删除 RTF 控制字*/
     %if %upcase(&del_rtf_ctrl) = YES %then %do;
         /*控制字-空的分组*/
@@ -341,7 +357,7 @@ options cmplib = sasuser.func;
                                        %bquote(a&i..context)%bquote(,)
                                    %end;)
                                    a&max_header_level..context)
-                    as header_context
+                    as header_context length = 32767 /*这里用 length =32767 是有必要的，有时候解析 utf8 字符时会出现长度异常的问题，原因未知*/
             from _tmp_rtf_header(where = (header_cell_level = &max_header_level)) as a&max_header_level
                 %do i = %eval(&max_header_level - 1) %to 1 %by -1;
                     left join _tmp_rtf_header(where = (header_cell_level = &i)) as a&i
