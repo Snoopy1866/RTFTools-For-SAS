@@ -52,6 +52,12 @@
 
 **依赖**：无
 
+### [CompareAllRTF.sas](./docs/CompareAllRTF.md)
+
+**功能**：比较两个文件夹下的 RTF 文件
+
+**依赖**：[CompareRTF.sas](./docs/CompareRTF.md) -> [CompareAllRTF.sas](./docs/CompareAllRTF.md)
+
 ### [CompareRTFWithDataset](./docs/CompareRTFWithDataset.md)
 
 **功能**：比较 RTF 文件与 SAS 数据集
