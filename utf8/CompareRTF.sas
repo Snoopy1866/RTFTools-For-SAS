@@ -177,6 +177,68 @@
         run;
     %end;
 
+    /*3.3 忽略页脚*/
+    %if %upcase(&ignorefooter) = YES %then %do;
+        %let reg_footer_expr = %bquote(/^\{\\footer\\pard\\plain\\q[lcr]\{$/o);
+        data _tmp_rtf_data_base;
+            set _tmp_rtf_data_base;
+            reg_footer_id = prxparse("&reg_footer_expr");
+
+            retain footer_brace_unclosed; /*未闭合的大括号数量*/
+            retain footer_start_flag 0
+                   footer_end_flag 0;
+            if prxmatch(reg_footer_id, strip(line)) then do; /*页脚开始*/
+                footer_brace_unclosed = (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                footer_start_flag = 1;
+                delete;
+            end;
+            else if footer_start_flag = 1 and footer_end_flag = 0 then do;
+                footer_brace_unclosed + (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                if footer_brace_unclosed = 2 and strip(line) = "{\row}" then do; /*页脚结束*/
+                    footer_end_flag = 1;
+                    footer_brace_unclosed = .;
+                    delete;
+                end;
+                else do; /*页脚中间*/
+                    delete;
+                end;
+            end;
+            else if footer_brace_unclosed = . then do;
+                footer_start_flag = 0;
+                footer_end_flag = 0;
+            end;
+        run;
+
+        data _tmp_rtf_data_compare;
+            set _tmp_rtf_data_compare;
+            reg_footer_id = prxparse("&reg_footer_expr");
+
+            retain footer_brace_unclosed; /*未闭合的大括号数量*/
+            retain footer_start_flag 0
+                   footer_end_flag 0;
+            if prxmatch(reg_footer_id, strip(line)) then do; /*页脚开始*/
+                footer_brace_unclosed = (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                footer_start_flag = 1;
+                delete;
+            end;
+            else if footer_start_flag = 1 and footer_end_flag = 0 then do;
+                footer_brace_unclosed + (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                if footer_brace_unclosed = 2 and strip(line) = "{\row}" then do; /*页脚结束*/
+                    footer_end_flag = 1;
+                    footer_brace_unclosed = .;
+                    delete;
+                end;
+                else do; /*页脚中间*/
+                    delete;
+                end;
+            end;
+            else if footer_brace_unclosed = . then do;
+                footer_start_flag = 0;
+                footer_end_flag = 0;
+            end;
+        run;
+    %end;
+
 
     /*4. 比较新旧数据集*/
     proc compare base = _tmp_rtf_data_base compare = _tmp_rtf_data_compare noprint;
