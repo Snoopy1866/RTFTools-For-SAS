@@ -12,6 +12,8 @@
 ### 可选参数
 
 - [IGNORECREATIM](#ignorecreatim)
+- [IGNOREHEADER](#ignoreheader)
+- [IGNOREFOOTER](#ignorefooter)
 - [OUTDATA](#outdata)
 
 ### 调试参数
@@ -76,6 +78,38 @@ RTF 文件元信息中包含文件创建时间，指定 `IGNORECREATIM = YES` �
 
 ```sas
 IGNORECREATIM = NO
+```
+
+---
+
+### IGNOREHEADER
+
+**Syntax** : YES | NO
+
+指定是否忽略页眉。
+
+**Default** : YES
+
+**Example** :
+
+```sas
+IGNOREHEADER = NO
+```
+
+---
+
+### IGNOREFOOTER
+
+**Syntax** : YES | NO
+
+指定是否忽略页脚。
+
+**Default** : YES
+
+**Example** :
+
+```sas
+IGNOREFOOTER = NO
 ```
 
 ---
