@@ -2,7 +2,10 @@
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-%macro CompareRTF(base, compare, ignorecreatim = yes, outdata = diff, del_temp_data = yes);
+%macro CompareRTF(base, compare, outdata = diff, del_temp_data = yes,
+                  ignorecreatim = yes,
+                  ignoreheader = yes,
+                  ignorefooter = yes);
     /*1. 获取文件路径*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
@@ -94,6 +97,7 @@
     run;
 
     /*3. 处理忽略比较的部分*/
+    /*3.1 忽略创建时间*/
     %if %upcase(&ignorecreatim) = YES %then %do;
         %let reg_creatim_expr = %bquote(/\\creatim\\yr\d{1,4}\\mo\d{1,2}\\dy\d{1,2}\\hr\d{1,2}\\min\d{1,2}\\sec\d{1,2}/o);
         data _tmp_rtf_data_base;
@@ -110,6 +114,69 @@
             if prxmatch(reg_creatim_id, strip(line)) then delete;
         run;
     %end;
+
+    /*3.2 忽略页眉*/
+    %if %upcase(&ignoreheader) = YES %then %do;
+        %let reg_header_expr = %bquote(/^\{\\header\\pard\\plain\\q[lcr]\{$/o);
+        data _tmp_rtf_data_base;
+            set _tmp_rtf_data_base;
+            reg_header_id = prxparse("&reg_header_expr");
+
+            retain header_brace_unclosed; /*未闭合的大括号数量*/
+            retain header_start_flag 0
+                   header_end_flag 0;
+            if prxmatch(reg_header_id, strip(line)) then do; /*页眉开始*/
+                header_brace_unclosed = (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                header_start_flag = 1;
+                delete;
+            end;
+            else if header_start_flag = 1 and header_end_flag = 0 then do;
+                header_brace_unclosed + (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                if header_brace_unclosed = 0 then do; /*页眉结束*/
+                    header_end_flag = 1;
+                    header_brace_unclosed = .;
+                    delete;
+                end;
+                else do; /*页眉中间*/
+                    delete;
+                end;
+            end;
+            else if header_brace_unclosed = . then do;
+                header_start_flag = 0;
+                header_end_flag = 0;
+            end;
+        run;
+
+        data _tmp_rtf_data_compare;
+            set _tmp_rtf_data_compare;
+            reg_header_id = prxparse("&reg_header_expr");
+
+            retain header_brace_unclosed; /*未闭合的大括号数量*/
+            retain header_start_flag 0
+                   header_end_flag 0;
+            if prxmatch(reg_header_id, strip(line)) then do; /*页眉开始*/
+                header_brace_unclosed = (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                header_start_flag = 1;
+                delete;
+            end;
+            else if header_start_flag = 1 and header_end_flag = 0 then do;
+                header_brace_unclosed + (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                if header_brace_unclosed = 0 then do; /*页眉结束*/
+                    header_end_flag = 1;
+                    header_brace_unclosed = .;
+                    delete;
+                end;
+                else do; /*页眉中间*/
+                    delete;
+                end;
+            end;
+            else if header_brace_unclosed = . then do;
+                header_start_flag = 0;
+                header_end_flag = 0;
+            end;
+        run;
+    %end;
+
 
     /*4. 比较新旧数据集*/
     proc compare base = _tmp_rtf_data_base compare = _tmp_rtf_data_compare noprint;
