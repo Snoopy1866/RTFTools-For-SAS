@@ -273,6 +273,7 @@
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf_data_base
                    _tmp_rtf_data_compare
+                   _tmp_outdata
                   ;
         quit;
     %end;
