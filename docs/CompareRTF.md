@@ -14,6 +14,7 @@
 - [IGNORECREATIM](#ignorecreatim)
 - [IGNOREHEADER](#ignoreheader)
 - [IGNOREFOOTER](#ignorefooter)
+- [IGNORECELLSTYLE](#ignorecellstyle)
 - [OUTDATA](#outdata)
 
 ### 调试参数
@@ -110,6 +111,20 @@ IGNOREHEADER = NO
 
 ```sas
 IGNOREFOOTER = NO
+```
+
+### IGNORECELLSTYLE
+
+**Syntax** : YES | NO
+
+指定是否忽略单元格样式。
+
+**Default** : YES
+
+**Example** :
+
+```sas
+IGNORECELLSTYLE = NO
 ```
 
 ---

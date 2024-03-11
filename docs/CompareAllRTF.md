@@ -12,6 +12,9 @@
 ### 可选参数
 
 - [IGNORECREATIM](#ignorecreatim)
+- [IGNOREHEADER](#ignoreheader)
+- [IGNOREFOOTER](#ignorefooter)
+- [IGNORECELLSTYLE](#ignorecellstyle)
 - [OUTDATA](#outdata)
 
 ### 调试参数
@@ -65,6 +68,24 @@ BASE = cdir
 ### IGNORECREATIM
 
 用法同 [IGNORECREATIM](./CompareRTF.md#ignorecreatim)
+
+---
+
+### IGNOREHEADER
+
+用法同 [IGNOREHEADER](./CompareRTF.md#ignoreheader)
+
+---
+
+### IGNOREFOOTER
+
+用法同 [IGNOREFOOTER](./CompareRTF.md#ignorefooter)
+
+---
+
+### IGNORECELLSTYLE
+
+用法同 [IGNORECELLSTYLE](./CompareRTF.md#ignorecellstyle)
 
 ---
 
