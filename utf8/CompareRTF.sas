@@ -5,7 +5,8 @@
 %macro CompareRTF(base, compare, outdata = diff, del_temp_data = yes,
                   ignorecreatim = yes,
                   ignoreheader = yes,
-                  ignorefooter = yes);
+                  ignorefooter = yes,
+                  ignorecellstyle = yes);
     /*1. 获取文件路径*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
@@ -236,6 +237,25 @@
                 footer_start_flag = 0;
                 footer_end_flag = 0;
             end;
+        run;
+    %end;
+
+    /*3.4 忽略单元格样式*/
+    %if %upcase(&ignorecellstyle) = YES %then %do;
+        %let reg_cellstyle_expr = %bquote(/^(?:\\clbrdrb\\brdrs\\brdrw\d+\\brdrcf\d+)?\\cltxlrtb\\clvertalt\\clcbpat\d+(?:\\clpadt\d+\\clpadft\d+\\clpadr\d+\\clpadfr\d+)?\\cellx\d+$/o);
+
+        data _tmp_rtf_data_base;
+            set _tmp_rtf_data_base;
+            reg_cellstyle_id = prxparse("&reg_cellstyle_expr");
+
+            if prxmatch(reg_cellstyle_id, strip(line)) then delete;
+        run;
+
+        data _tmp_rtf_data_compare;
+            set _tmp_rtf_data_compare;
+            reg_cellstyle_id = prxparse("&reg_cellstyle_expr");
+
+            if prxmatch(reg_cellstyle_id, strip(line)) then delete;
         run;
     %end;
 
