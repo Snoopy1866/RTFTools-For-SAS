@@ -2,7 +2,15 @@
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-%macro CompareAllRTF(basedir, comparedir, ignorecreatim = yes, outdata = diff, del_temp_data = yes);
+%macro CompareAllRTF(basedir,
+                     comparedir,
+                     ignorecreatim = yes,
+                     ignoreheader = yes,
+                     ignorefooter = yes,
+                     ignorecellstyle = yes,
+                     outdata = diff,
+                     del_temp_data = yes);
+
     %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
 
@@ -129,7 +137,13 @@
         retain n 0;
         if not missing(base_rtf_name) and not missing(compare_rtf_name) then do;
             n + 1;
-            call execute('%nrstr(%CompareRTF(base = ' || baseref || ', compare = ' || compareref || ', ignorecreatim = ' || "&ignorecreatim" || ', outdata = _tmp_diff_' || strip(n) || '));');
+            call execute('%nrstr(%CompareRTF(base = ' || baseref ||
+                                          ', compare = ' || compareref ||
+                                          ', ignorecreatim = ' || "&ignorecreatim" ||
+                                          ', ignoreheader = ' || "&ignoreheader" ||
+                                          ', ignorefooter = ' || "&ignorefooter" ||
+                                          ', ignorecellstyle = ' || "&ignorecellstyle" ||
+                                          ', outdata = _tmp_diff_' || strip(n) || '));');
         end;
         call symputx("diff_n_max", n);
     run;
