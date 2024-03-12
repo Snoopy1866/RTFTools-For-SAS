@@ -8,6 +8,8 @@
                      ignoreheader = yes,
                      ignorefooter = yes,
                      ignorecellstyle = yes,
+                     ignorefonttable = yes,
+                     ignorecolortable = yes,
                      outdata = diff,
                      del_temp_data = yes);
 
@@ -143,6 +145,8 @@
                                           ', ignoreheader = ' || "&ignoreheader" ||
                                           ', ignorefooter = ' || "&ignorefooter" ||
                                           ', ignorecellstyle = ' || "&ignorecellstyle" ||
+                                          ', ignorefonttable = ' || "&ignorefonttable" ||
+                                          ', ignorecolortable = ' || "&ignorecolortable" ||
                                           ', outdata = _tmp_diff_' || strip(n) || '));');
         end;
         call symputx("diff_n_max", n);
