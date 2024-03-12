@@ -269,7 +269,7 @@
 
     /*3.5 忽略单元格样式*/
     %if %upcase(&ignorecellstyle) = YES %then %do;
-        %let reg_cellstyle_expr = %bquote(/^(?:\\clbrdrb\\brdrs\\brdrw\d+\\brdrcf\d+)?\\cltxlrtb\\clvertalt\\clcbpat\d+(?:\\clpadt\d+\\clpadft\d+\\clpadr\d+\\clpadfr\d+)?\\cellx\d+$/o);
+        %let reg_cellstyle_expr = %bquote(/^(?:\\clbrdr[tblr]\\brdrs\\brdrw\d+\\brdrcf\d+)*\\cltxlrtb\\clvertal[tc](?:\\clcbpat\d+)?(?:\\clpadt\d+\\clpadft\d+\\clpadr\d+\\clpadfr\d+)?\\cellx\d+$/o);
 
         data _tmp_rtf_data_base;
             set _tmp_rtf_data_base;
