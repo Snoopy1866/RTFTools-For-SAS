@@ -299,14 +299,12 @@
         compare_path = "&compareloc";
         base_name    = scan(base_path, -1, "\");
         compare_name = scan(compare_path, -1, "\");
-        code         = &_sysinfo;
-        diffyn       = ifc(code > 0, "Y", "");
+        diffyn       = ifc(&_sysinfo > 0, "Y", "");
 
         label base_path    = "base文件路径"
               compare_path = "compare文件路径"
               base_name    = "base文件名"
               compare_name = "compare文件名"
-              code         = "返回码"
               diffyn       = "存在差异";
     run;
 
