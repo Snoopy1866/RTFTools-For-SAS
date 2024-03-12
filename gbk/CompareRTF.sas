@@ -7,7 +7,8 @@
                   ignoreheader = yes,
                   ignorefooter = yes,
                   ignorecellstyle = yes,
-                  ignorefonttable = yes);
+                  ignorefonttable = yes,
+                  ignorecolortable = yes);
     /*1. 获取文件路径*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
@@ -123,7 +124,31 @@
         run;
     %end;
 
-    /*3.2 忽略创建时间*/
+    /*3.2 忽略颜色表*/
+    %if %upcase(&ignorecolortable) = YES %then %do;
+        %let reg_colortable_ini_expr = %bquote(/^\}?\{\\colortbl\x3B$/o);
+        %let reg_colortable_def_expr = %bquote(/^\\red\d+\\green\d+\\blue\d+\x3B$/o);
+
+        data _tmp_rtf_data_base;
+            set _tmp_rtf_data_base;
+            reg_colortable_ini_id = prxparse("&reg_colortable_ini_expr");
+            reg_colortable_def_id = prxparse("&reg_colortable_def_expr");
+
+            if prxmatch(reg_colortable_ini_id, strip(line)) then desc = "delete";
+            if prxmatch(reg_colortable_def_id, strip(line)) then desc = "delete";
+        run;
+
+        data _tmp_rtf_data_compare;
+            set _tmp_rtf_data_compare;
+            reg_colortable_ini_id = prxparse("&reg_colortable_ini_expr");
+            reg_colortable_def_id = prxparse("&reg_colortable_def_expr");
+
+            if prxmatch(reg_colortable_ini_id, strip(line)) then desc = "delete";
+            if prxmatch(reg_colortable_def_id, strip(line)) then desc = "delete";
+        run;
+    %end;
+
+    /*3.3 忽略创建时间*/
     %if %upcase(&ignorecreatim) = YES %then %do;
         %let reg_creatim_expr = %bquote(/\\creatim\\yr\d{1,4}\\mo\d{1,2}\\dy\d{1,2}\\hr\d{1,2}\\min\d{1,2}\\sec\d{1,2}/o);
         data _tmp_rtf_data_base;
@@ -141,7 +166,7 @@
         run;
     %end;
 
-    /*3.3 忽略页眉*/
+    /*3.4 忽略页眉*/
     %if %upcase(&ignoreheader) = YES %then %do;
         %let reg_header_expr = %bquote(/^\{\\header\\pard\\plain\\q[lcr]\{$/o);
 
@@ -204,7 +229,7 @@
         run;
     %end;
 
-    /*3.4 忽略页脚*/
+    /*3.5 忽略页脚*/
     %if %upcase(&ignorefooter) = YES %then %do;
         %let reg_footer_expr = %bquote(/^\{\\footer\\pard\\plain\\q[lcr]\{$/o);
 
@@ -267,7 +292,7 @@
         run;
     %end;
 
-    /*3.5 忽略单元格样式*/
+    /*3.6 忽略单元格样式*/
     %if %upcase(&ignorecellstyle) = YES %then %do;
         %let reg_cellstyle_expr = %bquote(/^(?:\\clbrdr[tblr]\\brdrs\\brdrw\d+\\brdrcf\d+)*\\cltxlrtb\\clvertal[tc](?:\\clcbpat\d+)?(?:\\clpadt\d+\\clpadft\d+\\clpadr\d+\\clpadfr\d+)?\\cellx\d+$/o);
 
