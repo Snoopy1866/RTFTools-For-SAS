@@ -28,6 +28,8 @@
 
 实用程序大多数都需要依赖基础程序，因此在调用它们时，必须先调用基础程序。
 
+在 SAS 编辑器中运行 `%`_`macro`_`()` 或 `%`_`macro`_`(help)` 可打开对应实用程序的在线帮助文档，例如：`%ReadRTF()`。
+
 ### [ReadRTF.sas](./docs/ReadRTF.md)
 
 **功能**：读取 RTF 文件中的数据，并将其转换为 SAS 数据集。由于 RTF 文件仅保留了变量标签，没有保留变量名，因此转换后的 SAS 数据集中的变量名用 COLx 表示，其中 x 代表变量出现在表格中的第 x 列。
@@ -58,12 +60,12 @@
 
 **依赖**：[CompareRTF.sas](./docs/CompareRTF.md) -> [CompareAllRTF.sas](./docs/CompareAllRTF.md)
 
-### [CompareRTFWithDataset](./docs/CompareRTFWithDataset.md)
+### [CompareRTFWithDataset](./docs/CompareRTFWithDataset.md) （未开发完成）
 
 **功能**：比较 RTF 文件与 SAS 数据集
 
 **依赖**：[Transcode.sas](./docs/Transcode.md) -> [ReadRTF.sas](./docs/ReadRTF.md) -> [CompareRTFWithDataset](./docs/CompareRTFWithDataset.md)
 
-### [DeletePicInHeader](./docs/assets/DeletePicInHeader.md)
+### [DeletePicInHeader](./docs/assets/DeletePicInHeader.md) （未开发完成）
 
 **功能**：去除 RTF 文件页眉 logo
