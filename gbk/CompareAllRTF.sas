@@ -11,7 +11,14 @@
                      ignorefonttable = yes,
                      ignorecolortable = yes,
                      outdata = diff,
-                     del_temp_data = yes);
+                     del_temp_data = yes)
+                     / parmbuff;
+
+    /*打开帮助文档*/
+    %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
+        X explorer "https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/docs/CompareAllRTF.md";
+        %goto exit;
+    %end;
 
     %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
@@ -207,16 +214,20 @@
                    _tmp_rtf_list_bc
                    _tmp_diff
                    _tmp_outdata
-                   %do i = 1 %to &diff_n_max;
-                       _tmp_diff_&i
+                   %if %symexist(diff_n_max) %then %do;
+                       %do i = 1 %to &diff_n_max;
+                           _tmp_diff_&i
+                       %end;
                    %end;
                   ;
         quit;
     %end;
 
-    /*删除 _tmp_rtf_list_base.txt 和 _tmp_rtf_list_compare.txt*/
-    X "del ""&basedirloc\_tmp_rtf_list_base.txt"" & exit";
-    X "del ""&comparedirloc\_tmp_rtf_list_compare.txt"" & exit";
+    %if %symexist(basedirloc) and %symexist(comparedirloc) %then %do;
+        /*删除 _tmp_rtf_list_base.txt 和 _tmp_rtf_list_compare.txt*/
+        X "del ""&basedirloc\_tmp_rtf_list_base.txt"" & exit";
+        X "del ""&comparedirloc\_tmp_rtf_list_compare.txt"" & exit";
+    %end;
 
     /*删除 _null_.log 文件*/
     X "del _null_.log & exit";

@@ -8,7 +8,15 @@
                   ignorefooter = yes,
                   ignorecellstyle = yes,
                   ignorefonttable = yes,
-                  ignorecolortable = yes);
+                  ignorecolortable = yes)
+                  / parmbuff;
+
+    /*打开帮助文档*/
+    %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
+        X explorer "https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/docs/CompareRTF.md";
+        %goto exit;
+    %end;
+
     /*1. 获取文件路径*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));

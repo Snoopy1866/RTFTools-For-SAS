@@ -1,67 +1,17 @@
 /*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
-## ReadAllRTF
-
-### 程序信息
-
-- 名称：ReadAllRTF.sas
-- 类型：Macro
-- 依赖：[ReadRTF](./ReadRTF.md)
-- 功能：将指定文件夹中的所有 RTF 文件转换为 SAS 数据集。
-
-### 程序执行流程
-1. 使用 DOS 命令获取指定文件夹中的所有 RTF 文件，将 RTF 文件列表存储在 `_tmp_rtf_list.txt` 中；
-2. 读取 `_tmp_rtf_list.txt` 文件，获取 RTF 文件名称，构建并执行 filename 语句；
-3. 调用宏 `%ReadRTF()`，将 RTF 文件转换为 SAS 数据集
-4. 删除临时数据集
-5. 删除 `_tmp_rtf_list.txt`
-
-### 参数
-
-#### DIR
-类型 : 必选参数
-
-取值 : 指定 RTF 文件所在目录路径或引用。指定的目录路径或者引用的目录路径必须是一个合法的 Windows 路径。
-- 指定物理路径时，可以传入带引号的路径或不带引号的路径，若传入不带引号的路径，建议使用 `%str()` 将路径包围
-- 当指定的物理路径太长时，应当使用 filename 语句建立目录引用，然后传入目录引用，否则会导致 SAS 无法正确读取。
-
-举例 : 
-```
-DIR = "D:\~\01 table"
-```
-
-```
-DIR = %str(D:\~\01 table)
-```
-
-```
-filename ref "D:\~\01 table";
-DIR = ref;
-```
-
-#### OUTLIB
-类型 : 可选参数
-
-取值 : 指定输出数据集存放的逻辑库，该逻辑库必须事先定义，且逻辑库对应的物理路径必须存在
-
-默认值 : WORK
-
-#### VD
-类型 : 可选参数
-
-取值 : 指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被使用的一个字符
-
-默认值 : X
-
-#### COMPRESS
-参见 [COMPRESS](./ReadRTF.md#compress)
-
-#### DEL_RTF_CTRL
-参见 [DEL_RTF_CTRL](./ReadRTF.md#del_rtf_ctrl)
 */
 
 options cmplib = sasuser.func;
-%macro ReadAllRTF(dir, outlib = work, vd = X, compress = yes, del_rtf_ctrl = yes);
+
+%macro ReadAllRTF(dir, outlib = work, vd = X, compress = yes, del_rtf_ctrl = yes)/ parmbuff;
+
+    /*打开帮助文档*/
+    %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
+        X explorer "https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/docs/ReadAllRTF.md";
+        %goto exit;
+    %end;
+
     /*1. 获取目录路径*/
     %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
@@ -142,12 +92,10 @@ options cmplib = sasuser.func;
     run;
 
     /*4. 删除临时数据集*/
-    %if 1 > 2 %then %do;
     proc datasets library = work nowarn noprint;
         delete _tmp_rtf_list
               ;
     quit;
-    %end;
 
     /*5. 删除 _tmp_rtf_list.txt*/
     X " del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
