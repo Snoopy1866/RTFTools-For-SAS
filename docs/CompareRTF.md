@@ -15,6 +15,8 @@
 - [IGNOREHEADER](#ignoreheader)
 - [IGNOREFOOTER](#ignorefooter)
 - [IGNORECELLSTYLE](#ignorecellstyle)
+- [IGNOREFONTTABLE](#ignorefonttable)
+- [IGNORECOLORTABLE](#ignorecolortable)
 - [OUTDATA](#outdata)
 
 ### 调试参数
@@ -129,6 +131,42 @@ IGNORECELLSTYLE = NO
 
 ---
 
+### IGNOREFONTTABLE
+
+**Syntax** : YES | NO
+
+指定是否忽略字体表。
+
+**Default** : YES
+
+**Caution** : 忽略字体表并不代表会忽略文本字体差异，若字体表相同，但实际文本内容使用了字体表中的不同字体，则宏程序仍然会检测出差异。
+
+**Example** :
+
+```sas
+IGNOREFONTTABLE = NO
+```
+
+---
+
+### IGNORECOLORTABLE
+
+**Syntax** : YES | NO
+
+指定是否忽略颜色表。
+
+**Caution** : 忽略颜色表并不代表会忽略文本颜色差异，若颜色表相同，但实际文本内容使用了颜色表中的不同颜色，则宏程序仍然会检测出差异。
+
+**Default** : YES
+
+**Example** :
+
+```sas
+IGNORECOLORTABLE = NO
+```
+
+---
+
 ### OUTDATA
 
 **Syntax** : <_libname._>_dataset_(_dataset-options_)
@@ -141,7 +179,7 @@ _dataset_: 数据集名称
 
 _dataset-options_: 数据集选项，兼容 SAS 系统支持的所有数据集选项
 
-输出数据集有 6 个变量，具体如下：
+输出数据集有 5 个变量，具体如下：
 
 | 变量名       | 含义             |
 | ------------ | ---------------- |
@@ -149,7 +187,6 @@ _dataset-options_: 数据集选项，兼容 SAS 系统支持的所有数据集�
 | COMPARE_PATH | compare 文件路径 |
 | BASE_NAME    | base 文件名      |
 | COMPARE_NAME | compare 文件名   |
-| CODE         | 返回码           |
 | DIFFYN       | 存在差异         |
 
 **Default** : DIFF

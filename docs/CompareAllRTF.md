@@ -15,6 +15,8 @@
 - [IGNOREHEADER](#ignoreheader)
 - [IGNOREFOOTER](#ignorefooter)
 - [IGNORECELLSTYLE](#ignorecellstyle)
+- [IGNOREFONTTABLE](#ignorefonttable)
+- [IGNORECOLORTABLE](#ignorecolortable)
 - [OUTDATA](#outdata)
 
 ### 调试参数
@@ -86,6 +88,18 @@ BASE = cdir
 ### IGNORECELLSTYLE
 
 用法同 [IGNORECELLSTYLE](./CompareRTF.md#ignorecellstyle)
+
+---
+
+### IGNOREFONTTABLE
+
+用法同 [IGNOREFONTTABLE](./CompareRTF.md#ignorefonttable)
+
+---
+
+### IGNORECOLORTABLE
+
+用法同 [IGNORECOLORTABLE](./CompareRTF.md#ignorecolortable)
 
 ---
 
