@@ -60,10 +60,17 @@
     run;
 
     proc sql noprint;
-        select name into : dataset_col_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET";
+        select name into : dataset_col_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量名*/
         %let dataset_col_n = &SQLOBS;
+
+        select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF"; /*rtf 变量名*/
+        %let rtf_col_n = &SQLOBS;
+
+        select name into : rtf_col_eq1_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF" and length = 1; /*rtf 疑似空列变量名*/
+        %let rtf_col_eq1_n = &SQLOBS;
     quit;
 
+    /*3.1 忽略前置空格*/
     %if %upcase(&ignoreLeadBlank) = YES %then %do;
         data _tmp_dataset;
             set _tmp_dataset;
@@ -71,6 +78,21 @@
                 &&dataset_col_&i = strip(&&dataset_col_&i);
             %end;
         run;
+    %end;
+
+    /*3.2 忽略空列*/
+    %if %upcase(&ignoreEmptyColumn) = YES %then %do;
+        %if &rtf_col_eq1_n > 0 %then %do;
+            %do i = 1 %to &rtf_col_eq1_n;
+                proc sql noprint;
+                    select max(lengthn(&&rtf_col_eq1_&i)) into : col_len_max from _tmp_rtf;
+
+                    %if &col_len_max = 0 %then %do;
+                        alter table _tmp_rtf drop &&rtf_col_eq1_&i;
+                    %end;
+                quit;
+            %end;
+        %end;
     %end;
 
     /*4. 同步变量名*/
