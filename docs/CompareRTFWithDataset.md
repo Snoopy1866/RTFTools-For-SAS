@@ -84,8 +84,6 @@ IGNORELEADBLANK = NO
 
 ### IGNOREEMPTYCOLUMN
 
-⚠ 尚未开发完成！
-
 **Syntax** : YES | NO
 
 指定是否忽略空列。
