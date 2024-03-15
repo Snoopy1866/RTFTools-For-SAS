@@ -54,7 +54,7 @@
     %ReadRTF(file = "&rtfloc", outdata = _tmp_rtf(drop = obs_seq), compress = yes, del_rtf_ctrl = yes);
 
 
-    /*3. 处理忽略比较*/
+    /*3. 复制 dataset，使用 sql into 语句创建宏变量*/
     data _tmp_dataset;
         set &dataset;
     run;
@@ -63,6 +63,12 @@
         select name into : dataset_col_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量名*/
         %let dataset_col_n = &SQLOBS;
 
+        select type into : dataset_col_type_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量类型*/
+        %let dataset_col_type_n = &SQLOBS;
+
+        select format into : dataset_col_format_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量输出格式*/
+        %let dataset_col_format_n = &SQLOBS;
+
         select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF"; /*rtf 变量名*/
         %let rtf_col_n = &SQLOBS;
 
@@ -70,17 +76,35 @@
         %let rtf_col_eq1_n = &SQLOBS;
     quit;
 
-    /*3.1 忽略前置空格*/
+    /*4. 预处理*/
+    /*4.1 dataset 将数值转换成字符串*/
+    proc sql noprint;
+        create table _tmp_dataset_char_ver as
+            select
+                %do i = 1 %to &dataset_col_n;
+                    %if &&dataset_col_type_&i = num %then %do;
+                        put(&&dataset_col_&i, &&dataset_col_format_&i) as &&dataset_col_&i
+                    %end;
+                    %else %do;
+                        &&dataset_col_&i
+                    %end;
+
+                    %if &i < &dataset_col_n %then %do; %bquote(,) %end;
+                %end;
+            from _tmp_dataset;
+    quit;
+
+    /*4.2 dataset 忽略前置空格*/
     %if %upcase(&ignoreLeadBlank) = YES %then %do;
-        data _tmp_dataset;
-            set _tmp_dataset;
+        data _tmp_dataset_char_ver;
+            set _tmp_dataset_char_ver;
             %do i = 1 %to &dataset_col_n;
                 &&dataset_col_&i = strip(&&dataset_col_&i);
             %end;
         run;
     %end;
 
-    /*3.2 忽略空列*/
+    /*4.3 rtf 忽略空列*/
     %if %upcase(&ignoreEmptyColumn) = YES %then %do;
         %if &rtf_col_eq1_n > 0 %then %do;
             %do i = 1 %to &rtf_col_eq1_n;
@@ -95,11 +119,11 @@
         %end;
     %end;
 
-    /*4. 同步变量名*/
+    /*5. 同步变量名*/
     proc sql noprint;
-        select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF";
+        select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF"; /*rtf 变量名*/
         %let rtf_col_n = &SQLOBS;
-        
+
         %if &rtf_col_n ^= &dataset_col_n %then %do;
             %put ERROR: 变量数量不匹配！;
             %goto exit;
@@ -116,17 +140,18 @@
 
 
 
-    /*5. 比较 RTF 文件与数据集*/
-    proc compare base = _tmp_rtf compare = _tmp_dataset;
+    /*6. 比较 RTF 文件与数据集*/
+    proc compare base = _tmp_rtf compare = _tmp_dataset_char_ver;
     run;
 
 
     %exit:
-    /*6. 清除中间数据集*/
+    /*7. 清除中间数据集*/
     %if %upcase(&del_temp_data) = YES %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf
                    _tmp_dataset
+                   _tmp_dataset_char_ver
                   ;
         quit;
     %end;
