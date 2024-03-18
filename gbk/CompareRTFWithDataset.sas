@@ -66,7 +66,7 @@
         select type into : dataset_col_type_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量类型*/
         %let dataset_col_type_n = &SQLOBS;
 
-        select format into : dataset_col_format_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量输出格式*/
+        select ifc(not missing(format), format, "best.") into : dataset_col_format_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量输出格式*/
         %let dataset_col_format_n = &SQLOBS;
 
         select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF"; /*rtf 变量名*/
