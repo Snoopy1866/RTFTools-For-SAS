@@ -67,6 +67,41 @@ out = #auto
 
 ---
 
+#### RTF_LIST
+
+类型 : 可选参数
+
+取值 : 指定外部文件名（含扩展名），该文件包含需要合并的 RTF 文件路径列表。
+
+默认值 : #NULL
+
+举例 :
+
+```
+rtf_list = "rtf_list_copy.txt"
+```
+
+💡 如果指定 `rtf_list = rtf_list_copy.txt`，则 `rtf_list_copy.txt` 应包含类似如下的文本：
+
+```
+X:\01 table\表 7.3.1 副反应发生率 安全集.rtf
+// X:\01 table\表 7.3.2 不良事件发生率 安全集.rtf
+X:\01 table\表 7.3.3 不良事件汇总 安全集.rtf
+X:\01 table\表 7.3.4 按系统器官分类和首选术语汇总 AE 安全集.rtf
+X:\01 table\表 7.3.5 按系统器官分类和首选术语汇总 TEAE 安全集.rtf
+X:\01 table\表 7.3.6 按系统器官分类和首选术语汇总 SAE 安全集.rtf
+
+X:\01 table\表 7.3.7 按系统器官分类和首选术语汇总与试验用产品相关的 TEAE 安全集.rtf
+X:\01 table\表 7.3.8 按系统器官分类和首选术语汇总与试验用产品相关的 SAE 安全集.rtf
+X:\01 table\表 7.3.9 按系统器官分类、首选术语和严重程度汇总 TEAE 安全集.rtf
+```
+
+其中每一行表示一个 RTF 文件路径，空行和以 `//` 开头的 RTF 文件路径将被忽略，宏程序将按照从上到下的顺序进行 RTF 文件的合并。
+
+💡 一般情况下，可以先指定 `autoorder = no`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，可指定 `rtf_list = rtf_list_copy.txt`。
+
+---
+
 #### DEPTH
 
 类型 : 可选参数
@@ -263,4 +298,6 @@ run;
 %MergeRTF("~\TFL", out = merged.rtf, depth = 2, vd = Y);
 
 %MergeRTF("~\TFL", out = merged.rtf, depth = 2, vd = Y, merge = no);
+
+%MergeRTF("~\TFL", out = merged.rtf, rtf_list = rtf_list_copy.txt);
 ```
