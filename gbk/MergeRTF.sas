@@ -62,7 +62,7 @@
     /*3. AUTOORDER = NO 手动排序*/
     %if %upcase(&autoorder) = NO %then %do;
         X explorer "&vd:\_tmp_rtf_list.txt";
-        X mshta vbscript:msgbox("请在弹出的窗口中调整 RTF 文件的输出顺序，然后按确认按钮继续运行。（注意：当前遍历深度为 &depth.，部分 RTF 文件会被跳过！）",64,"提示")(window.close);
+        X mshta vbscript:msgbox("请在弹出的窗口中调整 RTF 文件的输出顺序，然后按确认按钮继续运行。（注意：当前遍历深度为 &depth.，部分 RTF 文件会被跳过！）",4160,"提示")(window.close);
     %end;
 
     %let run_start_time = %sysfunc(time()); /*记录开始时间*/
@@ -363,10 +363,10 @@
     %let run_spend_time = %sysfunc(putn(%sysevalf(&run_end_time - &run_start_time), 8.2)); /*计算耗时*/
 
     %if %sysevalf(&mergeable_rtf_ref_max < &rtf_ref_max) %then %do;
-        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！部分已被修改的 rtf 文件未合并，请查看日志详情！",48,"提示")(window.close);
+        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！部分已被修改的 rtf 文件未合并，请查看日志详情！",4144,"提示")(window.close);
     %end;
     %else %do;
-        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！",64,"提示")(window.close);
+        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！",4160,"提示")(window.close);
     %end;
 
 
