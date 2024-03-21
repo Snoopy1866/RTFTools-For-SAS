@@ -4,6 +4,7 @@
 
 %macro MergeRTF(dir,
                 out = #auto,
+                rtf_list = #null,
                 depth = 2,
                 autoorder = yes,
                 vd = X,
@@ -54,48 +55,83 @@
         %end;
     %end;
 
-    
-    /*2. 使用 DOS 命令获取所有 RTF 文件，存储在 _tmp_rtf_list.txt 中*/
-    X "subst &vd: ""&dirloc"" & dir ""&vd:\*.rtf"" /b/on/s > ""&vd:\_tmp_rtf_list.txt"" & exit";
+    X "subst &vd: ""&dirloc"" & exit"; /*建立虚拟磁盘*/
 
-    
-    /*3. AUTOORDER = NO 手动排序*/
-    %if %upcase(&autoorder) = NO %then %do;
-        X explorer "&vd:\_tmp_rtf_list.txt";
-        X mshta vbscript:msgbox("请在弹出的窗口中调整 RTF 文件的输出顺序，然后按确认按钮继续运行。（注意：当前遍历深度为 &depth.，部分 RTF 文件会被跳过！）",4160,"提示")(window.close);
+    /*2. RTF_LIST 处理*/
+    %if %upcase(&rtf_list) = #NULL %then %do;
+        /*使用 DOS 命令获取所有 RTF 文件，存储在 _tmp_rtf_list.txt 中*/
+        X "dir ""&vd:\*.rtf"" /b/on/s > ""&vd:\_tmp_rtf_list.txt"" & exit";
+
+        /*AUTOORDER = NO 手动排序*/
+        %if %upcase(&autoorder) = NO %then %do;
+            X explorer "&vd:\_tmp_rtf_list.txt";
+            X mshta vbscript:msgbox("请在弹出的窗口中调整 RTF 文件的输出顺序，然后按确认按钮继续运行。（注意：当前遍历深度为 &depth.，部分 RTF 文件会被跳过！）",4160,"提示")(window.close);
+        %end;
+
+        /*手动排序后，保存一份副本，以供后续调用时指定参数 RTF_LIST = rtf_list_copy.txt*/
+        X "copy ""&vd:\_tmp_rtf_list.txt"" ""&vd:\rtf_list_copy.txt"" & exit";
+
+
+        /*读取 _tmp_rtf_list.txt，识别、筛选 rtf 文件*/
+        data _tmp_rtf_list;
+            infile "&vd:\_tmp_rtf_list.txt" truncover encoding = 'gbke';
+            input rtf_path $char1000.;
+
+            /*真实路径*/
+            rtf_path_real = cats("&dirloc", substr(rtf_path, 3));
+
+            /*识别表格和清单*/
+            reg_table_id = prxparse("/^.*(((?:列)?表|清单|图)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf)\s*$/o");
+
+            /*筛选命名规范的 rtf 文件*/
+            if prxmatch(reg_table_id, rtf_path) then do;
+                rtf_name  = prxposn(reg_table_id, 1, rtf_path); /*RTF 文件名*/
+                rtf_type  = prxposn(reg_table_id, 2, rtf_path); /*RTF 类型*/
+                rtf_seq   = prxposn(reg_table_id, 3, rtf_path); /*RTF 编号*/
+                ref_label = prxposn(reg_table_id, 4, rtf_path); /*RTF 描述文字*/
+     
+                rtf_filename_valid_flag = "Y";
+            end;
+
+            /*筛选指定深度的文件夹的 rtf 文件*/
+            if count(rtf_path, "\") <= &depth then do;
+                rtf_depth_valid_flag = "Y";
+            end;
+        run;
+
+        %let run_start_time = %sysfunc(time()); /*记录开始时间*/
+    %end;
+    %else %do;
+        /*直接读取外部文件*/
+        data _tmp_rtf_list;
+            infile "&vd:\&rtf_list" truncover encoding = 'gbke';
+            input rtf_path $char1000.;
+
+            if substr(rtf_path, 1, 2) = "//" then delete; /*删除已注释的 RTF 文件*/
+            if kcompress(rtf_path, , "s") = "" then delete; /*删除空行*/
+        run;
+
+        /*兼容性处理*/
+        data _tmp_rtf_list_add_lv_sorted;
+            set _tmp_rtf_list;
+
+            /*真实路径*/
+            rtf_path_real = cats("&dirloc", substr(rtf_path, 3));
+
+            /*文件名*/
+            rtf_name = kscan(rtf_path, -1, "\");
+
+            rtf_filename_valid_flag = "Y";
+            rtf_depth_valid_flag = "Y";
+        run;
+
+        %let run_start_time = %sysfunc(time()); /*记录开始时间*/
+
+        %goto main_prog; /*跳过后续处理，直接转到主程序*/
     %end;
 
-    %let run_start_time = %sysfunc(time()); /*记录开始时间*/
 
-
-    /*4. 读取 _tmp_rtf_list.txt，识别、筛选 rtf 文件*/
-    data _tmp_rtf_list;
-        infile "&vd:\_tmp_rtf_list.txt" truncover encoding = 'gbke';
-        input rtf_path $char1000.;
-
-        /*真实路径*/
-        rtf_path_real = cats("&dirloc", substr(rtf_path, 3));
-
-        /*识别表格和清单*/
-        reg_table_id = prxparse("/^.*(((?:列)?表|清单|图)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf)\s*$/o");
-
-        /*筛选命名规范的 rtf 文件*/
-        if prxmatch(reg_table_id, rtf_path) then do;
-            rtf_name  = prxposn(reg_table_id, 1, rtf_path); /*RTF 文件名*/
-            rtf_type  = prxposn(reg_table_id, 2, rtf_path); /*RTF 类型*/
-            rtf_seq   = prxposn(reg_table_id, 3, rtf_path); /*RTF 编号*/
-            ref_label = prxposn(reg_table_id, 4, rtf_path); /*RTF 描述文字*/
- 
-            rtf_filename_valid_flag = "Y";
-        end;
-
-        /*筛选指定深度的文件夹的 rtf 文件*/
-        if count(rtf_path, "\") <= &depth then do;
-            rtf_depth_valid_flag = "Y";
-        end;
-    run;
-
-    /*5. AUTOORDER = YES，根据 RTF 文件名内的序号，自动排序*/
+    /*3. AUTOORDER = YES，根据 RTF 文件名内的序号，自动排序*/
     %if %upcase(&autoorder) = YES %then %do;
         proc sql noprint;
             select max(count(rtf_seq, ".")) + 1 into : lv_max trimmed from _tmp_rtf_list; /*计算 rtf 文件名的序号的最大层级数量*/
@@ -138,7 +174,9 @@
     %end;
 
 
-    /*仅列出而不合并 rtf 文件，用于调试和试运行*/
+
+    %main_prog:
+    /*4. 仅列出而不合并 rtf 文件，用于调试和试运行*/
     %if %upcase(&merge) = NO %then %do;
         data rtf_list;
             set _tmp_rtf_list_add_lv_sorted;
@@ -154,7 +192,7 @@
     proc printto log=_null_; 
     run;
 
-    /*6. 构造 filename 语句，建立文件引用*/
+    /*5. 构造 filename 语句，建立文件引用*/
     data _tmp_rtf_list_fnst;
         set _tmp_rtf_list_add_lv_sorted(where = (rtf_filename_valid_flag = "Y" and rtf_depth_valid_flag = "Y")) end = end;
 
@@ -167,7 +205,7 @@
     run;
 
 
-    /*7. 读取 rtf 文件*/
+    /*6. 读取 rtf 文件*/
     %if &rtf_ref_max = 0 %then %do;
         %put ERROR: 文件夹 &dirloc 内没有符合要求的 rtf 文件可以合并！;
         %goto exit;
@@ -190,7 +228,7 @@
     %end;
 
     
-    /*8. 检测 rtf 文件是否被 SAS 之外的其他程序修改*/
+    /*7. 检测 rtf 文件是否被 SAS 之外的其他程序修改*/
     %do i = 1 %to &rtf_ref_max;
         data _null_;
             set _tmp_rtf&i(obs = 1);
@@ -206,7 +244,7 @@
 
 
 
-    /*9. 获取可合并的 rtf 文件引用列表*/
+    /*8. 获取可合并的 rtf 文件引用列表*/
     %let mergeable_rtf_list = %bquote(); 
     %let unmergeable_rtf_index = 0;
     %do i = 1 %to &rtf_ref_max;
@@ -239,7 +277,7 @@
     proc printto log=_null_;
     run;
 
-    /*10. 处理 rtf 文件*/
+    /*9. 处理 rtf 文件*/
     /*大致思路如下：
       开头的 rtf 文件，删除末尾的 }
 
@@ -314,11 +352,11 @@
                    into : merged_rtf_file_&i trimmed from _tmp_rtf_list_fnst where fileref = "&mergeable_rtf_ref";
         quit;
         %let mergeable_rtf_&i._end_time = %sysfunc(time()); /*记录单个 rtf 文件处理结束时间*/
-        %let mergeable_rtf_&i._spend_time = %sysfunc(putn(%sysevalf(&mergeable_rtf_&i._end_time - &mergeable_rtf_&i._start_time), 8.2)); /*计算单个 rtf 文件处理耗时*/
+        %let mergeable_rtf_&i._spend_time = %sysfunc(putn(%sysevalf(&&mergeable_rtf_&i._end_time - &&mergeable_rtf_&i._start_time), 8.2)); /*计算单个 rtf 文件处理耗时*/
     %end;
 
 
-    /*11. 合并 rtf 文件*/
+    /*10. 合并 rtf 文件*/
     data _tmp_rtf_merged(compress = yes);
         set %do i = 1 %to &mergeable_rtf_ref_max;
                 _tmp_%scan(&mergeable_rtf_list, &i, %bquote( ))
@@ -335,7 +373,7 @@
     %end;
 
 
-    /*12. 输出 rtf 文件*/
+    /*11. 输出 rtf 文件*/
     %if %upcase(&out) = #AUTO %then %do;
         %let date = %sysfunc(putn(%sysfunc(today()), yymmdd10.));
         %let time = %sysfunc(time());
@@ -358,7 +396,7 @@
         put line $varying32767. act_length;
     run;
 
-    /*13. 弹出提示框*/
+    /*12. 弹出提示框*/
     %let run_end_time = %sysfunc(time()); /*记录结束时间*/
     %let run_spend_time = %sysfunc(putn(%sysevalf(&run_end_time - &run_start_time), 8.2)); /*计算耗时*/
 
