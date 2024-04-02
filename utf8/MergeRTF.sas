@@ -2,16 +2,16 @@
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-%macro MergeRTF(dir,
-                out = #auto,
-                rtf_list = #null,
-                depth = 2,
-                autoorder = yes,
-                exclude = #null,
-                vd = X,
-                merge = yes,
-                merged_file_show = short,
-                del_temp_data = yes)
+%macro MergeRTF(DIR,
+                OUT              = #AUTO,
+                RTF_LIST         = #NULL,
+                DEPTH            = MAX,
+                AUTOORDER        = YES,
+                EXCLUDE          = #NULL,
+                VD               = X,
+                MERGE            = YES,
+                MERGED_FILE_SHOW = SHORT,
+                DEL_TEMP_DATA    = YES)
                 /des = "合并RTF文件" parmbuff;
 
     /*打开帮助文档*/
