@@ -427,7 +427,6 @@
         %if %sysfunc(prxmatch(&reg_out_id, %superq(out))) %then %do;
             %let out = %bquote(%sysfunc(prxposn(&reg_out_id, 1, %superq(out))));
         %end;
-        %put &=out;
     %end;
 
     data _null_;
