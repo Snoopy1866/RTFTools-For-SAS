@@ -456,12 +456,14 @@
 
 
     /*删除临时数据集*/
-    proc datasets library = work nowarn noprint;
-        delete %do i = 1 %to &rtf_ref_max;
-                   _tmp_rtf&i
-               %end;
-              ;
-    quit;
+    %if %upcase(&del_temp_data) = YES %then %do;
+        proc datasets library = work nowarn noprint;
+            delete %do i = 1 %to &rtf_ref_max;
+                       _tmp_rtf&i
+                   %end;
+                  ;
+        quit;
+    %end;
 
 
     %exit_with_no_merge:
