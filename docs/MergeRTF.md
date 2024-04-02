@@ -22,6 +22,7 @@
 - [VD](#vd)
 - [MERGE](#merge)
 - [MERGED_FILE_SHOW](#merged_file_show)
+- [LINK_TO_PREV](#link_to_prev)
 
 ### 调试参数
 
@@ -120,7 +121,7 @@ rtf_list = rtf_list_copy.txt
 
 **Tips** :
 
-- 一般情况下，可以先指定 `AUTOORDER = NO`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，可指定 `RTF_LIST = rtf_list_copy.txt`。
+- 一般情况下，可以先指定 `AUTOORDER = NO`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，调用宏程序时可直接指定 `RTF_LIST = rtf_list_copy.txt`。
 
 ---
 
@@ -154,7 +155,7 @@ rtf_list = rtf_list_copy.txt
     └─other
   ```
 
-  合并根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 中的所有 RTF 文件。
+  合并根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing`, `~\TFL\other` 中的所有 RTF 文件。
 
 - `DEPTH = 3` :
   ```
@@ -167,7 +168,7 @@ rtf_list = rtf_list_copy.txt
     │ └─draft
     └─other
   ```
-  合并根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing`，以及 `~\TFL\table\draft`, `~\TFL\listing\draft` 中的所有 RTF 文件。
+  合并根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing`, `~\TFL\other`，以及 `~\TFL\table\draft`, `~\TFL\listing\draft` 中的所有 RTF 文件。
 
 **Caution** :
 
@@ -253,6 +254,44 @@ rtf_list = rtf_list_copy.txt
 - `VIRTUAL`：显示虚拟磁盘路径
 
 **Default** ：SHORT
+
+---
+
+#### LINK_TO_PREV
+
+**Syntax** : YES | NO
+
+指定是否将第二张及之后的 RTF 文件的页眉页脚链接到前一节
+
+**Default** : NO
+
+默认情况下，宏程序不会将第二张及之后的 RTF 文件的页眉页脚链接到前一节。
+
+如果待合并的 RTF 文件的页眉或页脚包含相同的图片（例如：企业 logo 图片），则建议指定 `LINK_TO_PREV = YES`，宏程序将仅保留第一张 RTF 文件的页眉页脚，后续 RTF 文件的页眉页脚将自动链接到前一节，以压缩合并后的 RTF 文件的体积。
+
+以下两种典型情况，指定 `LINK_TO_PREV = YES` 带来的时间成本与收益如下：
+
+| 典型情况         | 参数值             | 运行时间    | 文件体积    |
+| ---------------- | ------------------ | ----------- | ----------- |
+| 页眉页脚包含图片 | LINK_TO_PREV = NO  | 7.20s       | 16510KiB    |
+|                  | LINK_TO_PREV = YES | 8.87s       | 4644KiB     |
+|                  |                    | **+23.19%** | **-71.87%** |
+| 页眉页脚不含图片 | LINK_TO_PREV = NO  | 10.39s      | 14084KiB    |
+|                  | LINK_TO_PREV = YES | 16.27s      | 14006KiB    |
+|                  |                    | **+56.59%** | **-0.55%**  |
+
+\* 上述表格数据是基于 SAS 9.4M7 运行在 Windows 10 上的单次测试结果，仅供参考。
+
+可以发现，并非在所有情况下指定 `LINK_TO_PREV = YES` 都能带来明显收益。
+
+- 当 RTF 文件的页眉、页脚包含图片时，指定 `LINK_TO_PREV = YES` 会增加少量运行时间，文件体积明显减小；
+- 当 RTF 文件的页眉、页脚不含图片时，指定 `LINK_TO_PREV = YES` 会增加大量运行时间，文件体积几乎不变；
+
+**Caution** :
+
+- 如果 RTF 文件的页眉、页脚仅包含文本内容，则谨慎指定 `LINK_TO_PREV = YES`；
+- 如果 RTF 文件的页眉、页脚不一致，请勿指定 `LINK_TO_PREV = YES`；
+- 如果 RTF 文件的页面布局存在不一致，请勿指定 `LINK_TO_PREV = YES`，否则可能导致部分页面的页眉、页脚超出页面边缘。
 
 ---
 
