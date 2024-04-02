@@ -22,6 +22,7 @@
 - [VD](#vd)
 - [MERGE](#merge)
 - [MERGED_FILE_SHOW](#merged_file_show)
+- [LINK_TO_PREV](#link_to_prev)
 
 ### 调试参数
 
@@ -263,6 +264,42 @@ rtf_list = rtf_list_copy.txt
 指定是否删除宏程序运行产生的中间数据集
 
 **Default** ：YES
+
+---
+
+#### LINK_TO_PREV
+
+**Syntax** : YES | NO
+
+指定是否将第二张及之后的 RTF 文件的页眉页脚链接到前一节
+
+**Default** : NO
+
+默认情况下，宏程序不会将第二张及之后的 RTF 文件的页眉页脚链接到前一节。
+
+如果待合并的 RTF 文件的页眉或页脚包含相同的图片（例如：企业 logo 图片），则建议指定 `LINK_TO_PREV = YES`，宏程序将仅保留第一张 RTF 文件的页眉页脚，后续 RTF 文件的页眉页脚将自动链接到前一节，以压缩合并后的 RTF 文件的体积。
+
+以下两种典型情况，指定 `LINK_TO_PREV = YES` 带来的时间成本与收益如下：
+
+| 典型情况         | 参数值             | 花费时间    | 文件体积    |
+| ---------------- | ------------------ | ----------- | ----------- |
+| 页眉页脚包含图片 | LINK_TO_PREV = NO  | 7.20s       | 16510KiB    |
+|                  | LINK_TO_PREV = YES | 8.87s       | 4644KiB     |
+|                  |                    | **+23.19%** | **-71.87%** |
+| 页眉页脚不含图片 | LINK_TO_PREV = NO  | 10.39s      | 14084KiB    |
+|                  | LINK_TO_PREV = YES | 16.27s      | 14006KiB    |
+|                  |                    | **+56.59%** | **-0.55%**  |
+
+\* 上述表格数据是基于 SAS 9.4M7 运行在 Windows 10 上的单次测试结果，仅供参考。
+
+可以发现，并非在所有情况下指定 `LINK_TO_PREV = YES` 都能带来明显收益。
+
+- 当 RTF 文件的页眉、页脚包含图片时，指定 `LINK_TO_PREV = YES` 会增加少量运行时间，文件体积明显减小；
+- 当 RTF 文件的页眉、页脚不含图片时，指定 `LINK_TO_PREV = YES` 会增加大量运行时间，文件体积几乎不变；
+
+**Caution** :
+
+- 如果 RTF 文件的页眉仅包含文本内容，则谨慎指定 `LINK_TO_PREV = YES`。
 
 ---
 

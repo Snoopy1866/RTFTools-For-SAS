@@ -11,6 +11,7 @@
                 VD               = X,
                 MERGE            = YES,
                 MERGED_FILE_SHOW = SHORT,
+                LINK_TO_PREV     = NO,
                 DEL_TEMP_DATA    = YES)
                 /des = "合并RTF文件" parmbuff;
 
@@ -317,7 +318,11 @@
 
     /*8. 处理 rtf 文件*/
     /*大致思路如下：
+
+      预处理，删除第 2 个及之后的RTF文件的页眉页脚
+
       开头的 rtf 文件，删除末尾的 }
+
 
       中间的 rtf 文件
       - 删除 \sectd 之前的所有行
@@ -332,6 +337,84 @@
         %let mergeable_rtf_&i._start_time = %sysfunc(time()); /*记录单个 rtf 文件处理开始时间*/
 
         %let mergeable_rtf_ref = %scan(&mergeable_rtf_list, &i, %bquote( ));
+
+        /*预处理，删除第 2 个及之后的RTF文件的页眉页脚*/
+        %if %sysevalf(&i >= 2) %then %do;
+            %if %upcase(&link_to_prev) = YES %then %do;
+                %let reg_header_expr = %bquote(/^\{\\header\\pard\\plain\\q[lcr]\{$/o);
+                %let reg_footer_expr = %bquote(/^\{\\footer\\pard\\plain\\q[lcr]\{$/o);
+
+                /*页眉*/
+                data _tmp_&mergeable_rtf_ref(compress = yes);
+                    set _tmp_&mergeable_rtf_ref;
+
+                    reg_header_id = prxparse("&reg_header_expr");
+
+                    retain header_brace_unclosed; /*未闭合的大括号数量*/
+                    retain header_start_flag 0
+                           header_end_flag 0;
+                    if prxmatch(reg_header_id, strip(line)) then do; /*页眉开始*/
+                        header_brace_unclosed = (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                        header_start_flag = 1;
+                        delete;
+                    end;
+                    else if header_start_flag = 1 and header_end_flag = 0 then do;
+                        header_brace_unclosed + (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                        if header_brace_unclosed = 0 then do; /*页眉结束*/
+                            header_end_flag = 1;
+                            header_brace_unclosed = .;
+                            delete;
+                        end;
+                        else do; /*页眉中间*/
+                            delete;
+                        end;
+                    end;
+                    else if header_brace_unclosed = . then do;
+                        header_start_flag = 0;
+                        header_end_flag = 0;
+                    end;
+                run;
+
+                /*页脚*/
+                data _tmp_&mergeable_rtf_ref(compress = yes);
+                    set _tmp_&mergeable_rtf_ref;
+
+                    reg_footer_id = prxparse("&reg_footer_expr");
+
+                    retain footer_brace_unclosed; /*未闭合的大括号数量*/
+                    retain footer_start_flag 0
+                           footer_end_flag 0;
+                    if prxmatch(reg_footer_id, strip(line)) then do; /*页脚开始*/
+                        footer_brace_unclosed = (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                        footer_start_flag = 1;
+                        delete;
+                    end;
+                    else if footer_start_flag = 1 and footer_end_flag = 0 then do;
+                        footer_brace_unclosed + (count(strip(line), "{") - count(strip(line), "\{")) - (count(strip(line), "}") - count(strip(line), "\}"));
+                        if footer_brace_unclosed = 2 and strip(line) = "{\row}" then do; /*页脚结束*/
+                            footer_end_flag = 1;
+                            footer_brace_unclosed = -2;
+                            delete;
+                        end;
+                        else do; /*页脚中间*/
+                            delete;
+                        end;
+                    end;
+                    else if footer_brace_unclosed = -2 then do; /*末尾 \pard}} 处理*/
+                        if substr(strip(line), 1, 7) = "\pard}}" then do;
+                            line = strip(substr(line, 8));
+                            footer_brace_unclosed = .;
+                        end;
+                    end;
+                    else if footer_brace_unclosed = . then do;
+                        footer_start_flag = 0;
+                        footer_end_flag = 0;
+                    end;
+                run;
+            %end;
+        %end;
+
+        /*正式处理*/
         data _tmp_&mergeable_rtf_ref(compress = yes);
             set _tmp_&mergeable_rtf_ref end = end;
             
