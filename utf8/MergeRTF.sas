@@ -86,12 +86,24 @@
                     rtf_filename_valid_flag = "Y";
                 end;
 
+                /*文件类型衍生编码*/
+                select (rtf_type);
+                    when ("表") rtf_type_n = 1;
+                    when ("图") rtf_type_n = 2;
+                    when ("列表") rtf_type_n = 3;
+                    when ("清单") rtf_type_n = 4;
+                    otherwise rtf_type_n = constant("BIG");
+                end;
+
+                /*文件所在文件夹的深度*/
+                rtf_dir_depth = count(rtf_path, "\");
+
                 /*筛选指定深度的文件夹的 rtf 文件*/
                 %if %upcase(&depth) = MAX %then %do;
                     rtf_depth_valid_flag = "Y";
                 %end;
                 %else %do;
-                    if count(rtf_path, "\") <= &depth then do;
+                    if rtf_dir_depth <= &depth then do;
                         rtf_depth_valid_flag = "Y";
                     end;
                 %end;
@@ -130,7 +142,9 @@
                 by %do i = 1 %to &lv_max;
                        seq_lv_&i
                    %end;
+                   rtf_type_n
                    ref_label
+                   rtf_dir_depth
                    ;
             run;
         %end;
