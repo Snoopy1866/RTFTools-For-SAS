@@ -87,9 +87,14 @@
                 end;
 
                 /*筛选指定深度的文件夹的 rtf 文件*/
-                if count(rtf_path, "\") <= &depth then do;
+                %if %upcase(&depth) = MAX %then %do;
                     rtf_depth_valid_flag = "Y";
-                end;
+                %end;
+                %else %do;
+                    if count(rtf_path, "\") <= &depth then do;
+                        rtf_depth_valid_flag = "Y";
+                    end;
+                %end;
             run;
 
 
@@ -99,7 +104,7 @@
                 
                 /*添加代表层级序号的变量，最多有 n 层，就添加 n 个变量，每个变量代表当前 rtf 文件在某个层级的顺序*/
                 alter table _tmp_rtf_list
-                        add %do i = 1 %to %eval(&lv_max - 1); 
+                        add %do i = 1 %to %eval(&lv_max - 1);
                                 seq_lv_&i num,
                             %end;
                                 seq_lv_&lv_max num
@@ -183,7 +188,9 @@
     %if %upcase(&merge) = NO %then %do;
         data rtf_list;
             set _tmp_rtf_list_add_lv_sorted;
-            label rtf_path = "路径"
+            label rtf_path = "虚拟磁盘路径"
+                  rtf_path_real = "物理磁盘路径"
+                  rtf_name = "文件名"
                   rtf_filename_valid_flag = "文件名是否规范"
                   rtf_depth_valid_flag = "文件是否在指定深度内";
             keep rtf_name rtf_path rtf_path_real rtf_filename_valid_flag rtf_depth_valid_flag;
@@ -473,6 +480,7 @@
 
     /*删除 _null_.log 文件*/
     X "del _null_.log & exit";
+
 
     %put NOTE: 宏 MergeRTF 已结束运行！;
 
