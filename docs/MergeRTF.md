@@ -1,91 +1,94 @@
 ## MergeRTF
 
-### 程序信息
+合并 RTF 文件。
 
-- 名称：MergeRTF.sas
-- 类型：Macro
-- 依赖：无
-- 功能：合并文件夹中的 RTF 文件。
+## 依赖
 
-### 程序执行流程
+无。
 
-1. 根据参数 DIR 的值获取文件夹的物理路径
-2. 使用 DOS 命令 `dir` 获取所有 RTF 文件，将文件路径存储在参数 DIR 指定的文件夹下的 `_tmp_rtf_list.txt` 中
-3. 读取 `_tmp_rtf_list.txt`，识别、筛选符合要求的 RTF 文件
-4. 对 RTF 文件进行排序
-5. 对 RTF 文件建立文件引用（`filename` 语句）
-6. 读取 RTF 文件
-7. 检测 RTF 文件是否由 SAS 生成，且未被其他应用程序修改
-8. 获取可以合并的 RTF 文件的引用列表
-9. 处理 RTF 文件
-10. 合并 RTF 文件
-11. 输出合并后的 RTF 文件
+## 语法
 
-### 参数
+### 必选参数
+
+- [DIR](#dir)
+
+### 可选参数
+
+- [OUT](#out)
+- [RTF_LIST](#rtf_list)
+- [DEPTH](#depth)
+- [AUTOORDER](#autoorder)
+- [EXCLUDE](#exclude)
+- [VD](#vd)
+- [MERGE](#merge)
+- [MERGED_FILE_SHOW](#merged_file_show)
+
+### 调试参数
+
+- [DEL_TEMP_DATA](#del_temp_data)
+
+## 参数说明
 
 #### DIR
 
-类型 : 必选参数
+**Syntax** : _path_ | _fileref_
 
-取值 : 指定 RTF 文件夹路径或引用。指定的文件夹路径或者引用的文件夹路径必须是一个合法的 Windows 路径。
+指定 RTF 文件夹路径或引用。指定的文件夹路径必须是一个合法的 Windows 路径。
+
+**Caution** :
 
 - 指定物理路径时，可以传入带引号的路径或不带引号的路径，若传入不带引号的路径，建议使用 `%str()` 将路径包围
 - 当指定的物理路径太长时，应当使用 filename 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
 
-举例 :
+**Example** :
 
 ```
 DIR = "D:\~\TFL"
 ```
 
 ```
-FILE = %str(D:\~\TFL)
+DIR = %str(D:\~\TFL)
 ```
 
 ```
 filename ref "D:\~\TFL";
-FILE = ref;
+DIR = ref;
 ```
 
 ---
 
 #### OUT
 
-类型 : 可选参数
+**Syntax** : _filename_
 
-取值 : 指定合并后的 RTF 文件名称
+指定合并后的 RTF 文件名称，需包含扩展名。合并后的 RTF 文件将保存在参数 [DIR](#dir) 指定的文件夹下。
 
-默认值 : `merged-yyyy-mm-dd hh-mm-ss.rtf`，其中 `yyyy-mm-dd` 表示当前系统日期，`hh-mm-ss` 表示当前系统时间。
+**Default** : #AUTO
 
-举例 :
+默认文件名为：merged-_yyyy-mm-dd hh-mm-ss_.rtf，其中 _`yyyy-mm-dd`_ 表示当前系统日期，_`hh-mm-ss`_ 表示当前系统时间。
+
+**Example** :
 
 ```
-out = "合并表格.rtf"
-
-out = #auto
+OUT = "合并表格.rtf"
 ```
 
 ---
 
 #### RTF_LIST
 
-类型 : 可选参数
+**Syntax** : _filename_
 
-取值 : 指定外部文件名（含扩展名），该文件包含需要合并的 RTF 文件路径列表。
+指定定义合并清单的外部文件名，需包含扩展名。
 
-默认值 : #NULL
-
-举例 :
+文件 _filename_ 应包含如下形式的文本（文件名仅作示例，与实际情况不完全相同）：
 
 ```
-rtf_list = "rtf_list_copy.txt"
-```
+// X:\01 table\draft\表 7.3.3 不良事件汇总 安全集.rtf
+// X:\01 table\draft\表 7.3.4 按系统器官分类和首选术语汇总 AE 安全集.rtf
+// X:\01 table\draft\表 7.3.5 按系统器官分类和首选术语汇总 TEAE 安全集.rtf
+// X:\01 table\draft\表 7.3.6 按系统器官分类和首选术语汇总 SAE 安全集.rtf
 
-💡 如果指定 `rtf_list = rtf_list_copy.txt`，则 `rtf_list_copy.txt` 应包含类似如下的文本：
-
-```
-X:\01 table\表 7.3.1 副反应发生率 安全集.rtf
-// X:\01 table\表 7.3.2 不良事件发生率 安全集.rtf
 X:\01 table\表 7.3.3 不良事件汇总 安全集.rtf
 X:\01 table\表 7.3.4 按系统器官分类和首选术语汇总 AE 安全集.rtf
 X:\01 table\表 7.3.5 按系统器官分类和首选术语汇总 TEAE 安全集.rtf
@@ -96,102 +99,180 @@ X:\01 table\表 7.3.8 按系统器官分类和首选术语汇总与试验用产�
 X:\01 table\表 7.3.9 按系统器官分类、首选术语和严重程度汇总 TEAE 安全集.rtf
 ```
 
-其中每一行表示一个 RTF 文件路径，空行和以 `//` 开头的 RTF 文件路径将被忽略，宏程序将按照从上到下的顺序进行 RTF 文件的合并。
+其中，每一行文本代表一个需要合并的 RTF 文件的路径。
 
-💡 一般情况下，可以先指定 `autoorder = no`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，可指定 `rtf_list = rtf_list_copy.txt`。
+例外：
+
+- 以 `//` 开头的文本为注释，`//` 后面的 RTF 文件将不会被合并
+- 空行将被忽略
+
+宏程序将按照文件 _filename_ 中文本指定的 RTF 路径，从上到下的顺序进行 RTF 文件的合并。
+
+**Default** : #NULL
+
+默认情况下，宏程序将根据参数 [AUTOORDER](#autoorder) 的值决定是否进行自动排序或手动排序。若指定 `AUTOORDER = NO`，则弹出窗口要求用户进行手动排序，生成经过排序后的 RTF 文件清单副本，并再次递归调用宏程序自身，递归调用时，指定 `RTF_LIST = rtf_list_copy.txt`。
+
+**Example** :
+
+```
+rtf_list = rtf_list_copy.txt
+```
+
+**Tips** :
+
+- 一般情况下，可以先指定 `AUTOORDER = NO`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，可指定 `RTF_LIST = rtf_list_copy.txt`。
 
 ---
 
 #### DEPTH
 
-类型 : 可选参数
+**Syntax** : _numeric_
 
-取值 : 指定读取子文件夹中 RTF 文件的递归深度
+指定遍历 RTF 文件的子文件夹深度。取值范围：<img src="https://latex.codecogs.com/svg.image?\{x|x\in\mathbf{N}_&plus;\}" width=8%/>
 
-默认值 : 2
+若需要合并的 RTF 文件存储在参数 `DIR` 指定的文件夹的子文件夹中。例如：某项目在 `~\TFL` 目录下包含三个子文件夹，名称分别为： `table`, `figure`, `listing` 中，此时指定 `DEPTH = 2`，宏程序将读取根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 中的所有 RTF 文件，但不会读取 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 下的子文件夹中的 RTF 文件。
 
-该参数适用于 `DIR` 指定的文件夹根目录没有任何 RTF 文件，但其子文件夹存在文件的情况。
+通过下面的文件夹结构可以更好地理解这一参数：
 
-例如：某项目的 RTF 文件按照其类型，存储在 `~\TFL` 目录下的 `table`, `figure`, `listing` 中，此时指定 `depth = 2`，宏程序将读取根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 中的所有 RTF 文件，但不会读取 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 下的子文件夹中的 RTF 文件。
+- `DEPTH = 1`
+
+  ```
+  ~:.
+  └─TFL
+  ```
+
+  合并根目录 `~\TFL` 中的所有 RTF 文件。
+
+- `DEPTH = 2` :
+
+  ```
+  ~:.
+  └─TFL
+    ├─table
+    ├─figure
+    ├─listing
+    └─other
+  ```
+
+  合并根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing` 中的所有 RTF 文件。
+
+- `DEPTH = 3` :
+  ```
+  ~:.
+  └─TFL
+    ├─table
+    │ └─draft
+    ├─figure
+    ├─listing
+    │ └─draft
+    └─other
+  ```
+  合并根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing`，以及 `~\TFL\table\draft`, `~\TFL\listing\draft` 中的所有 RTF 文件。
+
+**Caution** :
+
+- 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
+
+**Default** : MAX
+
+默认情况下，宏程序将合并参数 [DIR](#dir) 指定的文件夹下任何深度的子文件夹内的 RTF 文件。
+
+**Tips** :
+
+- 在 Windows 中，可通过 `tree` 命令显示当前路径的文件夹结构。
 
 ---
 
 #### AUTOORDER
 
-类型 : 可选参数
+**Syntax** : YES | NO
 
-取值 : 指定是否自动排序
+指定是否自动排序
 
-默认值 : yes
+**Default** : YES
 
-- `AUTOORDER = yes` 时，宏程序根据 RTF 文件名自动排序，排序的具体细节见 [#2](#2-如何对-rtf-文件进行排序)
-- `AUTOORDER = no` 时，宏程序将弹出提示框，提示用户进行手动排序，同时打开一个包含当前目录下所有 RTF 文档名称的 .txt 文件，用户可调整此 .txt 文件中 RTF 文档名称显示的顺序，通过这种方式完成手动排序，保存此 .txt 文件后，点击确定，宏程序将会继续运行。
+- `AUTOORDER = YES` 时，宏程序根据 RTF 文件名自动排序，排序的具体细节见 [#2](#2-如何对-rtf-文件进行排序)
+- `AUTOORDER = NO` 时，宏程序将弹出提示框，提示用户进行手动排序，同时打开一个包含当前目录下所有 RTF 文档名称的 .txt 文件，用户可调整此 .txt 文件中 RTF 文档名称显示的顺序，通过这种方式完成手动排序，保存此 .txt 文件后，点击确定，宏程序将会继续运行。
 
 ![](./assets/MergeRTF-autoorder-no.png)
 
----
+**Caution** :
 
-#### VD
-
-类型：可选参数
-
-取值：指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被使用的一个字符
-
-默认值：X
+- 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
 
 ---
 
 #### EXCLUDE
 
-类型：可选参数
+**Syntax** : _placeholder_
 
-取值：指定排除名单，暂无作用
+指定排除名单，暂无作用。
 
-默认值：#null
+**Default** ：#NULL
+
+**Caution** :
+
+- 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
+
+---
+
+#### VD
+
+**Syntax** : _drive_
+
+指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被操作系统使用的一个字符
+
+默认值：X
 
 ---
 
 #### MERGE
 
-类型：可选参数
+**Syntax** : YES | NO
 
-取值：指定是否执行合并，可选 `YES|NO`
+指定是否执行合并。
 
-默认值：yes
+此参数通常用于测试运行，如果你需要合并的 RTF 文件过多，或者你不确定指定的参数（尤其是参数 `DEPTH`）是否正确，可以先指定参数 `MERGE = NO`，此时宏程序将不会执行合并操作，但会输出数据集 `WORK.RTF_LIST`，你可以查看此数据集，了解具体将会被合并的 RTF 文件。在该数据集中，仅当变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 同时为 `Y` 时，对应路径上的 RTF 文件才会被合并。
 
-💡 这个参数通常用于对宏程序的调试，不过如果你需要合并的 RTF 文件过多，或者你不确定指定的参数是否正确（尤其是参数 `DEPTH`），可以先指定参数 `MERGE = NO`，此时宏程序将不会执行合并操作，但会输出数据集 `WORK.RTF_LIST`，你可以查看此数据集，了解具体将会被合并的 RTF 文件。在该数据集中，仅当变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 同时为 `Y` 时，对应路径上的 RTF 文件才会被合并。
+**Caution** :
+
+- 当 [RTF_LIST](#rtf_list) 指定了非 NULL 值时，数据集 `WORK.RTF_LIST` 中变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 的值均为 `Y`。
+
+**Default** ：YES
 
 ---
 
 #### MERGED_FILE_SHOW
 
-类型：可选参数
+**Syntax** : _path_type_
 
-取值：指定已合并的 RTF 文件在日志中显示的路径类型
+指定 RTF 文件在日志中显示的路径类型，_`path_type`_ 可取值如下：
 
 - `SHORT`：仅显示文件名
 - `FULL`：显示完整路径
 - `VIRTUAL`：显示虚拟磁盘路径
 
-默认值：`SHORT`
+**Default** ：SHORT
 
 ---
 
 #### DEL_TEMP_DATA
 
-类型：可选参数
+**Syntax** : YES | NO
 
-取值：指定是否删除宏程序运行产生的中间数据集
+指定是否删除宏程序运行产生的中间数据集
 
-默认值：`TRUE`
+**Default** ：YES
 
-### 细节
+---
 
-#### 1. 如何读取指定递归深度的子文件夹中 RTF 文件
+## 细节
+
+### 1. 如何读取指定递归深度的子文件夹中 RTF 文件
 
 使用 DOS 命令 `DIR` 的参数 `/s`，可以遍历指定目录下的文件，包括任意深度子文件夹中的文件，将获取到的文件路径列表写入外部文件 `_tmp_rtf_list.txt` 中。在 SAS 中，使用 `infile` 语句读取 `_tmp_rtf_list.txt`。由于在 Windows 系统下，文件名不能含有 `\`，因此，文件路径中的 `\` 的数量可以被视为文件所处子文件夹的深度，假设指定 `depth = n`，宏程序将筛选出路径包含的 `\` （路径中参数 `DIR` 部分的 `\` 不计入）的数量不超过 n 的文件，仅对筛选出的文件进行后续的处理。
 
-#### 2. 如何对 RTF 文件进行排序
+### 2. 如何对 RTF 文件进行排序
 
 首先使用以下正则表达式筛选需要合并的 RTF 文件：
 
@@ -219,7 +300,7 @@ X:\表7.1.10 ~.rtf
 
 ⚠ 若出现序号完全相同的 RTF 文件，则通过缓冲区 3 中的标题进一步排序。
 
-#### 3. 如何合并 RTF 文件
+### 3. 如何合并 RTF 文件
 
 合并 RTF 文件大体遵循以下步骤：
 
@@ -227,7 +308,7 @@ X:\表7.1.10 ~.rtf
 2. 中间的 RTF 文件，去除开头的元信息，同时在开头添加分节符，删除结尾的右半括号`}`
 3. 最后一个 RTF 文件，去除开头的元信息，同时在开头添加分节符，**保留**结尾的右半括号`}`
 
-##### 3.1 分节符处理
+#### 3.1 分节符处理
 
 宏程序使用以下正则表达式识别需要添加分节符的位置：
 
@@ -237,11 +318,11 @@ X:\表7.1.10 ~.rtf
 
 当该正则表达式成功匹配时，在当前行的开头插入控制字 `\sect` 即可。
 
-##### 3.2 元信息处理
+#### 3.2 元信息处理
 
 [3.1](#31-分节符处理) 中的正则表达式第一次匹配之前的所有信息均为元信息，由于同一个项目下的 RTF 文件元信息（字体表、颜色表等）通常是一致的，这些信息在合并的第一个 RTF 中已经保留，因此，在合并的第二个 RTF 文件及其后续的 RTF 文件中，这部分信息可以删除。
 
-##### 3.3 大纲级别标记处理
+#### 3.3 大纲级别标记处理
 
 某些 RTF 文件由于跨越多页，可能已经包含分节符，直接合并会导致在左侧导航窗格中，同一个 RTF 文件显示了多个导航项目的情况。对于这种情况，宏程序首先使用以下正则表达式识别首个具有大纲级别标记的文本：
 
@@ -257,7 +338,7 @@ s/\\outlinelevel\d//o
 
 通过上述操作，单个表（图）在合并后的 RTF 文件中，仅具有一个大纲级别标记。
 
-#### 4. 如何控制日志的隐藏和显示
+### 4. 如何控制日志的隐藏和显示
 
 由于宏程序使用场景涉及到大量 RTF 文件，读写数据集会生成大量 log，可以使用以下代码临时“隐藏” log：
 
@@ -275,7 +356,7 @@ run;
 
 尽管如此，这里的“隐藏”并非真正意义上的隐藏，你仍然可以在宏程序运行过程中，前往当前工作目录下的 `_null_.log` 中查看日志，不过，宏程序在结束前会使用 `del` 命令删除这个文件。
 
-#### 5.变量比较涉及到的磁盘读写的优化
+### 5.变量比较涉及到的磁盘读写的优化
 
 在 [大纲级别标记处理](#33-大纲级别标记处理) 部分，宏程序需要识别当前 RTF 代码行是否存在前面已经定义过的大纲级别标记，若存在相同的大纲级别标记，则删除 `\outlilelevel` 控制字，以确保合并后的 RTF 文件不存在重复的大纲级别标记。
 
@@ -286,7 +367,7 @@ run;
 ![](./assets/compare-long-var-not-use-md5.png)
 ![](./assets/compare-long-var-use-md5.png)
 
-### 示例程序
+## 示例程序
 
 ```sas
 %MergeRTF("~\TFL");
