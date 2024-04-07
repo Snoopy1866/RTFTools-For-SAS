@@ -87,7 +87,7 @@ options cmplib = sasuser.func;
     data _null_;
         set _tmp_rtf_list;
         if rtf_valid_flag = "Y" then do;
-            call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || '(label = "' || ref_label || '"), compress = ' || "&compress" || ', del_rtf_ctrl = ' || "&del_rtf_ctrl" || '));');
+            call execute('%nrstr(%ReadRTF(file = ' || strip(fileref) || ', outdata = ' || strip(outdata_name) || '(label = "' || strip(ref_label) || '"), compress = ' || "&compress" || ', del_rtf_ctrl = ' || "&del_rtf_ctrl" || '));');
         end;
     run;
 
@@ -103,4 +103,3 @@ options cmplib = sasuser.func;
     %exit:
     %put NOTE: 宏 ReadAllRTF 已结束运行！;
 %mend;
-
