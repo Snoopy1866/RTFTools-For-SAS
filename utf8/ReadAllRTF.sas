@@ -84,12 +84,24 @@ options cmplib = sasuser.func;
     run;
 
     /*3. 调用 %ReadRTF() 解析 RTF 文件*/
+
+    /*----------------临时关闭日志输出------------------*/
+    proc printto log=_null_;
+    run;
+
+
     data _null_;
         set _tmp_rtf_list;
         if rtf_valid_flag = "Y" then do;
             call execute('%nrstr(%ReadRTF(file = ' || strip(fileref) || ', outdata = ' || strip(outdata_name) || '(label = "' || strip(ref_label) || '"), compress = ' || "&compress" || ', del_rtf_ctrl = ' || "&del_rtf_ctrl" || '));');
         end;
     run;
+
+
+    /*----------------恢复日志输出------------------*/
+    proc printto log=log;
+    run;
+
 
     /*4. 删除临时数据集*/
     proc datasets library = work nowarn noprint;
