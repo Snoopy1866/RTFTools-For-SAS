@@ -1,6 +1,8 @@
-## 简介
+## CompareRTFWithDataset
 
-比较两个 RTF 文件的内容。
+比较 RTF 文件与 SAS 数据集的内容。
+
+**Compatibility** : RTF 1.6 specification
 
 ## 语法
 

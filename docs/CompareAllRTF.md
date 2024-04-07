@@ -1,6 +1,8 @@
-## 简介
+## CompareAllRTF
 
 比较两个目录下的所有 RTF 文件的内容。
+
+**Compatibility** : RTF 1.6 specification
 
 ## 语法
 

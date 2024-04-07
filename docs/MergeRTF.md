@@ -2,6 +2,8 @@
 
 合并 RTF 文件。
 
+**Compatibility** : RTF 1.6 specification
+
 ## 依赖
 
 无。
@@ -223,7 +225,7 @@ rtf_list = rtf_list_copy.txt
 
 指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被操作系统使用的一个字符
 
-默认值：X
+**Default** : X
 
 ---
 

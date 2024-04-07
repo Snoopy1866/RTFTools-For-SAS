@@ -1,6 +1,8 @@
-## 简介
+## CompareRTF
 
 比较两个 RTF 文件的内容。
+
+**Compatibility** : RTF 1.6 specification
 
 ## 语法
 
