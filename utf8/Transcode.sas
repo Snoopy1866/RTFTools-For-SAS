@@ -47,7 +47,7 @@ quit;
 
 
 /*自定义函数，用于解析 RTF 单元格内的字符串*/
-proc fcmp outlib = sasuser.func.rtf inlib = sasuser.func flow;
+proc fcmp outlib = sasuser.func.rtf inlib = sasuser.func;
     function cell_transcode(str $) $32767;
         reg_code_gbk_id = prxparse("/((?:\\\x27[0-9A-F]{2})+)/o");
         reg_code_utf8_id = prxparse("/((?:\\u\d{1,5};)+)/o");
@@ -70,6 +70,12 @@ proc fcmp outlib = sasuser.func.rtf inlib = sasuser.func flow;
                 _tmp_str_decoded = transcode(_tmp_str_nomarkup, "utf8");
                 reg_code_utf8_chg_id = prxparse("s/((?:\\u\d{1,5};)+)/"||trim(_tmp_str_decoded)||"/");
                 str_decoded = prxchange(reg_code_utf8_chg_id, 1, strip(str_decoded));
+
+                /*
+                去除未知原因导致的 Unicode 空白字符
+                https://github.com/Snoopy1866/RTFTools-For-SAS/issues/8
+                */
+                str_decoded = kcompress(str_decoded, "", "s");
             end;
         end;
         return(str_decoded);
