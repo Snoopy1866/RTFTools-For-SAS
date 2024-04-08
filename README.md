@@ -60,7 +60,7 @@
 
 **依赖**：[CompareRTF.sas](./docs/CompareRTF.md) -> [CompareAllRTF.sas](./docs/CompareAllRTF.md)
 
-### [CompareRTFWithDataset](./docs/CompareRTFWithDataset.md) （未开发完成）
+### [CompareRTFWithDataset](./docs/CompareRTFWithDataset.md)
 
 **功能**：比较 RTF 文件与 SAS 数据集
 
