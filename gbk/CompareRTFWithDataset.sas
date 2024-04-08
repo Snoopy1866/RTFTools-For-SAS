@@ -5,13 +5,16 @@
 %macro CompareRTFWithDataset(rtf, dataset, del_temp_data = yes,
                              ignoreLeadBlank = yes,
                              ignoreEmptyColumn = yes,
-                             ignoreHalfOrFullWidth = no) / parmbuff;
+                             ignoreHalfOrFullWidth = no,
+                             ignoreEmbeddedBlank = no
+                             ) / parmbuff;
 
     /*打开帮助文档*/
     %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
         X explorer "https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/docs/CompareRTFWithDataset.md";
         %goto exit;
     %end;
+
 
     /*1. 获取文件路径*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
@@ -75,6 +78,7 @@
         select name into : rtf_col_eq1_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF" and length = 1; /*rtf 疑似空列变量名*/
         %let rtf_col_eq1_n = &SQLOBS;
     quit;
+
 
     /*4. 预处理*/
     /*4.1 dataset 将数值转换成字符串*/
@@ -191,6 +195,24 @@
         run;
     %end;
 
+    /*4.5 忽略内嵌空格*/
+    %if %upcase(&ignoreembeddedblank = yes) %then %do;
+        data _tmp_dataset_char_ver;
+            set _tmp_dataset_char_ver;
+            %do i = 1 %to &dataset_col_n;
+                &&dataset_col_&i = kcompress(&&dataset_col_&i, , "s");
+            %end;
+        run;
+
+        data _tmp_rtf;
+            set _tmp_rtf;
+            %do i = 1 %to &rtf_col_n;
+                &&rtf_col_&i = kcompress(&&rtf_col_&i, , "s");
+            %end;
+        run;
+    %end;
+
+
     /*5. 同步变量名*/
     proc sql noprint;
         select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF"; /*rtf 变量名*/
@@ -209,7 +231,6 @@
                    %end;
                    ;
     quit;
-
 
 
     /*6. 比较 RTF 文件与数据集*/
