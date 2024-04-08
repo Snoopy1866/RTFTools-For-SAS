@@ -64,19 +64,10 @@ proc fcmp outlib = sasuser.func.rtf inlib = sasuser.func;
             end;
         end;
         else if prxmatch(reg_code_utf8_id, str_decoded) then do;
-            do while(prxmatch(reg_code_utf8_id, str_decoded));
-                _tmp_str = prxposn(reg_code_utf8_id, 1, str_decoded);
-                _tmp_str_nomarkup = transtrn(_tmp_str, "\u", "&#");
-                _tmp_str_decoded = transcode(_tmp_str_nomarkup, "utf8");
-                reg_code_utf8_chg_id = prxparse("s/((?:\\u\d{1,5};)+)/"||trim(_tmp_str_decoded)||"/");
-                str_decoded = prxchange(reg_code_utf8_chg_id, 1, strip(str_decoded));
-
-                /*
-                去除未知原因导致的 Unicode 空白字符
-                https://github.com/Snoopy1866/RTFTools-For-SAS/issues/8
-                */
-                str_decoded = kcompress(str_decoded, "", "s");
-            end;
+            _tmp_str = str_decoded;
+            _tmp_str_nomarkup = transtrn(_tmp_str, "\u", "&#");
+            _tmp_str_decoded = transcode(_tmp_str_nomarkup, "utf8");
+            str_decoded = _tmp_str_decoded;
         end;
         return(str_decoded);
     endsub;
