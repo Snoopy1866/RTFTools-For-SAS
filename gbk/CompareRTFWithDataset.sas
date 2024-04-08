@@ -5,7 +5,7 @@
 %macro CompareRTFWithDataset(rtf, dataset, del_temp_data = yes,
                              ignoreLeadBlank = yes,
                              ignoreEmptyColumn = yes,
-                             ignoreHalfOrFullWidth = yes) / parmbuff;
+                             ignoreHalfOrFullWidth = no) / parmbuff;
 
     /*打开帮助文档*/
     %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
@@ -117,6 +117,78 @@
                 quit;
             %end;
         %end;
+    %end;
+
+    /*4.4 rtf 忽略全角半角符号*/
+    %if %upcase(&ignoreHalfOrFullWidth) = YES %then %do;
+        %let HalfOrWidthTranslation = %nrstr(/*标点符号（不含引号）*/
+                                             ",", "，",
+                                             ".", "。",
+                                             "?", "？",
+                                             "!", "！",
+                                             ":", "：",
+                                             ";", "；",
+                                             "~", "～",
+
+                                             /*引号*/
+                                             """", "“",
+                                             """", "”",
+                                             """", "〝",
+                                             """", "〞",
+                                             """", "＂",
+                                             '''', "‘",
+                                             '''', "’",
+                                             '''', "｀",
+                                             '''', "＇",
+                                             '''', "′",
+
+                                             /*括号*/
+                                             "(", "（",
+                                             ")", "）",
+                                             "<", "＜",
+                                             "<", "〈",
+                                             ">", "＞",
+                                             ">", "〉",
+                                             "[", "［",
+                                             "]", "］",
+                                             "{", "｛",
+                                             "}", "｝",
+
+                                             /*数学符号*/
+                                             "0", "０", "1", "１", "2", "２", "3", "３", "4", "４",
+                                             "5", "５", "6", "６", "7", "７", "8", "８", "9", "９",
+                                             "+", "＋", "-", "－", "*", "＊", "/", "／", "\", "＼", "^", "＾",
+                                             "=", "＝",
+                                             "%%", "％",
+
+                                             /*拉丁字母*/
+                                             "a", "ａ", "b", "ｂ", "c", "ｃ", "d", "ｄ", "e", "ｅ", "f", "ｆ", "g", "ｇ", "h", "ｈ", "i", "ｉ", "j", "ｊ", "k", "ｋ", "l", "ｌ", "m", "ｍ",
+                                             "n", "ｎ", "o", "ｏ", "p", "ｐ", "q", "ｑ", "r", "ｒ", "s", "ｓ", "t", "ｔ", "u", "ｕ", "v", "ｖ", "w", "ｗ", "x", "ｘ", "y", "ｙ", "z", "ｚ",
+                                             "A", "Ａ", "B", "Ｂ", "C", "Ｃ", "D", "Ｄ", "E", "Ｅ", "F", "Ｆ", "G", "Ｇ", "H", "Ｈ", "I", "Ｉ", "J", "Ｊ", "K", "Ｋ", "L", "Ｌ", "M", "Ｍ",
+                                             "N", "Ｎ", "O", "Ｏ", "P", "Ｐ", "Q", "Ｑ", "R", "Ｒ", "S", "Ｓ", "T", "Ｔ", "U", "Ｕ", "V", "Ｖ", "W", "Ｗ", "X", "Ｘ", "Y", "Ｙ", "Z", "Ｚ",
+
+                                             /*特殊符号*/
+                                             "&", "＆",
+                                             "@", "＠",
+                                             "#", "＃",
+                                             "$", "＄",
+                                             "|", "｜",
+                                             "_", "＿"
+                                            );
+
+        data _tmp_dataset_char_ver;
+            set _tmp_dataset_char_ver;
+            %do i = 1 %to &dataset_col_n;
+                &&dataset_col_&i = ktranslate(&&dataset_col_&i, %unquote(%superq(HalfOrWidthTranslation)));
+            %end;
+        run;
+
+        data _tmp_rtf;
+            set _tmp_rtf;
+            %do i = 1 %to &rtf_col_n;
+                &&rtf_col_&i = ktranslate(&&rtf_col_&i, %unquote(%superq(HalfOrWidthTranslation)));
+            %end;
+        run;
     %end;
 
     /*5. 同步变量名*/
