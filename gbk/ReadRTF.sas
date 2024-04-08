@@ -13,6 +13,22 @@ options cmplib = sasuser.func;
         %goto exit;
     %end;
 
+    /*声明局部变量*/
+    %local i;
+
+    /*声明全局变量*/
+    %if not %symexist(readrtf_exit_with_error) %then %do;
+        %global readrtf_exit_with_error;
+    %end;
+
+    %if not %symexist(readrtf_exit_with_error_text) %then %do;
+        %global readrtf_exit_with_error_text;
+    %end;
+
+    %let readrtf_exit_with_error = FALSE;
+    %let readrtf_exit_with_error_text = %bquote();
+
+
     /*1. 获取文件路径*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
@@ -58,6 +74,11 @@ options cmplib = sasuser.func;
         infile "&fileloc" truncover;
         input line $char32767.;
     run;
+
+    %if &SYSERR > 0 %then %do;
+        %let readrtf_exit_with_error_text = %superq(SYSERRORTEXT);
+        %goto exit_with_error;
+    %end;
 
 
     /*3. 调整表头（解决由于表头内嵌换行符导致的 RTF 代码折行问题）*/
@@ -417,7 +438,14 @@ options cmplib = sasuser.func;
         set _tmp_outdata;
     run;
 
+    %goto exit;
 
+
+    /*异常退出*/
+    %exit_with_error:
+    %let readrtf_exit_with_error = TRUE;
+
+    /*正常退出*/
     %exit:
     /*11. 清除中间数据集*/
     %if %upcase(&del_temp_data) = YES %then %do;
