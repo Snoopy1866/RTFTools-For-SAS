@@ -56,6 +56,11 @@
     /*2. 调用 %ReadRTF 读取RTF文件*/
     %ReadRTF(file = "&rtfloc", outdata = _tmp_rtf(drop = obs_seq), compress = yes, del_rtf_ctrl = yes);
 
+    %if &readrtf_exit_with_error = TRUE %then %do;
+        X mshta vbscript:msgbox("&readrtf_exit_with_error_text",4144,"错误信息")(window.close);
+        %goto exit;
+    %end;
+
 
     /*3. 复制 dataset，使用 sql into 语句创建宏变量*/
     data _tmp_dataset;
