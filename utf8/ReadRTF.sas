@@ -318,7 +318,7 @@ options cmplib = sasuser.func;
         /*控制字-缩进*/
         %let reg_ctrl_2 = %bquote(\\li\d+);
         /*控制字-上标*/
-        %let reg_ctrl_3 = %bquote({\\super.*?}|\\super[^\\]+);
+        %let reg_ctrl_3 = %bquote({\\super.*?}|\\super[^\\\{\}]+); /*https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20*/
         /*控制字-取消上下标*/
         %let reg_ctrl_4 = %bquote(\\nosupersub);
 
