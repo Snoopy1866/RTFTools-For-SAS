@@ -539,7 +539,7 @@
 
 
     /*删除临时数据集*/
-    %if %upcase(&del_temp_data) = YES %then %do;
+    %if %upcase(&del_temp_data) = YES and %symexist(rtf_ref_max) %then %do;
         proc datasets library = work nowarn noprint;
             delete %do i = 1 %to &rtf_ref_max;
                        _tmp_rtf&i
