@@ -22,13 +22,9 @@
     %end;
 
     /*1. 获取目录路径*/
-    %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
+    %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
-    %if %sysfunc(prxmatch(&reg_dir_id, %superq(dir))) = 0 %then %do;
-        %put ERROR: 目录引用名超出 8 字节，或者目录物理地址不符合 Winodws 规范！;
-        %goto exit;
-    %end;
-    %else %do;
+    %if %sysfunc(prxmatch(&reg_dir_id, %superq(dir))) %then %do;
         %let dirref = %sysfunc(prxposn(&reg_dir_id, 1, %superq(dir)));
         %let dirloc = %sysfunc(prxposn(&reg_dir_id, 2, %superq(dir)));
 
@@ -43,17 +39,21 @@
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&dirref)) = 0 %then %do;
-                %let dirloc = %sysfunc(pathname(&dirref, F));
+                %let dirloc = %qsysfunc(pathname(&dirref, F));
             %end;
         %end;
 
         /*指定的是物理路径*/
-        %if %bquote(&dirloc) ^= %bquote() %then %do;
-            %if %sysfunc(fileexist(&dirloc)) = 0 %then %do;
-                %put ERROR: 目录路径 %bquote(&dirloc) 不存在！;
+        %if %superq(dirloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(%superq(dirloc))) = 0 %then %do;
+                %put ERROR: 目录路径 %superq(dirloc) 不存在！;
                 %goto exit;
             %end;
         %end;
+    %end;
+    %else %do;
+        %put ERROR: 目录引用名超出 8 字节，或者目录物理地址不符合 Winodws 规范！;
+        %goto exit;
     %end;
 
     X "subst &vd: ""&dirloc"" & exit"; /*建立虚拟磁盘*/

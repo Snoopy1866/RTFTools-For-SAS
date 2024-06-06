@@ -18,15 +18,11 @@
     %end;
 
     /*1. 获取文件路径*/
-    %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
+    %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
 
     /*base*/
-    %if %sysfunc(prxmatch(&reg_file_id, %superq(base))) = 0 %then %do;
-        %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
-        %goto exit;
-    %end;
-    %else %do;
+    %if %sysfunc(prxmatch(&reg_file_id, %superq(base))) %then %do;
         %let baseref = %sysfunc(prxposn(&reg_file_id, 1, %superq(base)));
         %let baseloc = %sysfunc(prxposn(&reg_file_id, 2, %superq(base)));
 
@@ -41,25 +37,25 @@
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&baseref)) = 0 %then %do;
-                %let baseloc = %sysfunc(pathname(&baseref, F));
+                %let baseloc = %qsysfunc(pathname(&baseref, F));
             %end;
         %end;
 
         /*指定的是物理路径*/
-        %if %bquote(&baseloc) ^= %bquote() %then %do;
-            %if %sysfunc(fileexist(&baseloc)) = 0 %then %do;
-                %put ERROR: 文件路径 %bquote(&baseloc) 不存在！;
+        %if %superq(baseloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(%superq(baseloc))) = 0 %then %do;
+                %put ERROR: 文件路径 %superq(baseloc) 不存在！;
                 %goto exit;
             %end;
         %end;
     %end;
-
-    /*compare*/
-    %if %sysfunc(prxmatch(&reg_file_id, %superq(compare))) = 0 %then %do;
+    %else %do;
         %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
         %goto exit;
     %end;
-    %else %do;
+
+    /*compare*/
+    %if %sysfunc(prxmatch(&reg_file_id, %superq(compare))) %then %do;
         %let compareref = %sysfunc(prxposn(&reg_file_id, 1, %superq(compare)));
         %let compareloc = %sysfunc(prxposn(&reg_file_id, 2, %superq(compare)));
 
@@ -74,17 +70,21 @@
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&compareref)) = 0 %then %do;
-                %let compareloc = %sysfunc(pathname(&compareref, F));
+                %let compareloc = %qsysfunc(pathname(&compareref, F));
             %end;
         %end;
 
         /*指定的是物理路径*/
-        %if %bquote(&compareloc) ^= %bquote() %then %do;
-            %if %sysfunc(fileexist(&compareloc)) = 0 %then %do;
-                %put ERROR: 文件路径 %bquote(&compareloc) 不存在！;
+        %if %superq(compareloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(%superq(compareloc))) = 0 %then %do;
+                %put ERROR: 文件路径 %superq(compareloc) 不存在！;
                 %goto exit;
             %end;
         %end;
+    %end;
+    %else %do;
+        %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
+        %goto exit;
     %end;
 
 
@@ -94,7 +94,7 @@
         format line $32767.;
         length line $32767.;
 
-        infile "&baseloc" truncover;
+        infile %unquote(%str(%')%superq(baseloc)%str(%')) truncover;
         input line $char32767.;
     run;
 
@@ -103,7 +103,7 @@
         format line $32767.;
         length line $32767.;
 
-        infile "&compareloc" truncover;
+        infile %unquote(%str(%')%superq(compareloc)%str(%')) truncover;
         input line $char32767.;
     run;
 
