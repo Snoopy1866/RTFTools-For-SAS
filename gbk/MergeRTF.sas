@@ -281,14 +281,20 @@
     %end;
     %else %do;
         %do i = 1 %to &rtf_ref_max;
-            data _tmp_rtf&i(compress = yes);
-                informat line $32767.;
-                format line $32767.;
-                length line $32767.;
+            %if %sysfunc(fileref(rtf&i)) < 0 %then %do;
+                X mshta vbscript:msgbox("合并失败，文件 %qsysfunc(pathname(rtf&i, F)) 不存在！",4112,"提示")(window.close);
+                %goto exit_with_no_merge;
+            %end;
+            %else %do;
+                data _tmp_rtf&i(compress = yes);
+                    informat line $32767.;
+                    format line $32767.;
+                    length line $32767.;
 
-                infile rtf&i truncover;
-                input line $char32767.;
-            run;
+                    infile rtf&i truncover;
+                    input line $char32767.;
+                run;
+            %end;
         %end;
     %end;
 
