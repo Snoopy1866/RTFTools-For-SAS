@@ -8,7 +8,7 @@
                 DEPTH            = MAX,
                 AUTOORDER        = YES,
                 EXCLUDE          = #NULL,
-                VD               = X,
+                VD               = #AUTO,
                 MERGE            = YES,
                 MERGED_FILE_SHOW = SHORT,
                 LINK_TO_PREV     = NO,
@@ -21,14 +21,11 @@
         %goto exit;
     %end;
 
+
     /*1. 获取目录路径*/
-    %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
+    %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
-    %if %sysfunc(prxmatch(&reg_dir_id, %superq(dir))) = 0 %then %do;
-        %put ERROR: 目录引用名超出 8 字节，或者目录物理地址不符合 Winodws 规范！;
-        %goto exit;
-    %end;
-    %else %do;
+    %if %sysfunc(prxmatch(&reg_dir_id, %superq(dir))) %then %do;
         %let dirref = %sysfunc(prxposn(&reg_dir_id, 1, %superq(dir)));
         %let dirloc = %sysfunc(prxposn(&reg_dir_id, 2, %superq(dir)));
 
@@ -43,22 +40,63 @@
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&dirref)) = 0 %then %do;
-                %let dirloc = %sysfunc(pathname(&dirref, F));
+                %let dirloc = %qsysfunc(pathname(&dirref, F));
             %end;
         %end;
 
         /*指定的是物理路径*/
-        %if %bquote(&dirloc) ^= %bquote() %then %do;
-            %if %sysfunc(fileexist(&dirloc)) = 0 %then %do;
-                %put ERROR: 目录路径 %bquote(&dirloc) 不存在！;
+        %if %superq(dirloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(%superq(dirloc))) = 0 %then %do;
+                %put ERROR: 目录路径 %superq(dirloc) 不存在！;
                 %goto exit;
             %end;
         %end;
     %end;
+    %else %do;
+        %put ERROR: 目录引用名超出 8 字节，或者目录物理地址不符合 Winodws 规范！;
+        %goto exit;
+    %end;
 
-    X "subst &vd: ""&dirloc"" & exit"; /*建立虚拟磁盘*/
+    /*2. 建立虚拟磁盘*/
+    %if %sysmexecname(%sysmexecdepth - 1) ^= MERGERTF %then %do;
+        %let is_disk_symbol_all_used = FALSE;
+        filename dlist pipe "wmic logicaldisk get deviceid";
+        data a;
+            infile dlist truncover end = end;
+            input disk_symbol $1.;
+            retain unused_disk_symbol 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            unused_disk_symbol = transtrn(unused_disk_symbol, disk_symbol, trimn(''));
+            if end then do;
+                if length(unused_disk_symbol) = 0 then do;
+                    call symputx('is_disk_symbol_all_used', 'TRUE');
+                end;
+                else do;
+                    call symputx('unused_disk_symbol', unused_disk_symbol);
+                end;
+            end;
+        run;
 
-    /*2. 是否指定外部文件作为 RTF 合并清单*/
+        %if &is_disk_symbol_all_used = TRUE %then %do;
+            %put ERROR: 无剩余盘符可用，程序无法运行！;
+            %goto exit_with_error;
+        %end;
+
+        %if %upcase(&vd) = #AUTO %then %do;
+            %let vd = %substr(&unused_disk_symbol, 1, 1);
+            %put NOTE: 自动选择可用的盘符 %upcase(&vd);
+        %end;
+        %else %do;
+            %if not %sysfunc(find(&unused_disk_symbol, &vd)) %then %do;
+                %put ERROR: 盘符 %upcase(&vd) 不合法或被占用，请指定其他合法或未被使用的盘符！;
+                %goto exit_with_error;
+            %end;
+        %end;
+
+        X "subst &vd: ""&dirloc"" & exit";
+    %end;
+
+    
+    /*3. 是否指定外部文件作为 RTF 合并清单*/
     %if %upcase(&rtf_list) = #NULL %then %do; /*未指定外部文件*/
 
         /*使用 DOS 命令获取所有 RTF 文件，存储在 _tmp_rtf_list.txt 中*/
@@ -199,7 +237,7 @@
     %let run_start_time = %sysfunc(time()); /*记录开始时间*/
 
 
-    /*3. 仅列出而不合并 rtf 文件，用于调试和试运行*/
+    /*4. 仅列出而不合并 rtf 文件，用于调试和试运行*/
     %if %upcase(&merge) = NO %then %do;
         data rtf_list;
             set _tmp_rtf_list_add_lv_sorted;
@@ -219,7 +257,7 @@
     run;
 
 
-    /*4. 构造 filename 语句，建立文件引用*/
+    /*5. 构造 filename 语句，建立文件引用*/
     data _tmp_rtf_list_fnst;
         set _tmp_rtf_list_add_lv_sorted(where = (rtf_filename_valid_flag = "Y" and rtf_depth_valid_flag = "Y")) end = end;
 
@@ -232,7 +270,7 @@
     run;
 
 
-    /*5. 读取 rtf 文件*/
+    /*6. 读取 rtf 文件*/
     %if &rtf_ref_max = 0 %then %do;
         %put ERROR: 文件夹 &dirloc 内没有符合要求的 rtf 文件可以合并！;
         %goto exit;
@@ -255,7 +293,7 @@
     %end;
 
     
-    /*6. 检测 rtf 文件是否被 SAS 之外的其他程序修改*/
+    /*7. 检测 rtf 文件是否被 SAS 之外的其他程序修改*/
     %do i = 1 %to &rtf_ref_max;
         data _null_;
             set _tmp_rtf&i(obs = 1);
@@ -271,7 +309,7 @@
 
 
 
-    /*7. 获取可合并的 rtf 文件引用列表*/
+    /*8. 获取可合并的 rtf 文件引用列表*/
     %let mergeable_rtf_list = %bquote(); 
     %let unmergeable_rtf_index = 0;
     %do i = 1 %to &rtf_ref_max;
@@ -316,7 +354,7 @@
     run;
 
 
-    /*8. 处理 rtf 文件*/
+    /*9. 处理 rtf 文件*/
     /*大致思路如下：
 
       预处理，删除第 2 个及之后的RTF文件的页眉页脚
@@ -477,7 +515,7 @@
     %end;
 
 
-    /*9. 合并 rtf 文件*/
+    /*10. 合并 rtf 文件*/
     data _tmp_rtf_merged(compress = yes);
         set %do i = 1 %to &mergeable_rtf_ref_max;
                 _tmp_%scan(&mergeable_rtf_list, &i, %bquote( ))
@@ -496,7 +534,7 @@
     %end;
 
 
-    /*10. 输出 rtf 文件*/
+    /*11. 输出 rtf 文件*/
     %if %upcase(&out) = #AUTO %then %do;
         %let date = %sysfunc(putn(%sysfunc(today()), yymmdd10.));
         %let time = %sysfunc(time());
@@ -520,7 +558,7 @@
     run;
 
 
-    /*11. 弹出提示框*/
+    /*12. 弹出提示框*/
     %let run_end_time = %sysfunc(time()); /*记录结束时间*/
     %let run_spend_time = %sysfunc(putn(%sysevalf(&run_end_time - &run_start_time), 8.2)); /*计算耗时*/
 
@@ -583,4 +621,5 @@
     %put NOTE: 宏 MergeRTF 已结束运行！;
 
     %exit_with_recursive_end:
+    %exit_with_error:
 %mend;
