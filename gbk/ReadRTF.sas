@@ -317,19 +317,25 @@ options cmplib = sasuser.func;
         %let reg_ctrl_1 = %bquote({\s*}|(?<!\\)[{}]);
         /*控制字-缩进*/
         %let reg_ctrl_2 = %bquote(\\li\d+);
-        /*控制字-上标*/
-        %let reg_ctrl_3 = %bquote({\\super.*?}|\\super[^\\\{\}]+); /*https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20*/
         /*控制字-取消上下标*/
-        %let reg_ctrl_4 = %bquote(\\nosupersub);
+        %let reg_ctrl_3 = %bquote(\\nosupersub);
+
+        /*控制字-上标*/
+        %let reg_ctrl_4 = %bquote(\{?\\super\s+((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
+                                                                               https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20
+                                                                               https://github.com/Snoopy1866/RTFTools-For-SAS/issues/26
+                                                                              */
 
         /*合并reg_ctrl_1 ~ reg_ctrl_n*/
-        %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 4; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
+        %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 3; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
 
         data _tmp_rtf_raw_del_ctrl(compress = &compress);
             set _tmp_rtf_raw;
-            reg_rtf_del_ctrl_id = prxparse("s/(?:&reg_ctrl)\s*//o");
+            reg_rtf_del_ctrl_id   = prxparse("s/(?:&reg_ctrl)\s*//o");
+            reg_rtf_del_ctrl_id_4 = prxparse("s/(?:&reg_ctrl_4)\s*/$1/o");
             if flag_header = "Y" or flag_data = "Y" then do;
-                context_raw = prxchange(reg_rtf_del_ctrl_id, -1, strip(context_raw));
+                context_raw = prxchange(reg_rtf_del_ctrl_id,   -1, strip(context_raw));
+                context_raw = prxchange(reg_rtf_del_ctrl_id_4, -1, strip(context_raw));
             end;
         run;
     %end;

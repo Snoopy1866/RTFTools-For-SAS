@@ -30,13 +30,9 @@ options cmplib = sasuser.func;
 
 
     /*1. 获取文件路径*/
-    %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
+    %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
-    %if %sysfunc(prxmatch(&reg_file_id, %superq(file))) = 0 %then %do;
-        %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
-        %goto exit;
-    %end;
-    %else %do;
+    %if %sysfunc(prxmatch(&reg_file_id, %superq(file))) %then %do;
         %let fileref = %sysfunc(prxposn(&reg_file_id, 1, %superq(file)));
         %let fileloc = %sysfunc(prxposn(&reg_file_id, 2, %superq(file)));
 
@@ -51,17 +47,21 @@ options cmplib = sasuser.func;
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&fileref)) = 0 %then %do;
-                %let fileloc = %sysfunc(pathname(&fileref, F));
+                %let fileloc = %qsysfunc(pathname(&fileref, F));
             %end;
         %end;
 
         /*指定的是物理路径*/
-        %if %bquote(&fileloc) ^= %bquote() %then %do;
-            %if %sysfunc(fileexist(&fileloc)) = 0 %then %do;
-                %put ERROR: 文件路径 %bquote(&fileloc) 不存在！;
+        %if %superq(fileloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(%superq(fileloc))) = 0 %then %do;
+                %put ERROR: 文件路径 %superq(fileloc) 不存在！;
                 %goto exit;
             %end;
         %end;
+    %end;
+    %else %do;
+        %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
+        %goto exit;
     %end;
 
 
@@ -71,7 +71,7 @@ options cmplib = sasuser.func;
         format line $32767.;
         length line $32767.;
 
-        infile "&fileloc" truncover;
+        infile %unquote(%str(%')&fileloc%str(%')) truncover;
         input line $char32767.;
     run;
 
@@ -317,19 +317,25 @@ options cmplib = sasuser.func;
         %let reg_ctrl_1 = %bquote({\s*}|(?<!\\)[{}]);
         /*控制字-缩进*/
         %let reg_ctrl_2 = %bquote(\\li\d+);
-        /*控制字-上标*/
-        %let reg_ctrl_3 = %bquote({\\super.*?}|\\super[^\\\{\}]+); /*https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20*/
         /*控制字-取消上下标*/
-        %let reg_ctrl_4 = %bquote(\\nosupersub);
+        %let reg_ctrl_3 = %bquote(\\nosupersub);
+
+        /*控制字-上标*/
+        %let reg_ctrl_4 = %bquote(\{?\\super\s+((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
+                                                                               https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20
+                                                                               https://github.com/Snoopy1866/RTFTools-For-SAS/issues/26
+                                                                              */
 
         /*合并reg_ctrl_1 ~ reg_ctrl_n*/
-        %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 4; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
+        %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 3; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
 
         data _tmp_rtf_raw_del_ctrl(compress = &compress);
             set _tmp_rtf_raw;
-            reg_rtf_del_ctrl_id = prxparse("s/(?:&reg_ctrl)\s*//o");
+            reg_rtf_del_ctrl_id   = prxparse("s/(?:&reg_ctrl)\s*//o");
+            reg_rtf_del_ctrl_id_4 = prxparse("s/(?:&reg_ctrl_4)\s*/$1/o");
             if flag_header = "Y" or flag_data = "Y" then do;
-                context_raw = prxchange(reg_rtf_del_ctrl_id, -1, strip(context_raw));
+                context_raw = prxchange(reg_rtf_del_ctrl_id,   -1, strip(context_raw));
+                context_raw = prxchange(reg_rtf_del_ctrl_id_4, -1, strip(context_raw));
             end;
         run;
     %end;
