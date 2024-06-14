@@ -113,22 +113,7 @@
         run;
     %end;
 
-    /*4.3 rtf ºöÂÔ¿ÕÁÐ*/
-    %if %upcase(&ignoreEmptyColumn) = YES %then %do;
-        %if &rtf_col_eq1_n > 0 %then %do;
-            %do i = 1 %to &rtf_col_eq1_n;
-                proc sql noprint;
-                    select max(lengthn(&&rtf_col_eq1_&i)) into : col_len_max from _tmp_rtf;
-
-                    %if &col_len_max = 0 %then %do;
-                        alter table _tmp_rtf drop &&rtf_col_eq1_&i;
-                    %end;
-                quit;
-            %end;
-        %end;
-    %end;
-
-    /*4.4 rtf ºöÂÔÈ«½Ç°ë½Ç·ûºÅ*/
+    /*4.3 rtf ºöÂÔÈ«½Ç°ë½Ç·ûºÅ*/
     %if %upcase(&ignoreHalfOrFullWidth) = YES %then %do;
         %let HalfOrWidthTranslation = %nrstr(/*±êµã·ûºÅ£¨²»º¬ÒýºÅ£©*/
                                              ",", "£¬",
@@ -200,7 +185,7 @@
         run;
     %end;
 
-    /*4.5 ºöÂÔÄÚÇ¶¿Õ¸ñ*/
+    /*4.4 ºöÂÔÄÚÇ¶¿Õ¸ñ*/
     %if %upcase(&ignoreembeddedblank = yes) %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -215,6 +200,21 @@
                 &&rtf_col_&i = kcompress(&&rtf_col_&i, , "s");
             %end;
         run;
+    %end;
+
+    /*4.5 rtf ºöÂÔ¿ÕÁÐ*/
+    %if %upcase(&ignoreEmptyColumn) = YES %then %do;
+        %if &rtf_col_eq1_n > 0 %then %do;
+            %do i = 1 %to &rtf_col_eq1_n;
+                proc sql noprint;
+                    select max(lengthn(&&rtf_col_eq1_&i)) into : col_len_max from _tmp_rtf;
+
+                    %if &col_len_max = 0 %then %do;
+                        alter table _tmp_rtf drop &&rtf_col_eq1_&i;
+                    %end;
+                quit;
+            %end;
+        %end;
     %end;
 
 

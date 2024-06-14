@@ -17,14 +17,10 @@
 
 
     /*1. 获取文件路径*/
-    %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
+    %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
 
-    %if %sysfunc(prxmatch(&reg_file_id, %superq(rtf))) = 0 %then %do;
-        %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
-        %goto exit;
-    %end;
-    %else %do;
+    %if %sysfunc(prxmatch(&reg_file_id, %superq(rtf))) %then %do;
         %let rtfref = %sysfunc(prxposn(&reg_file_id, 1, %superq(rtf)));
         %let rtfloc = %sysfunc(prxposn(&reg_file_id, 2, %superq(rtf)));
 
@@ -39,17 +35,21 @@
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&rtfref)) = 0 %then %do;
-                %let rtfloc = %sysfunc(pathname(&rtfref, F));
+                %let rtfloc = %qsysfunc(pathname(&rtfref, F));
             %end;
         %end;
 
         /*指定的是物理路径*/
-        %if %bquote(&rtfloc) ^= %bquote() %then %do;
-            %if %sysfunc(fileexist(&rtfloc)) = 0 %then %do;
-                %put ERROR: 文件路径 %bquote(&rtfloc) 不存在！;
+        %if %superq(rtfloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(%superq(rtfloc))) = 0 %then %do;
+                %put ERROR: 文件路径 %superq(rtfloc) 不存在！;
                 %goto exit;
             %end;
         %end;
+    %end;
+    %else %do;
+        %put ERROR: 文件引用名超出 8 字节，或者文件物理地址不符合 Winodws 规范！;
+        %goto exit;
     %end;
 
 
@@ -113,22 +113,7 @@
         run;
     %end;
 
-    /*4.3 rtf 忽略空列*/
-    %if %upcase(&ignoreEmptyColumn) = YES %then %do;
-        %if &rtf_col_eq1_n > 0 %then %do;
-            %do i = 1 %to &rtf_col_eq1_n;
-                proc sql noprint;
-                    select max(lengthn(&&rtf_col_eq1_&i)) into : col_len_max from _tmp_rtf;
-
-                    %if &col_len_max = 0 %then %do;
-                        alter table _tmp_rtf drop &&rtf_col_eq1_&i;
-                    %end;
-                quit;
-            %end;
-        %end;
-    %end;
-
-    /*4.4 rtf 忽略全角半角符号*/
+    /*4.3 rtf 忽略全角半角符号*/
     %if %upcase(&ignoreHalfOrFullWidth) = YES %then %do;
         %let HalfOrWidthTranslation = %nrstr(/*标点符号（不含引号）*/
                                              ",", "，",
@@ -200,7 +185,7 @@
         run;
     %end;
 
-    /*4.5 忽略内嵌空格*/
+    /*4.4 忽略内嵌空格*/
     %if %upcase(&ignoreembeddedblank = yes) %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -215,6 +200,21 @@
                 &&rtf_col_&i = kcompress(&&rtf_col_&i, , "s");
             %end;
         run;
+    %end;
+
+    /*4.5 rtf 忽略空列*/
+    %if %upcase(&ignoreEmptyColumn) = YES %then %do;
+        %if &rtf_col_eq1_n > 0 %then %do;
+            %do i = 1 %to &rtf_col_eq1_n;
+                proc sql noprint;
+                    select max(lengthn(&&rtf_col_eq1_&i)) into : col_len_max from _tmp_rtf;
+
+                    %if &col_len_max = 0 %then %do;
+                        alter table _tmp_rtf drop &&rtf_col_eq1_&i;
+                    %end;
+                quit;
+            %end;
+        %end;
     %end;
 
 
