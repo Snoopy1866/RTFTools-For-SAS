@@ -53,8 +53,15 @@
     %end;
 
 
-    /*2. 调用 %ReadRTF 读取RTF文件*/
-    %ReadRTF(file = "&rtfloc", outdata = _tmp_rtf(drop = obs_seq), compress = yes, del_rtf_ctrl = yes);
+    /*2. 读取RTF文件*/
+    /*2.1 复制一份文件，规避文件已被外部打开导致读取冲突的问题*/
+    X "copy ""&rtfloc"" ""&rtfloc.-copy"" & exit";
+
+    /*2.2 调用 %ReadRTF 读取文件*/
+    %ReadRTF(file = "&rtfloc.-copy", outdata = _tmp_rtf(drop = obs_seq), compress = yes, del_rtf_ctrl = yes);
+
+    /*2.3 删除复制的文件*/
+    X "del ""&rtfloc.-copy"" & exit";
 
     %if &readrtf_exit_with_error = TRUE %then %do;
         X mshta vbscript:msgbox("&readrtf_exit_with_error_text",4144,"错误信息")(window.close);
