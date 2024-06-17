@@ -92,7 +92,7 @@
             select
                 %do i = 1 %to &dataset_col_n;
                     %if &&dataset_col_type_&i = num %then %do;
-                        put(&&dataset_col_&i, &&dataset_col_format_&i) as &&dataset_col_&i
+                        ifc(not missing(&&dataset_col_&i), strip(put(&&dataset_col_&i, &&dataset_col_format_&i)), '') as &&dataset_col_&i
                     %end;
                     %else %do;
                         &&dataset_col_&i
