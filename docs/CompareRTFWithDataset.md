@@ -30,7 +30,9 @@
 
 指定比较的 RTF 文件路径或文件引用。
 
-**Caution** : 如果路径过长，应当事先使用 `filename` 语句为文件定义引用，再将文件引用名传入参数 BASE。
+> [!IMPORTANT]
+>
+> - 如果路径过长，应当事先使用 `filename` 语句为文件定义引用，再将文件引用名传入参数 BASE。
 
 **Example** :
 
@@ -242,4 +244,6 @@ IGNOREEMBEDDEDBLANK = YES
 
 **Default** : YES
 
-⚠ 该参数通常用于调试，用户无需关注。
+> [!NOTE]
+>
+> - 该参数通常用于调试，用户无需关注。

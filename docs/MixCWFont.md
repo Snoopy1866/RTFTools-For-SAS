@@ -4,7 +4,7 @@
 
 **Compatibility** : RTF 1.6 specification
 
-> [!Cation]
+> [!Caution]
 >
 > - 请勿在已经使用 %MixCWFont 处理后生成的 RTF 文件上再次使用此宏，否则可能会导致发生堆栈溢出错误。
 
@@ -49,7 +49,7 @@ filename rtfref "~\表 7.1.1 受试者入组完成情况.rtf";
 RTF = rtfref
 ```
 
-#### CFONT
+### CFONT
 
 **Syntax** : _font_
 
@@ -78,7 +78,7 @@ CFONT = Noto Sans SC Regular
 
 ---
 
-#### WFONT
+### WFONT
 
 **Syntax** : _font_
 
@@ -107,7 +107,7 @@ WFONT = Monoca
 
 ---
 
-#### REPLACE
+### REPLACE
 
 **Syntax** : YES | NO
 
@@ -129,12 +129,16 @@ REPLACE = yes
 
 ---
 
-#### DEL_TEMP_DATA
+### DEL_TEMP_DATA
 
 **Syntax** : YES | NO
 
 指定是否删除宏程序运行产生的中间数据集
 
 **Default** ：YES
+
+> [!NOTE]
+>
+> - 该参数通常用于调试，用户无需关注。
 
 ---

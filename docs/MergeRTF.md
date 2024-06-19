@@ -32,25 +32,20 @@
 
 ## 参数说明
 
-#### DIR
+### DIR
 
 **Syntax** : _path_ | _fileref_
 
 指定 RTF 文件夹路径或引用。指定的文件夹路径必须是一个合法的 Windows 路径。
 
-**Caution** :
-
-- 指定物理路径时，可以传入带引号的路径或不带引号的路径，若传入不带引号的路径，建议使用 `%str()` 将路径包围
-- 当指定的物理路径太长时，应当使用 filename 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
+> [!IMPORTANT]
+>
+> - 当指定的物理路径太长时，应当使用 filename 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
 
 **Example** :
 
 ```
 DIR = "D:\~\TFL"
-```
-
-```
-DIR = %str(D:\~\TFL)
 ```
 
 ```
@@ -60,7 +55,7 @@ DIR = ref;
 
 ---
 
-#### OUT
+### OUT
 
 **Syntax** : _filename_
 
@@ -78,7 +73,7 @@ OUT = "合并表格.rtf"
 
 ---
 
-#### RTF_LIST
+### RTF_LIST
 
 **Syntax** : _filename_
 
@@ -121,13 +116,13 @@ X:\01 table\表 7.3.9 按系统器官分类、首选术语和严重程度汇总 
 rtf_list = rtf_list_copy.txt
 ```
 
-**Tips** :
-
-- 一般情况下，可以先指定 `AUTOORDER = NO`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，调用宏程序时可直接指定 `RTF_LIST = rtf_list_copy.txt`。
+> [!TIP]
+>
+> - 一般情况下，可以先指定 `AUTOORDER = NO`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，调用宏程序时可直接指定 `RTF_LIST = rtf_list_copy.txt`。
 
 ---
 
-#### DEPTH
+### DEPTH
 
 **Syntax** : _numeric_
 
@@ -172,21 +167,21 @@ rtf_list = rtf_list_copy.txt
   ```
   合并根目录 `~\TFL` 及其子文件夹 `~\TFL\table`, `~\TFL\figure`, `~\TFL\listing`, `~\TFL\other`，以及 `~\TFL\table\draft`, `~\TFL\listing\draft` 中的所有 RTF 文件。
 
-**Caution** :
-
-- 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
+> [!IMPORTANT]
+>
+> - 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
 
 **Default** : MAX
 
 默认情况下，宏程序将合并参数 [DIR](#dir) 指定的文件夹下任何深度的子文件夹内的 RTF 文件。
 
-**Tips** :
-
-- 在 Windows 中，可通过 `tree` 命令显示当前路径的文件夹结构。
+> [!TIP]
+>
+> - 在 Windows 中，可通过 `tree` 命令显示当前路径的文件夹结构。
 
 ---
 
-#### AUTOORDER
+### AUTOORDER
 
 **Syntax** : YES | NO
 
@@ -199,13 +194,13 @@ rtf_list = rtf_list_copy.txt
 
 ![](./assets/MergeRTF-autoorder-no.png)
 
-**Caution** :
-
-- 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
+> [!IMPORTANT]
+>
+> - 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
 
 ---
 
-#### EXCLUDE
+### EXCLUDE
 
 **Syntax** : _placeholder_
 
@@ -213,13 +208,13 @@ rtf_list = rtf_list_copy.txt
 
 **Default** ：#NULL
 
-**Caution** :
-
-- 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
+> [!IMPORTANT]
+>
+> - 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
 
 ---
 
-#### VD
+### VD
 
 **Syntax** : _drive_
 
@@ -231,7 +226,7 @@ rtf_list = rtf_list_copy.txt
 
 ---
 
-#### MERGE
+### MERGE
 
 **Syntax** : YES | NO
 
@@ -239,15 +234,15 @@ rtf_list = rtf_list_copy.txt
 
 此参数通常用于测试运行，如果你需要合并的 RTF 文件过多，或者你不确定指定的参数（尤其是参数 `DEPTH`）是否正确，可以先指定参数 `MERGE = NO`，此时宏程序将不会执行合并操作，但会输出数据集 `WORK.RTF_LIST`，你可以查看此数据集，了解具体将会被合并的 RTF 文件。在该数据集中，仅当变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 同时为 `Y` 时，对应路径上的 RTF 文件才会被合并。
 
-**Caution** :
-
-- 当 [RTF_LIST](#rtf_list) 指定了非 NULL 值时，数据集 `WORK.RTF_LIST` 中变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 的值均为 `Y`。
+> [!NOTE]
+>
+> - 当 [RTF_LIST](#rtf_list) 指定了非 NULL 值时，数据集 `WORK.RTF_LIST` 中变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 的值均为 `Y`。
 
 **Default** ：YES
 
 ---
 
-#### MERGED_FILE_SHOW
+### MERGED_FILE_SHOW
 
 **Syntax** : _path_type_
 
@@ -261,7 +256,7 @@ rtf_list = rtf_list_copy.txt
 
 ---
 
-#### LINK_TO_PREV
+### LINK_TO_PREV
 
 **Syntax** : YES | NO
 
@@ -291,21 +286,25 @@ rtf_list = rtf_list_copy.txt
 - 当 RTF 文件的页眉、页脚包含图片时，指定 `LINK_TO_PREV = YES` 会增加少量运行时间，文件体积明显减小；
 - 当 RTF 文件的页眉、页脚不含图片时，指定 `LINK_TO_PREV = YES` 会增加大量运行时间，文件体积几乎不变；
 
-**Caution** :
-
-- 如果 RTF 文件的页眉、页脚仅包含文本内容，则谨慎指定 `LINK_TO_PREV = YES`；
-- 如果 RTF 文件的页眉、页脚不一致，请勿指定 `LINK_TO_PREV = YES`；
-- 如果 RTF 文件的页面布局存在不一致，请勿指定 `LINK_TO_PREV = YES`，否则可能导致部分页面的页眉、页脚超出页面边缘。
+> [!WARNING]
+>
+> - 如果 RTF 文件的页眉、页脚仅包含文本内容，则谨慎指定 `LINK_TO_PREV = YES`；
+> - 如果 RTF 文件的页眉、页脚不一致，请勿指定 `LINK_TO_PREV = YES`；
+> - 如果 RTF 文件的页面布局存在不一致，请勿指定 `LINK_TO_PREV = YES`，否则可能导致部分页面的页眉、页脚超出页面边缘。
 
 ---
 
-#### DEL_TEMP_DATA
+### DEL_TEMP_DATA
 
 **Syntax** : YES | NO
 
 指定是否删除宏程序运行产生的中间数据集
 
 **Default** ：YES
+
+> [!NOTE]
+>
+> - 该参数通常用于调试，用户无需关注。
 
 ---
 

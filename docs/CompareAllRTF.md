@@ -33,7 +33,9 @@
 
 指定比较的 BASE 目录路径或目录引用。
 
-**Caution** : 如果路径过长，应当事先使用 `filename` 语句为目录定义引用，再将目录引用名传入参数 BASEDIR。
+> [!IMPORTANT]
+>
+> - 如果路径过长，应当事先使用 `filename` 语句为目录定义引用，再将目录引用名传入参数 BASEDIR。
 
 **Example** :
 
@@ -54,7 +56,9 @@ BASE = bdir
 
 指定比较的 COMPARE 目录路径或文件引用。
 
-**Caution** : 如果路径过长，应当事先使用 `filename` 语句为目录定义引用，再将目录引用名传入参数 COMPAREDIR。
+> [!IMPORTANT]
+>
+> - 如果路径过长，应当事先使用 `filename` 语句为目录定义引用，再将目录引用名传入参数 COMPAREDIR。
 
 **Example** :
 
@@ -147,7 +151,9 @@ INDATA = CMP.DIFF(keep = BASE_RTF_NAME COMPARE_RTF_NAME DIFFYN)
 
 **Default** : YES
 
-⚠ 该参数通常用于调试，用户无需关注。
+> [!NOTE]
+>
+> - 该参数通常用于调试，用户无需关注。
 
 ## 结果示例
 
