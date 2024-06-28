@@ -4,6 +4,10 @@
 
 **Compatibility** : RTF 1.6 specification
 
+## 依赖
+
+[CompareRTF.sas](../docs/CompareRTF.md) -> [CompareAllRTF.sas](../docs/CompareAllRTF.md)
+
 ## 语法
 
 ### 必选参数

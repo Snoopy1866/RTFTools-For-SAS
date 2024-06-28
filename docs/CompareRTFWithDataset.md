@@ -4,6 +4,10 @@
 
 **Compatibility** : RTF 1.6 specification
 
+## 依赖
+
+[Transcode.sas](../docs/Transcode.md) -> [ReadRTF.sas](../docs/ReadRTF.md) -> [CompareRTFWithDataset](../docs/CompareRTFWithDataset.md)
+
 ## 语法
 
 ### 必选参数
