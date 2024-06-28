@@ -20,6 +20,7 @@
 
 ### 可选参数
 
+- [OUT](#out)
 - [CFONT](#cfont)
 - [WFONT](#wfont)
 - [REPLACE](#replace)
@@ -34,7 +35,7 @@
 
 **Syntax** : _path_ | _fileref_
 
-指定比较的 RTF 文件路径或文件引用。
+指定需进行处理的 RTF 文件路径。
 
 **Caution** : 如果路径过长，应当事先使用 `filename` 语句为文件定义引用，再将文件引用名传入参数 BASE。
 
@@ -48,6 +49,30 @@ RTF = "~\表 7.1.1 受试者入组完成情况.rtf"
 filename rtfref "~\表 7.1.1 受试者入组完成情况.rtf";
 RTF = rtfref
 ```
+
+---
+
+### OUT
+
+**Syntax** : _path_
+
+指定处理后输出的 RTF 文件路径。
+
+**Default** ：#AUTO
+
+默认情况下，处理后的 RTF 文件名将遵循以下规则：
+
+- 若源 RTF 文件名以 `.rtf` 结尾，则修改后的 RTF 文件名将使用 _`source_name`_`-mixed.rtf` 作为新的文件名，其中 _`source_name`_ 为源 RTF 文件名，不包含 `.rtf` 后缀。例如：`~\表 7.1.1 受试者入组完成情况-mixed.rtf`。
+
+- 若源 RTF 文件名不以 `.rtf` 结尾，则修改后的 RTF 文件名将使用 _`source_name`_`-mixed.rtf` 作为新的文件名，其中 _`source_name`_ 为源 RTF 文件名（可能包含其他后缀名）。例如：`~\表 7.1.1 受试者入组完成情况.sfx-mixed.rtf`。
+
+**Example** :
+
+```
+OUT = ~\表 7.1.1 受试者入组完成情况-ChangeFont.rtf
+```
+
+---
 
 ### CFONT
 
@@ -103,28 +128,6 @@ CFONT = Noto Sans SC Regular
 
 ```
 WFONT = Monoca
-```
-
----
-
-### REPLACE
-
-**Syntax** : YES | NO
-
-制定是否覆盖源 RTF 文件。
-
-**Default** ：NO
-
-默认情况下，宏程序将不会覆盖源 RTF 文件。修改后的 RTF 文件名将遵循以下规则：
-
-- 若源 RTF 文件名以 `.rtf` 结尾，则修改后的 RTF 文件名将使用 _`source_name`_`-mixed.rtf` 作为新的文件名，其中 _`source_name`_ 为源 RTF 文件名，不包含 `.rtf` 后缀。例如：`~\表 7.1.1 受试者入组完成情况-mixed.rtf`。
-
-- 若源 RTF 文件名不以 `.rtf` 结尾，则修改后的 RTF 文件名将使用 _`source_name`_`-mixed.rtf` 作为新的文件名，其中 _`source_name`_ 为源 RTF 文件名（可能包含其他后缀名）。例如：`~\表 7.1.1 受试者入组完成情况.sfx-mixed.rtf`。
-
-**Example** :
-
-```
-REPLACE = yes
 ```
 
 ---

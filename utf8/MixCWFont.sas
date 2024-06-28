@@ -3,9 +3,9 @@
 */
 
 %macro MixCWFont(RTF,
+                 OUT              = #AUTO,
                  CFONT            = #AUTO,
                  WFONT            = #AUTO,
-                 REPLACE          = NO,
                  DEL_TEMP_DATA    = YES)
                  /des = "中西文字体混排" parmbuff;
 
@@ -310,16 +310,19 @@
 
 
     /*8. 输出文件*/
-    %if %qupcase(&replace) = YES %then %do;
-        %let out = %superq(rtfloc);
+    %if %qupcase(&out) = #AUTO %then %do;
+        %let outloc = %superq(rtfloc_mixed);
     %end;
     %else %do;
-        %let out = %superq(rtfloc_mixed);
+        %let reg_out_id = %sysfunc(prxparse(%bquote(/^[\x22\x27]?(.+?)[\x22\x27]?$/o)));
+        %if %sysfunc(prxmatch(&reg_out_id, %superq(out))) %then %do;
+            %let outloc = %bquote(%sysfunc(prxposn(&reg_out_id, 1, %superq(out))));
+        %end;
     %end;
 
     data _null_;
         set _tmp_rtf_mixed(keep = line);
-        file "&out" lrecl = 32767;
+        file "&outloc" lrecl = 32767;
         act_length = length(line);
         put line $varying32767. act_length;
     run;
@@ -338,7 +341,7 @@
         quit;
     %end;
 
-    %if %qupcase(&replace) = YES %then %do;
+    %if %qupcase(&out) ^= #AUTO %then %do;
         X "del ""&rtfloc_mixed"" & exit";
     %end;
 
