@@ -15,6 +15,26 @@
         %goto exit;
     %end;
 
+    /*检查依赖*/
+    %let is_dependency_loaded = 1;
+    proc sql noprint;
+        select count(*) into : is_transcode_loaded from DICTIONARY.CATALOGS where libname = "WORK" and memname = "SASMACR" and objname = "_MACRO_TRANSCODE";
+        select count(*) into : is_readrtf_loaded   from DICTIONARY.CATALOGS where libname = "WORK" and memname = "SASMACR" and objname = "READRTF";
+    quit;
+    %if not &is_transcode_loaded %then %do;
+        %put ERROR: 前置依赖缺失，请先加载文件 Transcode.sas。;
+        %let is_dependency_loaded = 0;
+    %end;
+
+    %if not &is_readrtf_loaded %then %do;
+        %put ERROR: 前置依赖缺失，请先加载宏程序 %nrstr(%%)ReadRTF。;
+        %let is_dependency_loaded = 0;
+    %end;
+
+    %if not &is_dependency_loaded %then %do;
+        %goto exit;
+    %end;
+
 
     /*1. 获取文件路径*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
