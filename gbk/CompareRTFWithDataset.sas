@@ -229,24 +229,27 @@
     proc sql noprint;
         select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF"; /*rtf 变量名*/
         %let rtf_col_n = &SQLOBS;
-
-        %if &rtf_col_n ^= &dataset_col_n %then %do;
-            %put ERROR: 变量数量不匹配！;
-            %goto exit;
-        %end;
     quit;
 
-    proc datasets library = work nowarn noprint;
-        modify _tmp_rtf;
-            rename %do i = 1 %to &rtf_col_n;
-                       &&rtf_col_&i = &&dataset_col_&i
-                   %end;
-                   ;
-    quit;
+    %if &rtf_col_n ^= &dataset_col_n %then %do;
+        %put ERROR: 变量数量不匹配！;
+        %goto exit;
+    %end;
+    %else %do;
+        proc sql noprint;
+            create table _tmp_rtf_rename as
+                select
+                    %do i = 1 %to &rtf_col_n;
+                        &&rtf_col_&i as &&dataset_col_&i
+                        %if &i < &rtf_col_n %then %do; %bquote(,) %end;
+                    %end;
+                from _tmp_rtf;
+        quit;
+    %end;
 
 
     /*6. 比较 RTF 文件与数据集*/
-    proc compare base = _tmp_rtf compare = _tmp_dataset_char_ver;
+    proc compare base = _tmp_rtf_rename compare = _tmp_dataset_char_ver;
     run;
 
 
@@ -255,6 +258,7 @@
     %if %upcase(&del_temp_data) = YES %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf
+                   _tmp_rtf_rename
                    _tmp_dataset
                    _tmp_dataset_char_ver
                   ;
