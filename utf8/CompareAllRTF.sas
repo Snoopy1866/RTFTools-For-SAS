@@ -20,6 +20,15 @@
         %goto exit;
     %end;
 
+    /*检查依赖*/
+    proc sql noprint;
+        select * from DICTIONARY.CATALOGS where libname = "WORK" and memname = "SASMACR" and objname = "COMPARERTF";
+    quit;
+    %if &SQLOBS = 0 %then %do;
+        %put ERROR: 前置依赖缺失，请先加载宏程序 %nrstr(%%)CompareRTF。;
+        %goto exit;
+    %end;
+
     %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
 
