@@ -165,14 +165,16 @@
 
     
     /*6. 输出差异比较结果*/
-    proc sql noprint;
-        create table _tmp_diff as
-            select * from _tmp_diff_1
-            %do i = 2 %to &diff_n_max;
-                outer union corr select * from _tmp_diff_&i
-            %end;
-            ;
-    quit;
+    %if &diff_n_max > 0 %then %do;
+        proc sql noprint;
+            create table _tmp_diff as
+                select * from _tmp_diff_1
+                %do i = 2 %to &diff_n_max;
+                    outer union corr select * from _tmp_diff_&i
+                %end;
+                ;
+        quit;
+    %end;
 
     proc sql noprint;
         create table _tmp_outdata as

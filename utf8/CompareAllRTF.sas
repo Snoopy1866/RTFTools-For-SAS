@@ -20,16 +20,12 @@
         %goto exit;
     %end;
 
-    %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[%str(%"%')]?((?:[A-Za-z]:\\|\\\\[^\\\/:?%str(%")<>|]+)[^\\\/:?%str(%")<>|]+(?:\\[^\\\/:?%str(%")<>|]+)*)[%str(%"%')]?)$/);
+    %let reg_dir_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
     %let reg_dir_id = %sysfunc(prxparse(%superq(reg_dir_expr)));
 
     /*1. 获取目录路径*/
     /*base*/
-    %if %sysfunc(prxmatch(&reg_dir_id, %superq(basedir))) = 0 %then %do;
-        %put ERROR: 目录引用名超出 8 字节，或者目录物理地址不符合 Winodws 规范！;
-        %goto exit;
-    %end;
-    %else %do;
+    %if %sysfunc(prxmatch(&reg_dir_id, %superq(basedir))) %then %do;
         %let basedirref = %sysfunc(prxposn(&reg_dir_id, 1, %superq(basedir)));
         %let basedirloc = %sysfunc(prxposn(&reg_dir_id, 2, %superq(basedir)));
 
@@ -44,25 +40,25 @@
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&basedirref)) = 0 %then %do;
-                %let basedirloc = %sysfunc(pathname(&basedirref, F));
+                %let basedirloc = %qsysfunc(pathname(&basedirref, F));
             %end;
         %end;
 
         /*指定的是物理路径*/
-        %if %bquote(&basedirloc) ^= %bquote() %then %do;
-            %if %sysfunc(fileexist(&basedirloc)) = 0 %then %do;
-                %put ERROR: 目录路径 %bquote(&basedirloc) 不存在！;
+        %if %superq(basedirloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(%superq(basedirloc))) = 0 %then %do;
+                %put ERROR: 目录路径 %superq(basedirloc) 不存在！;
                 %goto exit;
             %end;
         %end;
     %end;
-
-    /*compare*/
-    %if %sysfunc(prxmatch(&reg_dir_id, %superq(comparedir))) = 0 %then %do;
+    %else %do;
         %put ERROR: 目录引用名超出 8 字节，或者目录物理地址不符合 Winodws 规范！;
         %goto exit;
     %end;
-    %else %do;
+
+    /*compare*/
+    %if %sysfunc(prxmatch(&reg_dir_id, %superq(comparedir))) %then %do;
         %let comparedirref = %sysfunc(prxposn(&reg_dir_id, 1, %superq(comparedir)));
         %let comparedirloc = %sysfunc(prxposn(&reg_dir_id, 2, %superq(comparedir)));
 
@@ -77,17 +73,21 @@
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&comparedirref)) = 0 %then %do;
-                %let comparedirloc = %sysfunc(pathname(&comparedirref, F));
+                %let comparedirloc = %qsysfunc(pathname(&comparedirref, F));
             %end;
         %end;
 
         /*指定的是物理路径*/
-        %if %bquote(&comparedirloc) ^= %bquote() %then %do;
-            %if %sysfunc(fileexist(&comparedirloc)) = 0 %then %do;
-                %put ERROR: 目录路径 %bquote(&comparedirloc) 不存在！;
+        %if %superq(comparedirloc) ^= %bquote() %then %do;
+            %if %sysfunc(fileexist(%superq(comparedirloc))) = 0 %then %do;
+                %put ERROR: 目录路径 %superq(comparedirloc) 不存在！;
                 %goto exit;
             %end;
         %end;
+    %end;
+    %else %do;
+        %put ERROR: 目录引用名超出 8 字节，或者目录物理地址不符合 Winodws 规范！;
+        %goto exit;
     %end;
 
 
@@ -165,14 +165,16 @@
 
     
     /*6. 输出差异比较结果*/
-    proc sql noprint;
-        create table _tmp_diff as
-            select * from _tmp_diff_1
-            %do i = 2 %to &diff_n_max;
-                outer union corr select * from _tmp_diff_&i
-            %end;
-            ;
-    quit;
+    %if &diff_n_max > 0 %then %do;
+        proc sql noprint;
+            create table _tmp_diff as
+                select * from _tmp_diff_1
+                %do i = 2 %to &diff_n_max;
+                    outer union corr select * from _tmp_diff_&i
+                %end;
+                ;
+        quit;
+    %end;
 
     proc sql noprint;
         create table _tmp_outdata as
