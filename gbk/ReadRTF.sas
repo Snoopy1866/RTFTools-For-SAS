@@ -13,6 +13,15 @@ options cmplib = sasuser.func;
         %goto exit;
     %end;
 
+    /*检查依赖*/
+    proc sql noprint;
+        select * from DICTIONARY.CATALOGS where libname = "WORK" and memname = "SASMACR" and objname = "_MACRO_TRANSCODE";
+    quit;
+    %if &SQLOBS = 0 %then %do;
+        %put ERROR: 前置依赖缺失，请先加载文件 Transcode.sas。;
+        %goto exit;
+    %end;
+
     /*声明局部变量*/
     %local i;
 
