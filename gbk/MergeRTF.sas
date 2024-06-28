@@ -550,7 +550,7 @@
         %let out = %bquote(merged-&date &hour-&minu-&secd..rtf);
     %end;
     %else %do;
-        %let reg_out_id = %sysfunc(prxparse(%bquote(/^[%str(%"%')]?(.+?)[%str(%"%')]?$/o)));
+        %let reg_out_id = %sysfunc(prxparse(%bquote(/^[\x22\x27]?(.+?)[\x22\x27]?$/o)));
         %if %sysfunc(prxmatch(&reg_out_id, %superq(out))) %then %do;
             %let out = %bquote(%sysfunc(prxposn(&reg_out_id, 1, %superq(out))));
         %end;
