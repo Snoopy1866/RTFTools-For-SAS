@@ -10,7 +10,7 @@ quit;
 
 /*内置宏，仅供 Fcmp 函数 run_macro() 使用*/
 %macro _macro_transcode;
-    %let code_point = %sysfunc(dequote(&code_point));
+    %let code_point = %sysfunc(dequote(%superq(code_point)));
     %let raw_encoding = %sysfunc(dequote(&raw_encoding));
     data _null_(encoding = asciiany);
         length char $32767;
