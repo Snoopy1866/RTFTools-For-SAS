@@ -365,7 +365,7 @@ options cmplib = sasuser.func;
 
 
     /*7. 生成SAS数据集*/
-    proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted(compress = &compress);
+    proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted(compress = &compress) presorted;
         by obs_seq obs_var_pointer;
     run;
 
