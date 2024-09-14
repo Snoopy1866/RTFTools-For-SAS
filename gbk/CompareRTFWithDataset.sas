@@ -3,6 +3,7 @@
 */
 
 %macro CompareRTFWithDataset(rtf, dataset, del_temp_data = yes,
+                             ignoreCRLF = yes,
                              ignoreLeadBlank = yes,
                              ignoreEmptyColumn = yes,
                              ignoreHalfOrFullWidth = no,
@@ -130,7 +131,17 @@
             from _tmp_dataset;
     quit;
 
-    /*4.2 dataset ºöÂÔÇ°ÖÃ¿Õ¸ñ*/
+    /*4.2 dataset ºöÂÔCRLF×Ö·û*/
+    %if %upcase(&ignoreCRLF) = YES %then %do;
+        data _tmp_dataset_char_ver;
+            set _tmp_dataset_char_ver;
+            %do i = 1 %to &dataset_col_n;
+                &&dataset_col_&i = kcompress(&&dataset_col_&i, "0D0A"x);
+            %end;
+        run;
+    %end;
+
+    /*4.3 dataset ºöÂÔÇ°ÖÃ¿Õ¸ñ*/
     %if %upcase(&ignoreLeadBlank) = YES %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -140,7 +151,7 @@
         run;
     %end;
 
-    /*4.3 rtf ºöÂÔÈ«½Ç°ë½Ç·ûºÅ*/
+    /*4.4 rtf ºöÂÔÈ«½Ç°ë½Ç·ûºÅ*/
     %if %upcase(&ignoreHalfOrFullWidth) = YES %then %do;
         %let HalfOrWidthTranslation = %nrstr(/*±êµã·ûºÅ£¨²»º¬ÒýºÅ£©*/
                                              ",", "£¬",
@@ -212,7 +223,7 @@
         run;
     %end;
 
-    /*4.4 ºöÂÔÄÚÇ¶¿Õ¸ñ*/
+    /*4.5 ºöÂÔÄÚÇ¶¿Õ¸ñ*/
     %if %upcase(&ignoreembeddedblank = yes) %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -229,7 +240,7 @@
         run;
     %end;
 
-    /*4.5 rtf ºöÂÔ¿ÕÁÐ*/
+    /*4.6 rtf ºöÂÔ¿ÕÁÐ*/
     %if %upcase(&ignoreEmptyColumn) = YES %then %do;
         %if &rtf_col_eq1_n > 0 %then %do;
             %do i = 1 %to &rtf_col_eq1_n;

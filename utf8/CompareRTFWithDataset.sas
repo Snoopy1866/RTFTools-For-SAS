@@ -3,6 +3,7 @@
 */
 
 %macro CompareRTFWithDataset(rtf, dataset, del_temp_data = yes,
+                             ignoreCRLF = yes,
                              ignoreLeadBlank = yes,
                              ignoreEmptyColumn = yes,
                              ignoreHalfOrFullWidth = no,
@@ -130,7 +131,17 @@
             from _tmp_dataset;
     quit;
 
-    /*4.2 dataset 忽略前置空格*/
+    /*4.2 dataset 忽略CRLF字符*/
+    %if %upcase(&ignoreCRLF) = YES %then %do;
+        data _tmp_dataset_char_ver;
+            set _tmp_dataset_char_ver;
+            %do i = 1 %to &dataset_col_n;
+                &&dataset_col_&i = kcompress(&&dataset_col_&i, "0D0A"x);
+            %end;
+        run;
+    %end;
+
+    /*4.3 dataset 忽略前置空格*/
     %if %upcase(&ignoreLeadBlank) = YES %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -140,7 +151,7 @@
         run;
     %end;
 
-    /*4.3 rtf 忽略全角半角符号*/
+    /*4.4 rtf 忽略全角半角符号*/
     %if %upcase(&ignoreHalfOrFullWidth) = YES %then %do;
         %let HalfOrWidthTranslation = %nrstr(/*标点符号（不含引号）*/
                                              ",", "，",
@@ -212,7 +223,7 @@
         run;
     %end;
 
-    /*4.4 忽略内嵌空格*/
+    /*4.5 忽略内嵌空格*/
     %if %upcase(&ignoreembeddedblank = yes) %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -229,7 +240,7 @@
         run;
     %end;
 
-    /*4.5 rtf 忽略空列*/
+    /*4.6 rtf 忽略空列*/
     %if %upcase(&ignoreEmptyColumn) = YES %then %do;
         %if &rtf_col_eq1_n > 0 %then %do;
             %do i = 1 %to &rtf_col_eq1_n;
