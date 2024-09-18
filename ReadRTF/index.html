@@ -1070,7 +1070,7 @@
 <p>读取 RTF 文件，将 RTF 文件转为 SAS 数据集。</p>
 <p><strong>Compatibility</strong> : RTF 1.6 specification</p>
 <h2 id="_1">依赖<a class="headerlink" href="#_1" title="链接到本节以供参考">&para;</a></h2>
-<p><a href="../docs/Transcode.md#transcode">Transcode</a> -&gt; <a href="../docs/Transcode.md#cell_transcode">Cell_Transcode</a> -&gt; <a href="./">ReadRTF</a></p>
+<p><a href="../Transcode/#transcode">Transcode</a> -&gt; <a href="../Transcode/#cell_transcode">Cell_Transcode</a> -&gt; <a href="./">ReadRTF</a></p>
 <h2 id="_2">语法<a class="headerlink" href="#_2" title="链接到本节以供参考">&para;</a></h2>
 <h3 id="_3">必选参数<a class="headerlink" href="#_3" title="链接到本节以供参考">&para;</a></h3>
 <ul>
@@ -1181,7 +1181,7 @@
 <li>表头属性定义行：<code>/\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*(?:\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*)*\\cltxlrt[bl]\\clvertal[tcb](?:\\clcbpat\d*)?\\cellx(\d+)/o</code></li>
 <li>数据行：<code>/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o</code></li>
 <li>分节符标识行：<code>/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o</code></li>
-<li>开始转换数据。调用 <a href="../docs/Transcode.md#cell_transcode">Cell_Transcode</a> 函数，将单元格内的字符串转换为可读的字符串；</li>
+<li>开始转换数据。调用 <a href="../Transcode/#cell_transcode">Cell_Transcode</a> 函数，将单元格内的字符串转换为可读的字符串；</li>
 <li>使用 <code>PROC TRANSPOSE</code> 对上一步产生的数据集进行转置；</li>
 <li>处理变量标签，这一步主要是解决表头标签跨越多行可能导致的标签错位的问题</li>
 <li>修改数据集属性，包括缩减变量长度，添加标签</li>
@@ -1268,7 +1268,7 @@
 </span></code></pre></div>
 <p>某些 RTF 为了在每一页中重复表格标题，可能会使用分节符，这样会导致读取 RTF 文件时，从第 2 页开始，页脚的文本也被当做数据行被输出到数据集中，为了解决这一问题，使用这个正则表达式识别到分节符后，应当再次寻找定义了大纲级别的表格标题，在分节符之后，定义了大纲级别的表格标题之前的任何 RTF 标记文本都将被忽略。</p>
 <h3 id="5">5. 如何将转义字符转换为正常可读的字符串<a class="headerlink" href="#5" title="链接到本节以供参考">&para;</a></h3>
-<p>调用 PROC FCMP 函数 <a href="../docs/Transcode.md#cell_transcode">Cell_Transcode()</a></p>
+<p>调用 PROC FCMP 函数 <a href="../Transcode/#cell_transcode">Cell_Transcode()</a></p>
 <h3 id="6">6. 如何定义变量名称和变量标签<a class="headerlink" href="#6" title="链接到本节以供参考">&para;</a></h3>
 <p>RTF 文件本身不含原始的 SAS 变量名，因此程序只能根据变量在 RTF 文件中出现的先后顺序，依次命名为 <code>COL1</code>、<code>COL2</code>、<code>COL3</code>、...。除此之外，程序额外生成一列变量 <code>OBS_SEQ</code> 代表观测序号。</p>
 <p>变量标签根据 <a href="#4-如何识别-rtf-中的数据">#4</a> 中获得到的表格表头单元格的右边框位置，对跨越多行的标签进行组合，合并后的单元格标签将会重复，重复次数取决于其自身跨越的宽度在其他行相同位置和宽度下显示的单元格数量。</p>
