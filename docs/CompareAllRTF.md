@@ -6,7 +6,7 @@
 
 ## 依赖
 
-[CompareRTF.sas](../docs/CompareRTF.md) -> [CompareAllRTF.sas](../docs/CompareAllRTF.md)
+[CompareRTF.sas](CompareRTF.md) -> [CompareAllRTF.sas](CompareAllRTF.md)
 
 ## 语法
 

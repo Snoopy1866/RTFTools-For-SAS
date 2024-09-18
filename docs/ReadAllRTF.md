@@ -6,7 +6,7 @@
 
 ## 依赖
 
-[Transcode](../docs/Transcode.md#transcode) -> [Cell_Transcode](../docs/Transcode.md#cell_transcode) -> [ReadRTF](./ReadRTF.md) -> [ReadAllRTF](./ReadAllRTF.md)
+[Transcode](Transcode.md#transcode) -> [Cell_Transcode](Transcode.md#cell_transcode) -> [ReadRTF](ReadRTF.md) -> [ReadAllRTF](ReadAllRTF.md)
 
 ## 语法
 

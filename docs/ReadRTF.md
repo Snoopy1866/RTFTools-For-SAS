@@ -6,7 +6,7 @@
 
 ## 依赖
 
-[Transcode](../docs/Transcode.md#transcode) -> [Cell_Transcode](../docs/Transcode.md#cell_transcode) -> [ReadRTF](./ReadRTF.md)
+[Transcode](Transcode.md#transcode) -> [Cell_Transcode](Transcode.md#cell_transcode) -> [ReadRTF](ReadRTF.md)
 
 ## 语法
 
@@ -122,7 +122,7 @@ OUTDATA = t_7_1_1
    - 表头属性定义行：`/\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*(?:\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*)*\\cltxlrt[bl]\\clvertal[tcb](?:\\clcbpat\d*)?\\cellx(\d+)/o`
    - 数据行：`/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o`
    - 分节符标识行：`/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o`
-5. 开始转换数据。调用 [Cell_Transcode](../docs/Transcode.md#cell_transcode) 函数，将单元格内的字符串转换为可读的字符串；
+5. 开始转换数据。调用 [Cell_Transcode](Transcode.md#cell_transcode) 函数，将单元格内的字符串转换为可读的字符串；
 6. 使用 `PROC TRANSPOSE` 对上一步产生的数据集进行转置；
 7. 处理变量标签，这一步主要是解决表头标签跨越多行可能导致的标签错位的问题
 8. 修改数据集属性，包括缩减变量长度，添加标签
@@ -240,7 +240,7 @@ RTF 文件单行字符串没有限制长度，为确保读取的 RTF 标记字�
 
 ### 5. 如何将转义字符转换为正常可读的字符串
 
-调用 PROC FCMP 函数 [Cell_Transcode()](../docs/Transcode.md#cell_transcode)
+调用 PROC FCMP 函数 [Cell_Transcode()](Transcode.md#cell_transcode)
 
 ### 6. 如何定义变量名称和变量标签
 

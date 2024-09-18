@@ -6,7 +6,7 @@
 
 ## 依赖
 
-[Transcode.sas](../docs/Transcode.md) -> [ReadRTF.sas](../docs/ReadRTF.md) -> [CompareRTFWithDataset](../docs/CompareRTFWithDataset.md)
+[Transcode.sas](Transcode.md) -> [ReadRTF.sas](ReadRTF.md) -> [CompareRTFWithDataset](CompareRTFWithDataset.md)
 
 ## 语法
 
@@ -17,6 +17,7 @@
 
 ### 可选参数
 
+- [IGNORECRLF](#ignorecrlf)
 - [IGNORELEADBLANK](#ignoreleadblank)
 - [IGNOREEMPTYCOLUMN](#ignoreemptycolumn)
 - [IGNOREHALFORFULLWIDTH](#ignorehalforfullwidth)
@@ -82,6 +83,14 @@ DATASET = qc_t_7_1_1
 > [!TIP]
 >
 > - `strip()` 函数无法去除字符串开头和结尾的 `0D0A`x
+
+**Default** : YES
+
+**Example** :
+
+```sas
+IGNORECRLF = NO
+```
 
 ---
 
