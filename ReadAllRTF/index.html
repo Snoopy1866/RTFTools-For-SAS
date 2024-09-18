@@ -1,0 +1,1199 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="RTF 文件小工具">
+      
+      
+        <meta name="author" content="Snoopy1866">
+      
+      
+        <link rel="canonical" href="https://Snoopy1866.github.io/RTFTools-for-SAS/ReadAllRTF/">
+      
+      
+        <link rel="prev" href="../ReadRTF/">
+      
+      
+        <link rel="next" href="../MergeRTF/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+    
+    
+      
+        <title>%ReadAllRTF - RTFTools for SAS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.35f28582.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#readallrtf" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+  <!-- Add announcement here, including arbitrary HTML -->
+    <div class="alert alert-info" role="alert">
+
+          </div>
+          
+        </aside>
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href=".." title="RTFTools for SAS" class="md-header__button md-logo" aria-label="RTFTools for SAS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RTFTools for SAS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              %ReadAllRTF
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Snoopy1866/RTFTools-for-SAS" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    RTFTools for SAS
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  主页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../Transcode/" class="md-tabs__link">
+          
+  
+  文档
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="RTFTools for SAS" class="md-nav__button md-logo" aria-label="RTFTools for SAS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    RTFTools for SAS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Snoopy1866/RTFTools-for-SAS" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    RTFTools for SAS
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    文档
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            文档
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Transcode/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transcode
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ReadRTF/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    %ReadRTF
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    %ReadAllRTF
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    %ReadAllRTF
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#readallrtf" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReadAllRTF
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      依赖
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      语法
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="语法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      必选参数
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      可选参数
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      DIR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outlib" class="md-nav__link">
+    <span class="md-ellipsis">
+      OUTLIB
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vd" class="md-nav__link">
+    <span class="md-ellipsis">
+      VD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compress" class="md-nav__link">
+    <span class="md-ellipsis">
+      COMPRESS
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#del_rtf_ctrl" class="md-nav__link">
+    <span class="md-ellipsis">
+      DEL_RTF_CTRL
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      程序执行流程
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      细节
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="细节">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-rtf" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 如何获取文件夹中所有 RTF 文件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-rtf" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 如何识别符合命名要求的 RTF 文件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-rtf-sas" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 如何读取符合命名要求的 RTF 文件并转换为 SAS 数据集
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-sas" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 如何给输出的 SAS 数据集自动命名和添加标签
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      示例程序
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MergeRTF/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    %MergeRTF
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CompareRTF/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    %CompareRTF
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CompareAllRTF/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    %CompareAllRTF
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CompareRTFWithDataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    %CompareRTFWithDataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DeletePicInHeader.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    %DeletePicInHeader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MixCWFont/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    %MixCWFont
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#readallrtf" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReadAllRTF
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      依赖
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      语法
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="语法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      必选参数
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      可选参数
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      DIR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outlib" class="md-nav__link">
+    <span class="md-ellipsis">
+      OUTLIB
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vd" class="md-nav__link">
+    <span class="md-ellipsis">
+      VD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compress" class="md-nav__link">
+    <span class="md-ellipsis">
+      COMPRESS
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#del_rtf_ctrl" class="md-nav__link">
+    <span class="md-ellipsis">
+      DEL_RTF_CTRL
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      程序执行流程
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      细节
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="细节">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-rtf" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 如何获取文件夹中所有 RTF 文件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-rtf" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 如何识别符合命名要求的 RTF 文件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-rtf-sas" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 如何读取符合命名要求的 RTF 文件并转换为 SAS 数据集
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-sas" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 如何给输出的 SAS 数据集自动命名和添加标签
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      示例程序
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+    <a href="https://github.com/Snoopy1866/RTFTools-for-SAS/blob/main/docs/ReadAllRTF.md" title="编辑此页" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/Snoopy1866/RTFTools-for-SAS/raw/main/docs/ReadAllRTF.md" title="查看本页的源代码" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+  <h1>%ReadAllRTF</h1>
+
+<h2 id="readallrtf">ReadAllRTF<a class="headerlink" href="#readallrtf" title="链接到本节以供参考">&para;</a></h2>
+<p>读取指定文件夹中的所有 RTF 文件，将所有 RTF 文件转为 SAS 数据集。</p>
+<p><strong>Compatibility</strong> : RTF 1.6 specification</p>
+<h2 id="_1">依赖<a class="headerlink" href="#_1" title="链接到本节以供参考">&para;</a></h2>
+<p><a href="../docs/Transcode.md#transcode">Transcode</a> -&gt; <a href="../docs/Transcode.md#cell_transcode">Cell_Transcode</a> -&gt; <a href="../ReadRTF/">ReadRTF</a> -&gt; <a href="./">ReadAllRTF</a></p>
+<h2 id="_2">语法<a class="headerlink" href="#_2" title="链接到本节以供参考">&para;</a></h2>
+<h3 id="_3">必选参数<a class="headerlink" href="#_3" title="链接到本节以供参考">&para;</a></h3>
+<ul>
+<li><a href="#dir">DIR</a></li>
+</ul>
+<h3 id="_4">可选参数<a class="headerlink" href="#_4" title="链接到本节以供参考">&para;</a></h3>
+<ul>
+<li><a href="#outlib">OUTLIB</a></li>
+<li><a href="#vd">VD</a></li>
+<li><a href="#compress">COMPRESS</a></li>
+<li><a href="#del_rtf_ctrl">DEL_RTF_CTRL</a></li>
+</ul>
+<h2 id="_5">参数说明<a class="headerlink" href="#_5" title="链接到本节以供参考">&para;</a></h2>
+<h3 id="dir">DIR<a class="headerlink" href="#dir" title="链接到本节以供参考">&para;</a></h3>
+<p><strong>Syntax</strong> : <em>path</em> | <em>fileref</em></p>
+<p>指定 RTF 文件所在目录路径或引用。指定的目录路径必须是一个合法的 Windows 路径。</p>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<ul>
+<li>当指定的物理路径太长时，应当使用 filename 语句建立目录引用，然后传入目录引用，否则会导致 SAS 无法正确读取。</li>
+</ul>
+</blockquote>
+<p><strong>Example</strong> :</p>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>DIR = &quot;D:\~\01 table&quot;
+</span></code></pre></div>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>filename ref &quot;D:\~\01 table&quot;;
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>DIR = ref;
+</span></code></pre></div>
+<hr />
+<h3 id="outlib">OUTLIB<a class="headerlink" href="#outlib" title="链接到本节以供参考">&para;</a></h3>
+<p><strong>Syntax</strong> : <em>libname</em></p>
+<p>指定输出数据集存放的逻辑库，该逻辑库必须事先定义，且逻辑库对应的物理路径必须存在</p>
+<p><strong>Default</strong> : WORK</p>
+<hr />
+<h3 id="vd">VD<a class="headerlink" href="#vd" title="链接到本节以供参考">&para;</a></h3>
+<p><strong>Syntax</strong> : <em>drive</em></p>
+<p>指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被操作系统使用的一个字符。</p>
+<p><strong>Default</strong> : #AUTO</p>
+<p>默认情况下，宏程序将自动选择一个未被操作系统使用的字母作为虚拟磁盘的盘符。</p>
+<hr />
+<h3 id="compress">COMPRESS<a class="headerlink" href="#compress" title="链接到本节以供参考">&para;</a></h3>
+<p>同 <a href="../ReadRTF/#compress">COMPRESS</a></p>
+<hr />
+<h3 id="del_rtf_ctrl">DEL_RTF_CTRL<a class="headerlink" href="#del_rtf_ctrl" title="链接到本节以供参考">&para;</a></h3>
+<p>同 <a href="../ReadRTF/#del_rtf_ctrl">DEL_RTF_CTRL</a></p>
+<hr />
+<h2 id="_6">程序执行流程<a class="headerlink" href="#_6" title="链接到本节以供参考">&para;</a></h2>
+<ol>
+<li>使用 DOS 命令获取指定文件夹中的所有 RTF 文件，将 RTF 文件列表存储在 <code>_tmp_rtf_list.txt</code> 中；</li>
+<li>读取 <code>_tmp_rtf_list.txt</code> 文件，获取 RTF 文件名称，构建并执行 filename 语句；</li>
+<li>调用宏 <code>%ReadRTF()</code>，将 RTF 文件转换为 SAS 数据集</li>
+<li>删除临时数据集</li>
+<li>删除 <code>_tmp_rtf_list.txt</code></li>
+</ol>
+<h2 id="_7">细节<a class="headerlink" href="#_7" title="链接到本节以供参考">&para;</a></h2>
+<h3 id="1-rtf">1. 如何获取文件夹中所有 RTF 文件<a class="headerlink" href="#1-rtf" title="链接到本节以供参考">&para;</a></h3>
+<p>使用全局语句 <code>X ...</code> 调用 Windows 下的 DOS 命令，使用 <code>DIR</code> 命令获取文件夹中后缀为 <code>.rtf</code> 的文件列表，并存储在文件夹中的 <code>_tmp_rtf_list.txt</code> 中。</p>
+<p>在 CMD 中，该命令如下所示：</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dir &quot;~\*.rtf&quot; /b/on &gt; &quot;~\_tmp_rtf_list.txt&quot; &amp; exit
+</span></code></pre></div>
+<p>注意，不要忘记使用 exit 退出终端窗口；</p>
+<p>在 SAS 中，上述命令改写为：</p>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">X</span> <span class="s">&quot;dir &quot;&quot;~\*.rtf&quot;&quot; /b/on &gt; &quot;&quot;~\_tmp_rtf_list.txt&quot;&quot; </span><span class="nv">&amp;</span><span class="err"> </span><span class="nv">exit</span><span class="s">&quot;</span>
+</span></code></pre></div>
+<p>将 <code>~</code> 替换为宏变量 <code>&amp;dir</code>，即可。</p>
+<p>⚠ 在 Unicode 环境下，SAS 对于含中文字符的超长路径（超过 262 字符）支持不够友好，为了防止部分 RTF 文件因路径过长导致无法读取，可以使用命令 <code>subst</code> 临时建立虚拟磁盘映射，从而缩短文件路径，以便 SAS 能够正确读取 RTF 文件。</p>
+<p>因此，在 SAS 中，上述命令进一步改写为：</p>
+<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">X</span> <span class="s">&quot;subst </span><span class="nv">&amp;vd</span><span class="s">: &quot;&quot;</span><span class="nv">&amp;dir</span><span class="s">&quot;&quot; </span><span class="nv">&amp;</span><span class="err"> </span><span class="nv">dir</span><span class="s"> &quot;&quot;</span><span class="nv">&amp;vd</span><span class="s">:\*.rtf&quot;&quot; /b/on &gt; &quot;&quot;</span><span class="nv">&amp;vd</span><span class="s">:\_tmp_rtf_list.txt&quot;&quot; </span><span class="nv">&amp;</span><span class="err"> </span><span class="nv">exit</span><span class="s">&quot;</span>;
+</span></code></pre></div>
+<p>所有 RTF 文件读取完成后，记得删除虚拟磁盘映射：</p>
+<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">X</span> <span class="s">&quot; del &quot;&quot;</span><span class="nv">&amp;vd</span><span class="s">:\_tmp_rtf_list.txt&quot;&quot; </span><span class="nv">&amp;</span><span class="err"> </span><span class="nv">subst</span><span class="s"> </span><span class="nv">&amp;vd</span><span class="s">: /D </span><span class="nv">&amp;</span><span class="err"> </span><span class="nv">exit</span><span class="s">&quot;</span>;
+</span></code></pre></div>
+<h3 id="2-rtf">2. 如何识别符合命名要求的 RTF 文件<a class="headerlink" href="#2-rtf" title="链接到本节以供参考">&para;</a></h3>
+<p>通常情况下，输出的 RTF 文件名都含有一个序号，例如：<code>表7.1.1 受试者分布 筛选人群.rtf</code> 中的 <code>7.1.1</code>，此外前缀 <code>表</code> 也是固定的字符，通过这一规律，可以识别那些通过 SAS 输出的 RTF 文件。因此，可以构建以下正则表达式识别可以处理的 RTF 文件：</p>
+<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/^((?:列)?表|清单)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf\s*$/o
+</span></code></pre></div>
+<p>该正则表达式包含 3 个 buffer，各自含义如下：</p>
+<ul>
+<li>buffer1 : 文件名类型，如：列表、表、清单</li>
+<li>buffer2 : 文件名序号，如：7.1.1</li>
+<li>buffer3 : 文件名主体，如：受试者分布 筛选人群</li>
+</ul>
+<p>若 RTF 文件名匹配上述正则表达式，则在临时数据集 <code>_tmp_rtf_list</code> 中，变量 <code>rtf_valid_flag</code> 将被标记为 <code>Y</code>。</p>
+<h3 id="3-rtf-sas">3. 如何读取符合命名要求的 RTF 文件并转换为 SAS 数据集<a class="headerlink" href="#3-rtf-sas" title="链接到本节以供参考">&para;</a></h3>
+<p>在 <a href="#2-如何识别符合命名要求的-rtf-文件">#2</a> 的临时数据集 <code>_tmp_rtf_list</code> 中，筛选变量 <code>rtf_valid_flag</code>
+的值为 <code>Y</code> 的观测，然后通过使用 <code>call execute</code> 调用宏 <code>%ReadRTF()</code>，具体如下：</p>
+<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>call execute(&#39;%nrstr(%ReadRTF(file = &#39; || fileref || &#39;, outdata = &#39; || outdata_name || &#39;(label = &quot;&#39; || ref_label || &#39;&quot;), compress = yes&#39; || &#39;));&#39;);
+</span></code></pre></div>
+<p>注意：需要给输出数据集添加标签，因此参数 <code>outdata</code> 需要添加数据集选项 <code>label = "xxx"</code>。</p>
+<h3 id="3-sas">3. 如何给输出的 SAS 数据集自动命名和添加标签<a class="headerlink" href="#3-sas" title="链接到本节以供参考">&para;</a></h3>
+<p>根据 <a href="#2-如何识别符合命名要求的-rtf-文件">#2</a> 获取的 buffer，自动为输出的数据集附加属性。
+buffer1 和 buffer2 将作为输出数据集的名称，具体操作如下：</p>
+<ul>
+<li>若 buffer1 = "表"，则数据集名称以 ‘T’ 开头</li>
+<li>若 buffer1 = "列表" or "清单"，则数据集名称以 ‘L’ 开头</li>
+<li>将 buffer2 中的句点（.）替换为下划线（_），以符合 SAS 名称规范</li>
+</ul>
+<p>连接上述处理后的字符串，即为输出数据集的名称，例如：T_7_1_1</p>
+<p>buffer3 的内容将作为输出数据集的标签。</p>
+<h2 id="_8">示例程序<a class="headerlink" href="#_8" title="链接到本节以供参考">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nf">%ReadAllRTF</span>(dir = <span class="s">&quot;D:\~\TFL\table&quot;</span>);
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">libname</span> qc <span class="s">&quot;D:\qc&quot;</span>;
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nf">%ReadAllRTF</span>(dir = <span class="s">&quot;D:\~\TFL\table&quot;</span>, outlib = qc);
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nf">%ReadAllRTF</span>(dir = <span class="s">&quot;D:\~\TFL\table&quot;</span>, outlib = qc, vd = <span class="k">X</span>);
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="nf">%ReadAllRTF</span>(dir = <span class="s">&quot;D:\~\TFL\table&quot;</span>, outlib = qc, vd = <span class="k">X</span>, compress = yes);
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="nf">%ReadAllRTF</span>(dir = <span class="s">&quot;D:\~\TFL\table&quot;</span>, outlib = qc, vd = <span class="k">X</span>, compress = yes, del_rtf_ctrl = yes);
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="nf">%ReadAllRTF</span>(dir = <span class="nb">%str</span>(D:\~\TFL\<span class="k">table</span>), outlib = qc, vd = <span class="k">X</span>, compress = yes, del_rtf_ctrl = yes);
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="k">filename</span> dirref <span class="s">&quot;D:\~\TFL\table&quot;</span>;
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="nf">%ReadAllRTF</span>(dir = dirref, outlib = qc, vd = <span class="k">X</span>, compress = yes, del_rtf_ctrl = yes);
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright © 2024 Snoopy1866
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/Snoopy1866/RTFTools-for-SAS" target="_blank" rel="noopener" title="Github 仓库" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
