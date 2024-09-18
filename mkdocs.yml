@@ -1,0 +1,100 @@
+# 站点信息
+site_name: RTFTools for SAS
+site_url: https://Snoopy1866.github.io/RTFTools-for-SAS
+repo_url: https://github.com/Snoopy1866/RTFTools-for-SAS
+repo_name: RTFTools for SAS
+edit_uri: https://github.com/Snoopy1866/RTFTools-for-SAS/blob/main/docs
+site_description: RTF 文件小工具
+site_author: Snoopy1866
+copyright: Copyright © 2024 Snoopy1866
+
+# 导航信息
+nav:
+  - 主页: index.md
+  - 文档:
+    - 'Transcode': Transcode.md
+    - '%ReadRTF': ReadRTF.md
+    - '%ReadAllRTF': ReadAllRTF.md
+    - '%MergeRTF': MergeRTF.md
+    - '%CompareRTF': CompareRTF.md
+    - '%CompareAllRTF': CompareAllRTF.md
+    - '%CompareRTFWithDataset': CompareRTFWithDataset.md
+    - '%DeletePicInHeader': DeletePicInHeader.md
+    - '%MixCWFont': MixCWFont.md
+
+# 右下角展示的图标
+extra:
+  social:
+    - icon: simple/github
+      link: https://github.com/Snoopy1866/RTFTools-for-SAS
+      name: Github 仓库
+
+# 主题配置，这里使用了 material 主题，一般无需修改
+theme:
+  name: material
+  language: zh
+  features:
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+    - content.action.view
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+  custom_dir: overrides
+
+# 安装的 markdown 扩展，一般无需修改
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      permalink_title: 链接到本节以供参考
+      toc_depth: 5
+  - tables
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji 
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.keys
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+
+# 额外的 javascript 文件，无需修改
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+# 额外的插件，无需修改
+plugins:
+  - search:
+      lang:
+        - en
+        - zh
+      jieba_dict: dict.txt
