@@ -94,6 +94,8 @@ options cmplib = sasuser.func;
     data _tmp_rtf_data_polish_header(compress = &compress);
         set _tmp_rtf_data;
 
+        len = length(line);
+
         length break_line $32767.;
 
         reg_header_break_id = prxparse("/^(\\pard\\plain\\intbl\\keepn\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{.*){\\line}$/o");
@@ -132,9 +134,9 @@ options cmplib = sasuser.func;
 
         length line_data_part $32767 line_data_part_buffer $32767;
 
-        reg_data_line_start_id = prxparse("/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)$/o");
-        reg_data_line_mid_id   = prxparse("/^((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)$/o");
-        reg_data_line_end_id   = prxparse("/^((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o");
+        reg_data_line_start_id = prxparse("/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])*)$/o");
+        reg_data_line_mid_id   = prxparse("/^((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])*)$/o");
+        reg_data_line_end_id   = prxparse("/^((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])*)\\cell\}$/o");
 
         retain line_data_part "";
         retain line_data_part_found 0;
@@ -229,7 +231,7 @@ options cmplib = sasuser.func;
         reg_outlinelevel_id    = prxparse("/\\outlinelevel\d/o");
         reg_header_line_id     = prxparse("/\\trowd\\trkeep\\trhdr\\trq[lcr]/o");
         reg_header_def_line_id = prxparse("/\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*(?:\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*)*\\cltxlrt[bl]\\clvertal[tcb](?:\\clcbpat\d*)?\\cellx(\d+)/o");
-        reg_data_line_id       = prxparse("/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o");
+        reg_data_line_id       = prxparse("/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])*)\\cell\}$/o");
         reg_sect_line_id       = prxparse("/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o");
 
 

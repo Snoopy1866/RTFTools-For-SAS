@@ -120,7 +120,7 @@ OUTDATA = t_7_1_1
    - 标题：`/\\outlinelevel\d/o`
    - 表头定义起始行：`/\\trowd\\trkeep\\trhdr\\trq[lcr]/o`
    - 表头属性定义行：`/\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*(?:\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*)*\\cltxlrt[bl]\\clvertal[tcb](?:\\clcbpat\d*)?\\cellx(\d+)/o`
-   - 数据行：`/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o`
+   - 数据行：`/^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])*)\\cell\}$/o`
    - 分节符标识行：`/\\sect\\sectd\\linex\d*\\endnhere\\pgwsxn\d*\\pghsxn\d*\\lndscpsxn\\headery\d*\\footery\d*\\marglsxn\d*\\margrsxn\d*\\margtsxn\d*\\margbsxn\d*/o`
 5. 开始转换数据。调用 [Cell_Transcode](Transcode.md#cell_transcode) 函数，将单元格内的字符串转换为可读的字符串；
 6. 使用 `PROC TRANSPOSE` 对上一步产生的数据集进行转置；
@@ -219,14 +219,14 @@ RTF 文件单行字符串没有限制长度，为确保读取的 RTF 标记字�
 4. 使用以下正则表达式匹配数据行
 
 ```
-^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[[:ascii:]])*)\\cell\}$/o
+^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])*)\\cell\}$/o
 ```
 
 上述正则表达式中，包含了 3 种类型的数据编码形式：
 
 - `\\'[0-9A-F]{2}` : GBK
 - `\\u\d{1,5};` : UTF-8
-- `[[:ascii:]]` : ASCII
+- `[\x20-\x7e]` : ASCII
 
 其中 GBK 和 UTF-8 字符是以转义字符表示的，需要进一步转换成以 SAS 当前环境下的编码存储的字符串。
 
