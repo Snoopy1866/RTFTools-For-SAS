@@ -123,7 +123,7 @@
                         ifc(not missing(&&dataset_col_&i), strip(put(&&dataset_col_&i, &&dataset_col_format_&i)), '') as &&dataset_col_&i
                     %end;
                     %else %do;
-                        &&dataset_col_&i
+                        "&&dataset_col_&i"n
                     %end;
 
                     %if &i < &dataset_col_n %then %do; %bquote(,) %end;
