@@ -1139,22 +1139,22 @@
 <tr>
 <td>{}</td>
 <td>空的 Group</td>
-<td>{\s\*}|(?&lt;!\\)[{}]</td>
+<td><code>{\s*}\|(?&lt;!\\)[{}]</code></td>
 </tr>
 <tr>
 <td>\li<em>N</em></td>
 <td>缩进</td>
-<td>\\li\d+</td>
+<td><code>\\li\d+</code></td>
 </tr>
 <tr>
 <td>\super</td>
 <td>上标</td>
-<td>{\\super.\*?}|\\super[^\]+</td>
+<td><code>\{?\\super\s*((?:\\[\\\{\}]\|[^\\\{\}])+)\}?</code></td>
 </tr>
 <tr>
 <td>\nosupersub</td>
 <td>取消上下标</td>
-<td>\\nosupersub</td>
+<td><code>\\nosupersub</code></td>
 </tr>
 </tbody>
 </table>
