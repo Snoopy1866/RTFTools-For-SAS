@@ -332,7 +332,7 @@ options cmplib = sasuser.func;
         %let reg_ctrl_3 = %bquote(\\nosupersub);
 
         /*¿ØÖÆ×Ö-ÉÏ±ê*/
-        %let reg_ctrl_4 = %bquote(\{?\\super\s+((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
+        %let reg_ctrl_4 = %bquote(\{?\\super\s*((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
                                                                                https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20
                                                                                https://github.com/Snoopy1866/RTFTools-For-SAS/issues/26
                                                                               */
