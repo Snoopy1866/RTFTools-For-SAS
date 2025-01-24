@@ -8,6 +8,7 @@ on:
       - "multi_encoding_converter.py"
 
 permissions:
+  contents: write
   pull-requests: write
 
 defaults:
