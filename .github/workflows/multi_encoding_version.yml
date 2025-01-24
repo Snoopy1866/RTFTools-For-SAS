@@ -7,6 +7,9 @@ on:
       - "src/**.sas"
       - "multi_encoding_converter.py"
 
+permissions:
+  pull-requests: write
+
 defaults:
   run:
     shell: bash -e {0}
