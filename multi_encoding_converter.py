@@ -6,7 +6,7 @@ if __name__ == "__main__":
     base_encode = "gbk"
 
     # 转换编码格式列表
-    convert_encode_list = ["utf8", "utf16", "gb2312", "gb18030"]
+    convert_encode_list = ["utf8", "utf16", "gb18030"]
 
     # 开始转换
     base_path = Path("src") / base_encode
