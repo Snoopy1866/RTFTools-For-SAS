@@ -2,12 +2,14 @@
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-%macro CompareRTFWithDataset(rtf, dataset, del_temp_data = yes,
-                             ignoreCRLF = yes,
-                             ignoreLeadBlank = yes,
-                             ignoreEmptyColumn = yes,
+%macro CompareRTFWithDataset(rtf, dataset,
+                             key                   = #null,
+                             ignoreCRLF            = yes,
+                             ignoreLeadBlank       = yes,
+                             ignoreEmptyColumn     = yes,
                              ignoreHalfOrFullWidth = no,
-                             ignoreEmbeddedBlank = no
+                             ignoreEmbeddedBlank   = no,
+                             del_temp_data         = yes,
                              ) / parmbuff;
 
     /*打开帮助文档*/
@@ -90,19 +92,33 @@
     %end;
 
 
-    /*3. 复制 dataset，使用 sql into 语句创建宏变量*/
+    /*3. 复制 dataset*/
     data _tmp_dataset;
         set &dataset;
     run;
 
+    /*3.1 使用 key 处理数据*/
+    proc sort data = _tmp_dataset out = _tmp_dataset_nodup dupout = _tmp_dataset_dup nodupkey;
+        by &key;
+    run;
+
     proc sql noprint;
-        select name into : dataset_col_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量名*/
+        select count(*) into :dupkeyn trimmed from _tmp_dataset_dup;
+    quit;
+    %if &dupkeyn > 0 %then %do;
+        %put ERROR: 参数 BY = %superq(&by) 不足以构成数据集的主键！;
+        %goto exit;
+    %end;
+
+    /*使用 sql into 语句创建宏变量*/
+    proc sql noprint;
+        select name into : dataset_col_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET_NODUP"; /*dataset 变量名*/
         %let dataset_col_n = &SQLOBS;
 
-        select type into : dataset_col_type_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量类型*/
+        select type into : dataset_col_type_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET_NODUP"; /*dataset 变量类型*/
         %let dataset_col_type_n = &SQLOBS;
 
-        select ifc(not missing(format), format, "best.") into : dataset_col_format_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量输出格式*/
+        select ifc(not missing(format), format, "best.") into : dataset_col_format_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET_NODUP"; /*dataset 变量输出格式*/
         %let dataset_col_format_n = &SQLOBS;
 
         select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF"; /*rtf 变量名*/
