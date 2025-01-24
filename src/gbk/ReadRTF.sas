@@ -1,5 +1,5 @@
 /*
-è¯¦ç»†æ–‡æ¡£è¯·å‰å¾€ Github æŸ¥é˜…: https://github.com/Snoopy1866/RTFTools-For-SAS
+ÏêÏ¸ÎÄµµÇëÇ°Íù Github ²éÔÄ: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
 
@@ -7,25 +7,25 @@ options cmplib = sasuser.func;
 
 %macro ReadRTF(file, outdata, compress = yes, del_rtf_ctrl = yes, del_temp_data = yes)/ parmbuff;
 
-    /*æ‰“å¼€å¸®åŠ©æ–‡æ¡£*/
+    /*´ò¿ª°ïÖúÎÄµµ*/
     %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
         X explorer "https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/docs/ReadRTF.md";
         %goto exit;
     %end;
 
-    /*æ£€æŸ¥ä¾èµ–*/
+    /*¼ì²éÒÀÀµ*/
     proc sql noprint;
         select * from DICTIONARY.CATALOGS where libname = "WORK" and memname = "SASMACR" and objname = "_MACRO_TRANSCODE";
     quit;
     %if &SQLOBS = 0 %then %do;
-        %put ERROR: å‰ç½®ä¾èµ–ç¼ºå¤±ï¼Œè¯·å…ˆåŠ è½½æ–‡ä»¶ Transcode.sasã€‚;
+        %put ERROR: Ç°ÖÃÒÀÀµÈ±Ê§£¬ÇëÏÈ¼ÓÔØÎÄ¼ş Transcode.sas¡£;
         %goto exit;
     %end;
 
-    /*å£°æ˜å±€éƒ¨å˜é‡*/
+    /*ÉùÃ÷¾Ö²¿±äÁ¿*/
     %local i;
 
-    /*å£°æ˜å…¨å±€å˜é‡*/
+    /*ÉùÃ÷È«¾Ö±äÁ¿*/
     %if not %symexist(readrtf_exit_with_error) %then %do;
         %global readrtf_exit_with_error;
     %end;
@@ -38,21 +38,21 @@ options cmplib = sasuser.func;
     %let readrtf_exit_with_error_text = %bquote();
 
 
-    /*1. è·å–æ–‡ä»¶è·¯å¾„*/
+    /*1. »ñÈ¡ÎÄ¼şÂ·¾¶*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
     %if %sysfunc(prxmatch(&reg_file_id, %superq(file))) %then %do;
         %let fileref = %sysfunc(prxposn(&reg_file_id, 1, %superq(file)));
         %let fileloc = %sysfunc(prxposn(&reg_file_id, 2, %superq(file)));
 
-        /*æŒ‡å®šçš„æ˜¯æ–‡ä»¶å¼•ç”¨å*/
+        /*Ö¸¶¨µÄÊÇÎÄ¼şÒıÓÃÃû*/
         %if %bquote(&fileref) ^= %bquote() %then %do;
             %if %sysfunc(fileref(&fileref)) > 0 %then %do;
-                %put ERROR: æ–‡ä»¶åå¼•ç”¨ %upcase(&fileref) æœªå®šä¹‰ï¼;
+                %put ERROR: ÎÄ¼şÃûÒıÓÃ %upcase(&fileref) Î´¶¨Òå£¡;
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&fileref)) < 0 %then %do;
-                %put ERROR: æ–‡ä»¶åå¼•ç”¨ %upcase(&fileref) æŒ‡å‘çš„æ–‡ä»¶ä¸å­˜åœ¨ï¼;
+                %put ERROR: ÎÄ¼şÃûÒıÓÃ %upcase(&fileref) Ö¸ÏòµÄÎÄ¼ş²»´æÔÚ£¡;
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&fileref)) = 0 %then %do;
@@ -60,21 +60,21 @@ options cmplib = sasuser.func;
             %end;
         %end;
 
-        /*æŒ‡å®šçš„æ˜¯ç‰©ç†è·¯å¾„*/
+        /*Ö¸¶¨µÄÊÇÎïÀíÂ·¾¶*/
         %if %superq(fileloc) ^= %bquote() %then %do;
             %if %sysfunc(fileexist(%superq(fileloc))) = 0 %then %do;
-                %put ERROR: æ–‡ä»¶è·¯å¾„ %superq(fileloc) ä¸å­˜åœ¨ï¼;
+                %put ERROR: ÎÄ¼şÂ·¾¶ %superq(fileloc) ²»´æÔÚ£¡;
                 %goto exit;
             %end;
         %end;
     %end;
     %else %do;
-        %put ERROR: æ–‡ä»¶å¼•ç”¨åè¶…å‡º 8 å­—èŠ‚ï¼Œæˆ–è€…æ–‡ä»¶ç‰©ç†åœ°å€ä¸ç¬¦åˆ Winodws è§„èŒƒï¼;
+        %put ERROR: ÎÄ¼şÒıÓÃÃû³¬³ö 8 ×Ö½Ú£¬»òÕßÎÄ¼şÎïÀíµØÖ·²»·ûºÏ Winodws ¹æ·¶£¡;
         %goto exit;
     %end;
 
 
-    /*2. ä»¥çº¯æ–‡æœ¬å½¢å¼è¯»å–RTFæ–‡ä»¶*/
+    /*2. ÒÔ´¿ÎÄ±¾ĞÎÊ½¶ÁÈ¡RTFÎÄ¼ş*/
     data _tmp_rtf_data(compress = &compress);
         informat line $32767.;
         format line $32767.;
@@ -90,9 +90,11 @@ options cmplib = sasuser.func;
     %end;
 
 
-    /*3. è°ƒæ•´è¡¨å¤´ï¼ˆè§£å†³ç”±äºè¡¨å¤´å†…åµŒæ¢è¡Œç¬¦å¯¼è‡´çš„ RTF ä»£ç æŠ˜è¡Œé—®é¢˜ï¼‰*/
+    /*3. µ÷Õû±íÍ·£¨½â¾öÓÉÓÚ±íÍ·ÄÚÇ¶»»ĞĞ·ûµ¼ÖÂµÄ RTF ´úÂëÕÛĞĞÎÊÌâ£©*/
     data _tmp_rtf_data_polish_header(compress = &compress);
         set _tmp_rtf_data;
+
+        len = length(line);
 
         length break_line $32767.;
 
@@ -103,18 +105,18 @@ options cmplib = sasuser.func;
         retain break_line "";
         retain break_line_found 0;
 
-        if prxmatch(reg_header_break_id, strip(line)) then do; /*å‘ç°è¡¨å¤´å‡ºç°æŠ˜è¡Œé—®é¢˜*/
+        if prxmatch(reg_header_break_id, strip(line)) then do; /*·¢ÏÖ±íÍ·³öÏÖÕÛĞĞÎÊÌâ*/
             break_line = catt(break_line, prxposn(reg_header_break_id, 1, strip(line)));
             break_line_found = 1;
             delete;
         end;
-        else if prxmatch(reg_header_break_continue_id, strip(line)) then do; /*å‘ç°è¿ç»­æŠ˜è¡Œ*/
+        else if prxmatch(reg_header_break_continue_id, strip(line)) then do; /*·¢ÏÖÁ¬ĞøÕÛĞĞ*/
             if break_line_found = 1 then do;
                 break_line = catt(break_line, "|", prxposn(reg_header_break_continue_id, 1, strip(line)));
                 delete;
             end;
         end;
-        else if prxmatch(reg_header_break_end_id, strip(line)) then do; /*æŠ˜è¡Œç»“æŸ*/
+        else if prxmatch(reg_header_break_end_id, strip(line)) then do; /*ÕÛĞĞ½áÊø*/
             if break_line_found = 1 then do;
                 break_line = catt(break_line, "|", prxposn(reg_header_break_end_id, 1, strip(line)));
                 line = break_line;
@@ -126,7 +128,7 @@ options cmplib = sasuser.func;
     run;
 
 
-    /*5. è°ƒæ•´æ•°æ®è¡Œï¼ˆè§£å†³ç”±äºè¶…é•¿å­—ç¬¦ä¸²å¯¼è‡´çš„ RTF ä»£ç æŠ˜è¡Œé—®é¢˜ï¼‰*/
+    /*5. µ÷ÕûÊı¾İĞĞ£¨½â¾öÓÉÓÚ³¬³¤×Ö·û´®µ¼ÖÂµÄ RTF ´úÂëÕÛĞĞÎÊÌâ£©*/
     data _tmp_rtf_data_polish_body(compress = &compress);
         set _tmp_rtf_data_polish_header;
 
@@ -141,8 +143,8 @@ options cmplib = sasuser.func;
 
         if prxmatch(reg_data_line_start_id, strip(line)) then do;
             line_data_part_buffer = prxposn(reg_data_line_start_id, 1, strip(line));
-            /*æ­£åˆ™è¡¨è¾¾å¼ä½¿ç”¨äº†ASCIIå­—ç¬¦é›†åˆï¼Œå¯¼è‡´æŸäº›éæ•°æ®è¡Œè¢«é”™è¯¯åœ°åŒ¹é…ï¼Œéœ€è¦è¿›ä¸€æ­¥ç­›é€‰*/
-            if find(line_data_part_buffer, "\cell}") = 0 then do; /*æ§åˆ¶å­—\cell}ä¸å¯èƒ½å‡ºç°åœ¨æ•°æ®è¡Œå¼€å¤´*/
+            /*ÕıÔò±í´ïÊ½Ê¹ÓÃÁËASCII×Ö·û¼¯ºÏ£¬µ¼ÖÂÄ³Ğ©·ÇÊı¾İĞĞ±»´íÎóµØÆ¥Åä£¬ĞèÒª½øÒ»²½É¸Ñ¡*/
+            if find(line_data_part_buffer, "\cell}") = 0 then do; /*¿ØÖÆ×Ö\cell}²»¿ÉÄÜ³öÏÖÔÚÊı¾İĞĞ¿ªÍ·*/
                 line_data_part_found = 1;
                 line_data_part = strip(line);
                 delete;
@@ -151,14 +153,14 @@ options cmplib = sasuser.func;
 
         if line_data_part_found = 1 then do;
             if prxmatch(reg_data_line_mid_id, strip(line)) then do;
-                if find(strip(line), "\shppict") > 0 then do; /*æ§åˆ¶å­— \shppict æŒ‡å®š Word 97 å›¾ç‰‡ï¼Œå®ƒé€šå¸¸å‡ºç°åœ¨é¡µçœ‰ logo ä¸­ï¼Œä¸å¯èƒ½åœ¨æ•°æ®è¡Œä¸­å‡ºç°*/
+                if find(strip(line), "\shppict") > 0 then do; /*¿ØÖÆ×Ö \shppict Ö¸¶¨ Word 97 Í¼Æ¬£¬ËüÍ¨³£³öÏÖÔÚÒ³Ã¼ logo ÖĞ£¬²»¿ÉÄÜÔÚÊı¾İĞĞÖĞ³öÏÖ*/
                     line_data_part_found = 0;
                     line_data_part = "";
                 end;
                 else do;
                     line_data_part_buffer = prxposn(reg_data_line_mid_id, 1, strip(line));
-                    /*æ­£åˆ™è¡¨è¾¾å¼ä½¿ç”¨äº†ASCIIå­—ç¬¦é›†åˆï¼Œå¯¼è‡´æŸäº›éæ•°æ®è¡Œè¢«é”™è¯¯åœ°åŒ¹é…ï¼Œéœ€è¦è¿›ä¸€æ­¥ç­›é€‰*/
-                    if find(line_data_part_buffer, "\cell}") = 0 and substr(line_data_part_buffer, 1, 5) ^= "\pard" then do; /*æ§åˆ¶å­— \cell}, \pard ä¸å¯èƒ½å‡ºç°åœ¨æ•°æ®è¡Œä¸­é—´*/
+                    /*ÕıÔò±í´ïÊ½Ê¹ÓÃÁËASCII×Ö·û¼¯ºÏ£¬µ¼ÖÂÄ³Ğ©·ÇÊı¾İĞĞ±»´íÎóµØÆ¥Åä£¬ĞèÒª½øÒ»²½É¸Ñ¡*/
+                    if find(line_data_part_buffer, "\cell}") = 0 and substr(line_data_part_buffer, 1, 5) ^= "\pard" then do; /*¿ØÖÆ×Ö \cell}, \pard ²»¿ÉÄÜ³öÏÖÔÚÊı¾İĞĞÖĞ¼ä*/
                         if line_data_part_found = 1 then do;
                             line_data_part = cats(line_data_part, line_data_part_buffer);
                             delete;
@@ -181,51 +183,51 @@ options cmplib = sasuser.func;
     run;
 
 
-    /*4. è¯†åˆ«è¡¨æ ¼æ•°æ®*/
+    /*4. Ê¶±ğ±í¸ñÊı¾İ*/
     %let is_outlinelevel_found = 0;
 
     data _tmp_rtf_raw(compress = &compress);
         set _tmp_rtf_data_polish_body;
         
-        /*å˜é‡ä¸ªæ•°*/
+        /*±äÁ¿¸öÊı*/
         retain var_n 0;
 
-        /*å˜é‡ä½ç½®*/;
+        /*±äÁ¿Î»ÖÃ*/;
         retain var_pointer 0;
 
-        /*æ˜¯å¦å‘ç°è¡¨æ ¼æ ‡é¢˜*/
+        /*ÊÇ·ñ·¢ÏÖ±í¸ñ±êÌâ*/
         retain is_outlinelevel_found 0;
 
-        /*æ˜¯å¦å‘ç°è¡¨å¤´*/
+        /*ÊÇ·ñ·¢ÏÖ±íÍ·*/
         retain is_header_found 0;
 
-        /*æ˜¯å¦å‘ç°è¡¨å¤´å•å…ƒæ ¼è¾¹æ¡†ä½ç½®å®šä¹‰*/
+        /*ÊÇ·ñ·¢ÏÖ±íÍ·µ¥Ôª¸ñ±ß¿òÎ»ÖÃ¶¨Òå*/
         retain is_header_def_found 0;
 
-        /*è¡¨å¤´å•å…ƒæ ¼å±‚æ•°ä½ç½®(ä»ä¸Šå¾€ä¸‹é€’å¢)*/
+        /*±íÍ·µ¥Ôª¸ñ²ãÊıÎ»ÖÃ(´ÓÉÏÍùÏÂµİÔö)*/
         retain header_cell_level 0;
 
-        /*è¡¨å¤´å•å…ƒæ ¼å·¦ä¾§è¾¹æ¡†ä½ç½®*/
+        /*±íÍ·µ¥Ôª¸ñ×ó²à±ß¿òÎ»ÖÃ*/
         retain header_cell_left_padding 0;
 
-        /*è¡¨å¤´å•å…ƒæ ¼å³ä¾§è¾¹æ¡†ä½ç½®*/
+        /*±íÍ·µ¥Ôª¸ñÓÒ²à±ß¿òÎ»ÖÃ*/
         retain header_cell_right_padding 0;
 
-        /*æ˜¯å¦å‘ç°è¡¨æ ¼æ•°æ®*/
+        /*ÊÇ·ñ·¢ÏÖ±í¸ñÊı¾İ*/
         retain is_data_found 0;
 
         /*
-        å½“å‰ rtf ä»£ç æŒ‡å‘çš„å˜é‡ä½ç½®
-        obs_var_pointer éšç€è¯»å–çš„ rtf æ•°æ®è¡Œæ•°è‡ªå¢ï¼Œæœ€å¤§ä¸è¶…è¿‡ var_nï¼Œ
-        ä¸”åœ¨ä¸‹ä¸€æ®µæ•°æ®çš„èµ·å§‹ä½ç½®è¢«é‡ç½®ä¸º 0
+        µ±Ç° rtf ´úÂëÖ¸ÏòµÄ±äÁ¿Î»ÖÃ
+        obs_var_pointer Ëæ×Å¶ÁÈ¡µÄ rtf Êı¾İĞĞÊı×ÔÔö£¬×î´ó²»³¬¹ı var_n£¬
+        ÇÒÔÚÏÂÒ»¶ÎÊı¾İµÄÆğÊ¼Î»ÖÃ±»ÖØÖÃÎª 0
         */
         retain obs_var_pointer 0;
 
-        /*è§‚æµ‹åºå·*/
+        /*¹Û²âĞòºÅ*/
         retain obs_seq 0;
 
 
-        /*å®šä¹‰æ­£åˆ™è¡¨è¾¾å¼ç­›é€‰è¡¨å¤´å’Œæ•°æ®*/
+        /*¶¨ÒåÕıÔò±í´ïÊ½É¸Ñ¡±íÍ·ºÍÊı¾İ*/
         reg_outlinelevel_id    = prxparse("/\\outlinelevel\d/o");
         reg_header_line_id     = prxparse("/\\trowd\\trkeep\\trhdr\\trq[lcr]/o");
         reg_header_def_line_id = prxparse("/\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*(?:\\clbrdr[tlbr]\\brdrs\\brdrw\d*\\brdrcf\d*)*\\cltxlrt[bl]\\clvertal[tcb](?:\\clcbpat\d*)?\\cellx(\d+)/o");
@@ -235,7 +237,7 @@ options cmplib = sasuser.func;
 
         length context_raw $32767;
 
-        /*å‘ç°è¡¨æ ¼æ ‡é¢˜*/
+        /*·¢ÏÖ±í¸ñ±êÌâ*/
         if prxmatch(reg_outlinelevel_id, strip(line)) then do;
             if is_outlinelevel_found = 0 then do;
                 is_outlinelevel_found = 1;
@@ -243,13 +245,13 @@ options cmplib = sasuser.func;
             end;
         end;
 
-        /*å‘ç°è¡¨å¤´*/
+        /*·¢ÏÖ±íÍ·*/
         else if prxmatch(reg_header_line_id, strip(line)) then do;
             is_header_found = 1;
             header_cell_level + 1;
         end;
 
-        /*å‘ç°è¡¨å¤´å•å…ƒæ ¼è¾¹æ¡†ä½ç½®çš„å®šä¹‰*/
+        /*·¢ÏÖ±íÍ·µ¥Ôª¸ñ±ß¿òÎ»ÖÃµÄ¶¨Òå*/
         else if prxmatch(reg_header_def_line_id, strip(line)) then do;
             is_header_def_found = 1;
             header_cell_left_padding = header_cell_right_padding;
@@ -260,11 +262,11 @@ options cmplib = sasuser.func;
         end;
 
 
-        /*å‘ç°æ•°æ®*/
+        /*·¢ÏÖÊı¾İ*/
         else if prxmatch(reg_data_line_id, strip(line)) then do;
-            if is_outlinelevel_found = 1 then do; /*é™å®šåœ¨è¡¨æ ¼æ ‡é¢˜åçš„æ•°æ®è¡Œï¼Œæ’é™¤é¡µçœ‰ä¸­çš„æ•°æ®*/
-                if is_header_found = 1 then do; /*ç´§è·Ÿåœ¨æ§åˆ¶å­— \trhdr åçš„æ•°æ®è¡Œï¼Œå®é™…ä¸Šå°±æ˜¯è¡¨å¤´*/
-                    if not prxmatch(reg_header_def_line_id, strip(line)) and is_header_def_found = 1 then do; /*è¡¨å¤´è¾¹æ¡†ä½ç½®å®šä¹‰å·²ç»“æŸï¼Œå°†æŒ‡é’ˆé‡ç½®ä¸º 0*/
+            if is_outlinelevel_found = 1 then do; /*ÏŞ¶¨ÔÚ±í¸ñ±êÌâºóµÄÊı¾İĞĞ£¬ÅÅ³ıÒ³Ã¼ÖĞµÄÊı¾İ*/
+                if is_header_found = 1 then do; /*½ô¸úÔÚ¿ØÖÆ×Ö \trhdr ºóµÄÊı¾İĞĞ£¬Êµ¼ÊÉÏ¾ÍÊÇ±íÍ·*/
+                    if not prxmatch(reg_header_def_line_id, strip(line)) and is_header_def_found = 1 then do; /*±íÍ·±ß¿òÎ»ÖÃ¶¨ÒåÒÑ½áÊø£¬½«Ö¸ÕëÖØÖÃÎª 0*/
                         var_pointer = 0;
                     end;
                     flag_header = "Y";
@@ -272,7 +274,7 @@ options cmplib = sasuser.func;
                     var_n = max(var_n, var_pointer);
                     context_raw = prxposn(reg_data_line_id, 1, strip(line));
                 end;
-                else do; /*æ•°æ®è¡Œ*/
+                else do; /*Êı¾İĞĞ*/
                     flag_data = "Y";
                     is_data_found = 1;
                     obs_var_pointer + 1;
@@ -290,12 +292,12 @@ options cmplib = sasuser.func;
             header_cell_right_padding = 0;
         end;
 
-        /*å‘ç°åˆ†èŠ‚ç¬¦*/
+        /*·¢ÏÖ·Ö½Ú·û*/
         else if prxmatch(reg_sect_line_id, strip(line)) then do;
             is_outlinelevel_found = 0;
         end;
 
-        /*å…¶ä»–æƒ…å†µ*/
+        /*ÆäËûÇé¿ö*/
         else do;
             if header_cell_right_padding > 0 then do;
                 is_header_def_found = 0;
@@ -303,39 +305,39 @@ options cmplib = sasuser.func;
                 header_cell_right_padding = 0;
             end;
 
-            if var_pointer > 0 then do; /*è¡¨å¤´å®šä¹‰æš‚æ—¶ç»“æŸï¼Œå°†æŒ‡é’ˆä½ç½®é‡ç½®ä¸º 0*/
+            if var_pointer > 0 then do; /*±íÍ·¶¨ÒåÔİÊ±½áÊø£¬½«Ö¸ÕëÎ»ÖÃÖØÖÃÎª 0*/
                 is_header_found = 0;
                 var_pointer = 0;
             end;
 
 
-            if obs_var_pointer = var_n then do; /*æ•°æ®è¡Œå®šä¹‰æš‚æ—¶ç»“æŸï¼Œå°†æŒ‡é’ˆä½ç½®é‡ç½®ä¸º 0*/
+            if obs_var_pointer = var_n then do; /*Êı¾İĞĞ¶¨ÒåÔİÊ±½áÊø£¬½«Ö¸ÕëÎ»ÖÃÖØÖÃÎª 0*/
                 obs_var_pointer = 0;
             end;
         end;
     run;
 
     %if &is_outlinelevel_found = 0 %then %do;
-        %put ERROR: åœ¨ RTF æ–‡ä»¶ä¸­æœªå‘ç°å¤§çº²çº§åˆ«çš„æ ‡é¢˜ï¼Œè¯·ä½¿ç”¨æ§åˆ¶å­— \outlinelevel ç”Ÿæˆ RTF æ–‡ä»¶çš„æ ‡é¢˜ï¼;
+        %put ERROR: ÔÚ RTF ÎÄ¼şÖĞÎ´·¢ÏÖ´ó¸Ù¼¶±ğµÄ±êÌâ£¬ÇëÊ¹ÓÃ¿ØÖÆ×Ö \outlinelevel Éú³É RTF ÎÄ¼şµÄ±êÌâ£¡;
         %goto exit;
     %end;
 
-    /*5. åˆ é™¤ RTF æ§åˆ¶å­—*/
+    /*5. É¾³ı RTF ¿ØÖÆ×Ö*/
     %if %upcase(&del_rtf_ctrl) = YES %then %do;
-        /*æ§åˆ¶å­—-ç©ºçš„åˆ†ç»„*/
+        /*¿ØÖÆ×Ö-¿ÕµÄ·Ö×é*/
         %let reg_ctrl_1 = %bquote({\s*}|(?<!\\)[{}]);
-        /*æ§åˆ¶å­—-ç¼©è¿›*/
+        /*¿ØÖÆ×Ö-Ëõ½ø*/
         %let reg_ctrl_2 = %bquote(\\li\d+);
-        /*æ§åˆ¶å­—-å–æ¶ˆä¸Šä¸‹æ ‡*/
+        /*¿ØÖÆ×Ö-È¡ÏûÉÏÏÂ±ê*/
         %let reg_ctrl_3 = %bquote(\\nosupersub);
 
-        /*æ§åˆ¶å­—-ä¸Šæ ‡*/
-        %let reg_ctrl_4 = %bquote(\{?\\super\s+((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
+        /*¿ØÖÆ×Ö-ÉÏ±ê*/
+        %let reg_ctrl_4 = %bquote(\{?\\super\s*((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
                                                                                https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20
                                                                                https://github.com/Snoopy1866/RTFTools-For-SAS/issues/26
                                                                               */
 
-        /*åˆå¹¶reg_ctrl_1 ~ reg_ctrl_n*/
+        /*ºÏ²¢reg_ctrl_1 ~ reg_ctrl_n*/
         %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 3; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
 
         data _tmp_rtf_raw_del_ctrl(compress = &compress);
@@ -355,7 +357,7 @@ options cmplib = sasuser.func;
     %end;
 
 
-    /*6. å¼€å§‹è½¬ç */
+    /*6. ¿ªÊ¼×ªÂë*/
     data _tmp_rtf_context(compress = &compress);
         set _tmp_rtf_raw_del_ctrl;
         if flag_header = "Y" or flag_data = "Y" then do;
@@ -364,7 +366,7 @@ options cmplib = sasuser.func;
     run;
 
 
-    /*7. ç”ŸæˆSASæ•°æ®é›†*/
+    /*7. Éú³ÉSASÊı¾İ¼¯*/
     proc sort data = _tmp_rtf_context(where = (flag_data = "Y")) out = _tmp_rtf_context_sorted(compress = &compress) presorted;
         by obs_seq obs_var_pointer;
     run;
@@ -376,9 +378,9 @@ options cmplib = sasuser.func;
     run;
 
 
-    /*8. å¤„ç†å˜é‡æ ‡ç­¾*/
+    /*8. ´¦Àí±äÁ¿±êÇ©*/
     proc sql noprint;
-        /*è·å–æ‰€æœ‰å±‚çº§çš„æ ‡ç­¾*/
+        /*»ñÈ¡ËùÓĞ²ã¼¶µÄ±êÇ©*/
         create table _tmp_rtf_header as
             select
                 a.header_cell_level,
@@ -388,10 +390,10 @@ options cmplib = sasuser.func;
                 b.context
             from _tmp_rtf_context(where = (is_header_def_found = 1)) as a left join _tmp_rtf_context(where = (flag_header = "Y")) as b
                      on a.header_cell_level = b.header_cell_level and a.var_pointer = b.var_pointer;
-        /*è·å–æ ‡ç­¾æœ€å¤§å±‚æ•°*/
+        /*»ñÈ¡±êÇ©×î´ó²ãÊı*/
         select max(header_cell_level) into : max_header_level trimmed from _tmp_rtf_header;
 
-        /*åˆå¹¶æ‰€æœ‰å±‚çº§çš„æ ‡ç­¾*/
+        /*ºÏ²¢ËùÓĞ²ã¼¶µÄ±êÇ©*/
         create table _tmp_rtf_header_expand as
             select
                 a&max_header_level..var_pointer,
@@ -399,7 +401,7 @@ options cmplib = sasuser.func;
                                        %bquote(a&i..context)%bquote(,)
                                    %end;)
                                    a&max_header_level..context)
-                    as header_context length = 32767 /*è¿™é‡Œç”¨ length =32767 æ˜¯æœ‰å¿…è¦çš„ï¼Œæœ‰æ—¶å€™è§£æ utf8 å­—ç¬¦æ—¶ä¼šå‡ºç°é•¿åº¦å¼‚å¸¸çš„é—®é¢˜ï¼ŒåŸå› æœªçŸ¥*/
+                    as header_context length = 32767 /*ÕâÀïÓÃ length =32767 ÊÇÓĞ±ØÒªµÄ£¬ÓĞÊ±ºò½âÎö utf8 ×Ö·ûÊ±»á³öÏÖ³¤¶ÈÒì³£µÄÎÊÌâ£¬Ô­ÒòÎ´Öª*/
             from _tmp_rtf_header(where = (header_cell_level = &max_header_level)) as a&max_header_level
                 %do i = %eval(&max_header_level - 1) %to 1 %by -1;
                     left join _tmp_rtf_header(where = (header_cell_level = &i)) as a&i
@@ -408,7 +410,7 @@ options cmplib = sasuser.func;
                 ;
     quit;
 
-    /*æ ‡ç­¾è¿›ä¸€æ­¥å¤„ç†*/
+    /*±êÇ©½øÒ»²½´¦Àí*/
     data _tmp_rtf_header_expand_polish;
         set _tmp_rtf_header_expand;
         reg_header_control_word_id = prxparse("s/\\animtext\d*\\ul\d*\\strike\d*\\b\d*\\i\d*\\f\d*\\fs\d*\\cf\d*\s*//o");
@@ -420,21 +422,21 @@ options cmplib = sasuser.func;
         end;
 
         if header_context = "" then do;
-            header_context = "ç©ºæ ‡ç­¾";
+            header_context = "¿Õ±êÇ©";
         end;
     run;
 
 
-    /*9. ä¿®æ”¹SASæ•°æ®é›†çš„å±æ€§*/
+    /*9. ĞŞ¸ÄSASÊı¾İ¼¯µÄÊôĞÔ*/
     proc sql noprint;
-        /*è·å–å˜é‡ä¸ªæ•°*/
+        /*»ñÈ¡±äÁ¿¸öÊı*/
         select nvar - 2 into : var_n from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_OUTDATA";
         
         %do i = 1 %to &var_n;
-            /*è·å–å˜é‡å®é™…æ‰€éœ€é•¿åº¦*/
+            /*»ñÈ¡±äÁ¿Êµ¼ÊËùĞè³¤¶È*/
             select max(length(col&i)) into : var_&i._maxlen from _tmp_outdata;
 
-            /*è·å–å˜é‡æ ‡ç­¾*/
+            /*»ñÈ¡±äÁ¿±êÇ©*/
             select header_context into : var_&i._label trimmed from _tmp_rtf_header_expand_polish where var_pointer = &i;
         %end;
 
@@ -442,13 +444,13 @@ options cmplib = sasuser.func;
             modify %do i = 1 %to &var_n;
                        COL&i char(&&var_&i._maxlen) label = "%superq(var_&i._label)",
                    %end;
-                       OBS_SEQ label = "åºå·";
+                       OBS_SEQ label = "ĞòºÅ";
         alter table _tmp_outdata
             drop _NAME_;
     quit;
     
 
-    /*10. æœ€ç»ˆè¾“å‡º*/
+    /*10. ×îÖÕÊä³ö*/
     data &outdata;
         set _tmp_outdata;
     run;
@@ -456,13 +458,13 @@ options cmplib = sasuser.func;
     %goto exit;
 
 
-    /*å¼‚å¸¸é€€å‡º*/
+    /*Òì³£ÍË³ö*/
     %exit_with_error:
     %let readrtf_exit_with_error = TRUE;
 
-    /*æ­£å¸¸é€€å‡º*/
+    /*Õı³£ÍË³ö*/
     %exit:
-    /*11. æ¸…é™¤ä¸­é—´æ•°æ®é›†*/
+    /*11. Çå³ıÖĞ¼äÊı¾İ¼¯*/
     %if %upcase(&del_temp_data) = YES %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_outdata
@@ -480,6 +482,6 @@ options cmplib = sasuser.func;
         quit;
     %end;
 
-    %put NOTE: å® ReadRTF å·²ç»“æŸè¿è¡Œï¼;
+    %put NOTE: ºê ReadRTF ÒÑ½áÊøÔËĞĞ£¡;
 %mend;
 
