@@ -94,8 +94,6 @@ options cmplib = sasuser.func;
     data _tmp_rtf_data_polish_header(compress = &compress);
         set _tmp_rtf_data;
 
-        len = length(line);
-
         length break_line $32767.;
 
         reg_header_break_id = prxparse("/^(\\pard\\plain\\intbl\\keepn\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{.*){\\line}$/o");
@@ -332,7 +330,7 @@ options cmplib = sasuser.func;
         %let reg_ctrl_3 = %bquote(\\nosupersub);
 
         /*控制字-上标*/
-        %let reg_ctrl_4 = %bquote(\{?\\super\s*((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
+        %let reg_ctrl_4 = %bquote(\{?\\super\s+((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
                                                                                https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20
                                                                                https://github.com/Snoopy1866/RTFTools-For-SAS/issues/26
                                                                               */
