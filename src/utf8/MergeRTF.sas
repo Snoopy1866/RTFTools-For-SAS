@@ -259,10 +259,8 @@
 
 
     /*----------------临时关闭日志输出------------------*/
-    /*
     proc printto log=_null_;
     run;
-    */
 
 
     /*5. 构造 filename 语句，建立文件引用*/
@@ -350,10 +348,8 @@
 
 
     /*----------------恢复日志输出------------------*/
-    /*
     proc printto log=log;
     run;
-    */
 
 
     %if &mergeable_rtf_list = %bquote() %then %do;

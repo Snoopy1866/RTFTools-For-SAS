@@ -71,7 +71,7 @@
 
 
     /*3. 读取 rtf 文件*/
-    data _tmp_rtf(compress = true);
+    data _tmp_rtf(compress = yes);
         informat line $32767.;
         format line $32767.;
         length line $32767.;
@@ -87,7 +87,7 @@
     %let cfont_predefined_list = %upcase('CSongGB18030C-Light', 'CSongGB18030C-LightHWL', 'DengXian', 'FangSong', 'KaiTi', 'Lisu', 'Noto Sans SC Regular', 'SimSun', 'YouYuan');
     %let wfont_predefined_list = %upcase('Arial', 'Calibri', 'Cascadia Code', 'Consolas', 'HelveticaNeueforSAS', 'HelveticaNeueforSAS Light', 'Times', 'Times New Roman');
 
-    data _tmp_rtf_font_spec(compress = true);
+    data _tmp_rtf_font_spec(compress = yes);
         set _tmp_rtf;
 
         seq = _n_;
@@ -205,7 +205,7 @@
     %end;
 
     /*补齐剩余的 RTF 代码行*/
-    data _tmp_rtf_font_added(compress = true);
+    data _tmp_rtf_font_added(compress = yes);
         set _tmp_rtf_font_added
             _tmp_rtf_font_spec(firstobs = &font_def_end_seq);
     run;
@@ -216,7 +216,7 @@
 
 
     /*6. 处理表头文字折行的问题*/
-    data _tmp_rtf_polish(compress = true);
+    data _tmp_rtf_polish(compress = yes);
         set _tmp_rtf_font_added;
 
         reg_header_cell_id = prxparse("/\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])+)\{\\line\}/o");
@@ -253,7 +253,7 @@
 
 
     /*7. 修改字体*/
-    data _tmp_rtf_mixed(compress = true);
+    data _tmp_rtf_mixed(compress = yes);
         set _tmp_rtf_polish;
         length context_mixed $32767;
 

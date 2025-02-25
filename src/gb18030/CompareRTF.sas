@@ -95,7 +95,7 @@
 
 
     /*2. 以纯文本形式读取RTF文件*/
-    data _tmp_rtf_data_base(compress = true);
+    data _tmp_rtf_data_base(compress = yes);
         informat line $32767.;
         format line $32767.;
         length line $32767.;
@@ -104,7 +104,7 @@
         input line $char32767.;
     run;
 
-    data _tmp_rtf_data_compare(compress = true);
+    data _tmp_rtf_data_compare(compress = yes);
         informat line $32767.;
         format line $32767.;
         length line $32767.;
