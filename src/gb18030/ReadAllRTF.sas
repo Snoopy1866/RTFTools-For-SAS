@@ -1,4 +1,10 @@
 /*
+ * Macro Name:    ReadAllRTF
+ * Macro Purpose: 读取目录中的所有 RTF 文件并转为 SAS 数据集
+ * Author:        wtwang
+*/
+
+/*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
@@ -7,9 +13,9 @@ options cmplib = sasuser.func;
 %macro ReadAllRTF(dir,
                   outlib        = work,
                   vd            = #AUTO,
-                  compress      = yes,
-                  del_rtf_ctrl  = yes,
-                  del_temp_data = yes)/ parmbuff;
+                  compress      = true,
+                  del_rtf_ctrl  = true,
+                  del_temp_data = true)/ parmbuff;
 
     /*打开帮助文档*/
     %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
@@ -169,7 +175,7 @@ options cmplib = sasuser.func;
 
 
     /*4. 删除临时数据集*/
-    %if %upcase(&del_temp_data) = YES %then %do;
+    %if %upcase(&del_temp_data) = TRUE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf_list
                   ;

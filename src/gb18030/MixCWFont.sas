@@ -1,4 +1,10 @@
 /*
+ * Macro Name:    MixCWFont
+ * Macro Purpose: 中西文字体混排
+ * Author:        wtwang
+*/
+
+/*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
@@ -6,7 +12,7 @@
                  OUT              = #AUTO,
                  CFONT            = #AUTO,
                  WFONT            = #AUTO,
-                 DEL_TEMP_DATA    = YES)
+                 DEL_TEMP_DATA    = TRUE)
                  /des = "中西文字体混排" parmbuff;
 
     /*打开帮助文档*/
@@ -65,7 +71,7 @@
 
 
     /*3. 读取 rtf 文件*/
-    data _tmp_rtf(compress = yes);
+    data _tmp_rtf(compress = true);
         informat line $32767.;
         format line $32767.;
         length line $32767.;
@@ -81,7 +87,7 @@
     %let cfont_predefined_list = %upcase('CSongGB18030C-Light', 'CSongGB18030C-LightHWL', 'DengXian', 'FangSong', 'KaiTi', 'Lisu', 'Noto Sans SC Regular', 'SimSun', 'YouYuan');
     %let wfont_predefined_list = %upcase('Arial', 'Calibri', 'Cascadia Code', 'Consolas', 'HelveticaNeueforSAS', 'HelveticaNeueforSAS Light', 'Times', 'Times New Roman');
 
-    data _tmp_rtf_font_spec(compress = yes);
+    data _tmp_rtf_font_spec(compress = true);
         set _tmp_rtf;
 
         seq = _n_;
@@ -199,7 +205,7 @@
     %end;
 
     /*补齐剩余的 RTF 代码行*/
-    data _tmp_rtf_font_added(compress = yes);
+    data _tmp_rtf_font_added(compress = true);
         set _tmp_rtf_font_added
             _tmp_rtf_font_spec(firstobs = &font_def_end_seq);
     run;
@@ -210,7 +216,7 @@
 
 
     /*6. 处理表头文字折行的问题*/
-    data _tmp_rtf_polish(compress = yes);
+    data _tmp_rtf_polish(compress = true);
         set _tmp_rtf_font_added;
 
         reg_header_cell_id = prxparse("/\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])+)\{\\line\}/o");
@@ -247,7 +253,7 @@
 
 
     /*7. 修改字体*/
-    data _tmp_rtf_mixed(compress = yes);
+    data _tmp_rtf_mixed(compress = true);
         set _tmp_rtf_polish;
         length context_mixed $32767;
 
@@ -329,7 +335,7 @@
 
 
     /*9. 删除中间数据集*/
-    %if %qupcase(&del_temp_data) = YES %then %do;
+    %if %qupcase(&del_temp_data) = TRUE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf
                    _tmp_rtf_font_spec

@@ -1,13 +1,19 @@
 /*
+ * Macro Name:    CompareRTFWithDataset
+ * Macro Purpose: 比较一个 RTF 文件和一个 SAS 数据集 
+ * Author:        wtwang
+*/
+
+/*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-%macro CompareRTFWithDataset(rtf, dataset, del_temp_data = yes,
-                             ignoreCRLF = yes,
-                             ignoreLeadBlank = yes,
-                             ignoreEmptyColumn = yes,
-                             ignoreHalfOrFullWidth = no,
-                             ignoreEmbeddedBlank = no
+%macro CompareRTFWithDataset(rtf, dataset, del_temp_data = true,
+                             ignoreCRLF = true,
+                             ignoreLeadBlank = true,
+                             ignoreEmptyColumn = true,
+                             ignoreHalfOrFullWidth = false,
+                             ignoreEmbeddedBlank = false
                              ) / parmbuff;
 
     /*打开帮助文档*/
@@ -79,7 +85,7 @@
     X "copy ""&rtfloc"" ""&rtfloc.-copy"" & exit";
 
     /*2.2 调用 %ReadRTF 读取文件*/
-    %ReadRTF(file = "&rtfloc.-copy", outdata = _tmp_rtf(drop = obs_seq), compress = yes, del_rtf_ctrl = yes);
+    %ReadRTF(file = "&rtfloc.-copy", outdata = _tmp_rtf(drop = obs_seq), compress = true, del_rtf_ctrl = true);
 
     /*2.3 删除复制的文件*/
     X "del ""&rtfloc.-copy"" & exit";
@@ -132,7 +138,7 @@
     quit;
 
     /*4.2 dataset 忽略CRLF字符*/
-    %if %upcase(&ignoreCRLF) = YES %then %do;
+    %if %upcase(&ignoreCRLF) = TRUE %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
             %do i = 1 %to &dataset_col_n;
@@ -142,7 +148,7 @@
     %end;
 
     /*4.3 dataset 忽略前置空格*/
-    %if %upcase(&ignoreLeadBlank) = YES %then %do;
+    %if %upcase(&ignoreLeadBlank) = TRUE %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
             %do i = 1 %to &dataset_col_n;
@@ -152,7 +158,7 @@
     %end;
 
     /*4.4 rtf 忽略全角半角符号*/
-    %if %upcase(&ignoreHalfOrFullWidth) = YES %then %do;
+    %if %upcase(&ignoreHalfOrFullWidth) = TRUE %then %do;
         %let HalfOrWidthTranslation = %nrstr(/*标点符号（不含引号）*/
                                              ",", "，",
                                              ".", "。",
@@ -224,7 +230,7 @@
     %end;
 
     /*4.5 忽略内嵌空格*/
-    %if %upcase(&ignoreembeddedblank = yes) %then %do;
+    %if %upcase(&ignoreembeddedblank = true) %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
             %do i = 1 %to &dataset_col_n;
@@ -241,7 +247,7 @@
     %end;
 
     /*4.6 rtf 忽略空列*/
-    %if %upcase(&ignoreEmptyColumn) = YES %then %do;
+    %if %upcase(&ignoreEmptyColumn) = TRUE %then %do;
         %if &rtf_col_eq1_n > 0 %then %do;
             %do i = 1 %to &rtf_col_eq1_n;
                 proc sql noprint;
@@ -286,7 +292,7 @@
 
     %exit:
     /*7. 清除中间数据集*/
-    %if %upcase(&del_temp_data) = YES %then %do;
+    %if %upcase(&del_temp_data) = TRUE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf
                    _tmp_rtf_rename

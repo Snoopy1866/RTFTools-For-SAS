@@ -1,17 +1,23 @@
 /*
+ * Macro Name:    CompareAllRTF
+ * Macro Purpose: 比较两个目录中的所有 RTF 文件
+ * Author:        wtwang
+*/
+
+/*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
 %macro CompareAllRTF(basedir,
                      comparedir,
-                     ignorecreatim = yes,
-                     ignoreheader = yes,
-                     ignorefooter = yes,
-                     ignorecellstyle = yes,
-                     ignorefonttable = yes,
-                     ignorecolortable = yes,
+                     ignorecreatim = true,
+                     ignoreheader = true,
+                     ignorefooter = true,
+                     ignorecellstyle = true,
+                     ignorefonttable = true,
+                     ignorecolortable = true,
                      outdata = diff,
-                     del_temp_data = yes)
+                     del_temp_data = true)
                      / parmbuff;
 
     /*打开帮助文档*/
@@ -218,7 +224,7 @@
 
     %exit:
     /*8. 清除中间数据集*/
-    %if %upcase(&del_temp_data) = YES %then %do;
+    %if %upcase(&del_temp_data) = TRUE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf_list_base
                    _tmp_rtf_list_compare
