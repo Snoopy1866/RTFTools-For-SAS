@@ -43,6 +43,18 @@ options cmplib = sasuser.func;
     %let readrtf_exit_with_error = FALSE;
     %let readrtf_exit_with_error_text = %bquote();
 
+    /*变量 compress 处理*/
+    %if %upcase(&compress) = TRUE %then %do;
+        %let compress = yes;
+    %end;
+    %else %if %upcase(&compress) = FALSE %then %do;
+        %let compress = no;
+    %end;
+    %else %do;
+        %put ERROR: 参数 compress 只能取 TRUE 或 FALSE！;
+        %goto exit;
+    %end;
+
 
     /*1. 获取文件路径*/
     %let reg_file_expr = %bquote(/^(?:([A-Za-z_][A-Za-z_0-9]{0,7})|[\x22\x27]?((?:[A-Za-z]:\\|\\\\[^\\\/:?\x22\x27<>|]+)[^\\\/:?\x22\x27<>|]+(?:\\[^\\\/:?\x22\x27<>|]+)*)[\x22\x27]?)$/);

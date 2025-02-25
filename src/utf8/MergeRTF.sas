@@ -259,8 +259,10 @@
 
 
     /*----------------临时关闭日志输出------------------*/
+    /*
     proc printto log=_null_;
     run;
+    */
 
 
     /*5. 构造 filename 语句，建立文件引用*/
@@ -292,7 +294,7 @@
                 %goto exit_with_no_merge;
             %end;
             %else %do;
-                data _tmp_rtf&i(compress = true);
+                data _tmp_rtf&i(compress = yes);
                     informat line $32767.;
                     format line $32767.;
                     length line $32767.;
@@ -348,8 +350,10 @@
 
 
     /*----------------恢复日志输出------------------*/
+    /*
     proc printto log=log;
     run;
+    */
 
 
     %if &mergeable_rtf_list = %bquote() %then %do;
@@ -395,7 +399,7 @@
                 %let reg_footer_expr = %bquote(/^\{\\footer\\pard\\plain\\q[lcr]\{$/o);
 
                 /*页眉*/
-                data _tmp_&mergeable_rtf_ref(compress = true);
+                data _tmp_&mergeable_rtf_ref(compress = yes);
                     set _tmp_&mergeable_rtf_ref;
 
                     reg_header_id = prxparse("&reg_header_expr");
@@ -426,7 +430,7 @@
                 run;
 
                 /*页脚*/
-                data _tmp_&mergeable_rtf_ref(compress = true);
+                data _tmp_&mergeable_rtf_ref(compress = yes);
                     set _tmp_&mergeable_rtf_ref;
 
                     reg_footer_id = prxparse("&reg_footer_expr");
@@ -465,7 +469,7 @@
         %end;
 
         /*正式处理*/
-        data _tmp_&mergeable_rtf_ref(compress = true);
+        data _tmp_&mergeable_rtf_ref(compress = yes);
             set _tmp_&mergeable_rtf_ref end = end;
             
                 %if %sysevalf(&i = 1) %then %do;
@@ -528,7 +532,7 @@
 
 
     /*10. 合并 rtf 文件*/
-    data _tmp_rtf_merged(compress = true);
+    data _tmp_rtf_merged(compress = yes);
         set %do i = 1 %to &mergeable_rtf_ref_max;
                 _tmp_%scan(&mergeable_rtf_list, &i, %bquote( ))
             %end;
