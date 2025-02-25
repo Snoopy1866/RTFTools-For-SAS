@@ -15,12 +15,13 @@
 
 ## 详细文档
 
-- [Transcode.sas](docs/Transcode.md)
-- [ReadRTF.sas](docs/ReadRTF.md)
-- [ReadAllRTF.sas](docs/ReadAllRTF.md)
-- [MergeRTF.sas](docs/MergeRTF.md)
-- [CompareRTF.sas](docs/CompareRTF.md)
-- [CompareAllRTF.sas](docs/CompareAllRTF.md)
-- [CompareRTFWithDataset](docs/CompareRTFWithDataset.md)
-- [DeletePicInHeader](docs/assets/DeletePicInHeader.md) （未开发完成）
-- [MixCWFont.sas](docs/MixCWFont.md)
+| 🧩 程序名称              | ✨ 描述                                    | 📚 文档                             |
+| ------------------------ | ------------------------------------------ | ----------------------------------- |
+| `Transcode`              | 一些 Fcmp 函数的封装，其他程序的底层依赖   | [↗️](docs/Transcode.md)             |
+| `%ReadRTF`               | 读取单个 RTF 文件并转为 SAS 数据集         | [↗️](docs/ReadRTF.md)               |
+| `%ReadAllRTF`            | 读取目录中的所有 RTF 文件并转为 SAS 数据集 | [↗️](docs/ReadAllRTF.md)            |
+| `%MergeRTF`              | 合并 RTF 文件                              | [↗️](docs/MergeRTF.md)              |
+| `%CompareRTF`            | 比较两个 RTF 文件                          | [↗️](docs/CompareRTF.md)            |
+| `%CompareAllRTF`         | 比较两个目录中的所有 RTF 文件              | [↗️](docs/CompareAllRTF.md)         |
+| `%CompareRTFWithDataset` | 比较一个 RTF 文件和一个 SAS 数据集         | [↗️](docs/CompareRTFWithDataset.md) |
+| `%MixCWFont`             | 中西文字体混排                             | [↗️](docs/MixCWFont.md)             |

@@ -1,14 +1,20 @@
 /*
+ * Macro Name:    CompareRTF
+ * Macro Purpose: 比较两个 RTF 文件
+ * Author:        wtwang
+*/
+
+/*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-%macro CompareRTF(base, compare, outdata = diff, del_temp_data = yes,
-                  ignorecreatim = yes,
-                  ignoreheader = yes,
-                  ignorefooter = yes,
-                  ignorecellstyle = yes,
-                  ignorefonttable = yes,
-                  ignorecolortable = yes)
+%macro CompareRTF(base, compare, outdata = diff, del_temp_data = true,
+                  ignorecreatim = true,
+                  ignoreheader = true,
+                  ignorefooter = true,
+                  ignorecellstyle = true,
+                  ignorefonttable = true,
+                  ignorecolortable = true)
                   / parmbuff;
 
     /*打开帮助文档*/
@@ -109,7 +115,7 @@
 
     /*3. 处理忽略比较的部分*/
     /*3.1 忽略字体表*/
-    %if %upcase(&ignorefonttable) = YES %then %do;
+    %if %upcase(&ignorefonttable) = TRUE %then %do;
         %let reg_fonttable_ini_expr = %bquote(/^\{\\fonttbl$/o);
         %let reg_fonttable_def_expr = %bquote(/^\{\\f\d+\\froman\\fprq\d+\\fcharset\d+\\cpg\d+\s.+\x3B\}$/o);
 
@@ -133,7 +139,7 @@
     %end;
 
     /*3.2 忽略颜色表*/
-    %if %upcase(&ignorecolortable) = YES %then %do;
+    %if %upcase(&ignorecolortable) = TRUE %then %do;
         %let reg_colortable_ini_expr = %bquote(/^\}?\{\\colortbl\x3B$/o);
         %let reg_colortable_def_expr = %bquote(/^\\red\d+\\green\d+\\blue\d+\x3B$/o);
 
@@ -157,7 +163,7 @@
     %end;
 
     /*3.3 忽略创建时间*/
-    %if %upcase(&ignorecreatim) = YES %then %do;
+    %if %upcase(&ignorecreatim) = TRUE %then %do;
         %let reg_creatim_expr = %bquote(/\\creatim\\yr\d{1,4}\\mo\d{1,2}\\dy\d{1,2}\\hr\d{1,2}\\min\d{1,2}\\sec\d{1,2}/o);
         data _tmp_rtf_data_base;
             set _tmp_rtf_data_base;
@@ -175,7 +181,7 @@
     %end;
 
     /*3.4 忽略页眉*/
-    %if %upcase(&ignoreheader) = YES %then %do;
+    %if %upcase(&ignoreheader) = TRUE %then %do;
         %let reg_header_expr = %bquote(/^\{\\header\\pard\\plain\\q[lcr]\{$/o);
 
         data _tmp_rtf_data_base;
@@ -238,7 +244,7 @@
     %end;
 
     /*3.5 忽略页脚*/
-    %if %upcase(&ignorefooter) = YES %then %do;
+    %if %upcase(&ignorefooter) = TRUE %then %do;
         %let reg_footer_expr = %bquote(/^\{\\footer\\pard\\plain\\q[lcr]\{$/o);
 
         data _tmp_rtf_data_base;
@@ -301,7 +307,7 @@
     %end;
 
     /*3.6 忽略单元格样式*/
-    %if %upcase(&ignorecellstyle) = YES %then %do;
+    %if %upcase(&ignorecellstyle) = TRUE %then %do;
         %let reg_cellstyle_expr = %bquote(/^(?:\\clbrdr[tblr]\\brdrs\\brdrw\d+\\brdrcf\d+)*\\cltxlrtb\\clvertal[tc](?:\\clcbpat\d+)?(?:\\clpadt\d+\\clpadft\d+\\clpadr\d+\\clpadfr\d+)?\\cellx\d+$/o);
 
         data _tmp_rtf_data_base;
@@ -350,7 +356,7 @@
 
     %exit:
     /*7. 清除中间数据集*/
-    %if %upcase(&del_temp_data) = YES %then %do;
+    %if %upcase(&del_temp_data) = TRUE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf_data_base
                    _tmp_rtf_data_compare

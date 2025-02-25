@@ -1,4 +1,10 @@
 /*
+ * Macro Name:    MergeRTF
+ * Macro Purpose: 合并 RTF 文件
+ * Author:        wtwang
+*/
+
+/*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
@@ -6,13 +12,13 @@
                 OUT              = #AUTO,
                 RTF_LIST         = #NULL,
                 DEPTH            = MAX,
-                AUTOORDER        = YES,
+                AUTOORDER        = TRUE,
                 EXCLUDE          = #NULL,
                 VD               = #AUTO,
-                MERGE            = YES,
+                MERGE            = TRUE,
                 MERGED_FILE_SHOW = SHORT,
-                LINK_TO_PREV     = NO,
-                DEL_TEMP_DATA    = YES)
+                LINK_TO_PREV     = FALSE,
+                DEL_TEMP_DATA    = TRUE)
                 /des = "合并RTF文件" parmbuff;
 
     /*打开帮助文档*/
@@ -103,7 +109,7 @@
         X "dir ""&vd:\*.rtf"" /b/on/s > ""&vd:\_tmp_rtf_list.txt"" & exit";
 
 
-        %if %upcase(&autoorder) = YES %then %do; /*自动排序*/
+        %if %upcase(&autoorder) = TRUE %then %do; /*自动排序*/
             /*提取 RTF 文件名中的信息*/
             data _tmp_rtf_list;
                 infile "&vd:\_tmp_rtf_list.txt" truncover encoding = 'gbke';
@@ -187,7 +193,7 @@
                    ;
             run;
         %end;
-        %else %if %upcase(&autoorder) = NO %then %do; /*手动排序*/
+        %else %if %upcase(&autoorder) = FALSE %then %do; /*手动排序*/
             X explorer "&vd:\_tmp_rtf_list.txt";
             X mshta vbscript:msgbox("请在弹出的窗口中手动调整 RTF 文件的合并顺序，保存后回到此弹窗，按确认按钮继续。对于无需合并的 RTF 文件，您可以在对应行的开头使用 '//' 进行注释，或直接删除对应行，空行将被忽略。",4160,"提示")(window.close);
 
@@ -238,7 +244,7 @@
 
 
     /*4. 仅列出而不合并 rtf 文件，用于调试和试运行*/
-    %if %upcase(&merge) = NO %then %do;
+    %if %upcase(&merge) = FALSE %then %do;
         data rtf_list;
             set _tmp_rtf_list_add_lv_sorted;
             label rtf_path = "虚拟磁盘路径"
@@ -384,7 +390,7 @@
 
         /*预处理，删除第 2 个及之后的RTF文件的页眉页脚*/
         %if %sysevalf(&i >= 2) %then %do;
-            %if %upcase(&link_to_prev) = YES %then %do;
+            %if %upcase(&link_to_prev) = TRUE %then %do;
                 %let reg_header_expr = %bquote(/^\{\\header\\pard\\plain\\q[lcr]\{$/o);
                 %let reg_footer_expr = %bquote(/^\{\\footer\\pard\\plain\\q[lcr]\{$/o);
 
@@ -583,7 +589,7 @@
 
 
     /*删除临时数据集*/
-    %if %upcase(&del_temp_data) = YES and %symexist(rtf_ref_max) %then %do;
+    %if %upcase(&del_temp_data) = TRUE and %symexist(rtf_ref_max) %then %do;
         proc datasets library = work nowarn noprint;
             delete %do i = 1 %to &rtf_ref_max;
                        _tmp_rtf&i
@@ -600,7 +606,7 @@
 
 
     /*删除临时数据集*/
-    %if %upcase(&del_temp_data) = YES %then %do;
+    %if %upcase(&del_temp_data) = TRUE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf_list
                    _tmp_rtf_list_add_lv

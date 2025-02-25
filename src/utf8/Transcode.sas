@@ -1,4 +1,10 @@
 /*
+ * Macro Name:    Transcode
+ * Macro Purpose: 一些 Fcmp 函数的封装，其他程序的底层依赖
+ * Author:        wtwang
+*/
+
+/*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 

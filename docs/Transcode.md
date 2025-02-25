@@ -15,8 +15,8 @@
 
 ### 程序执行流程
 
-1. 判断参数 RAW_ENCODING 的值，若为 UTF8，则调用 SAS 自带函数 `UNICODE()` 进行转换；若为其他值，则调用 `RUN_MACRO` 函数；
-2. 获取 UNICODE() 函数或 RUN_MACRO() 函数的返回值，并返回至调用环境
+1. 判断参数 `RAW_ENCODING` 的值，若为 `UTF8`，则调用 SAS 自带函数 `UNICODE()` 进行转换；若为其他值，则调用 `RUN_MACRO` 函数；
+2. 获取 `UNICODE()` 函数或 `RUN_MACRO()` 函数的返回值，并返回至调用环境
 
 ### 返回值
 

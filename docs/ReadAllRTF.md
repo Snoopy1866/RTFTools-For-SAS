@@ -52,17 +52,17 @@ DIR = ref;
 
 指定输出数据集存放的逻辑库，该逻辑库必须事先定义，且逻辑库对应的物理路径必须存在
 
-**Default** : WORK
+**Default** : `work`
 
 ---
 
 ### VD
 
-**Syntax** : _drive_
+**Syntax** : _drive_ | `#auto`
 
 指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被操作系统使用的一个字符。
 
-**Default** : #AUTO
+**Default** : `#auto`
 
 默认情况下，宏程序将自动选择一个未被操作系统使用的字母作为虚拟磁盘的盘符。
 
@@ -100,7 +100,7 @@ DIR = ref;
 dir "~\*.rtf" /b/on > "~\_tmp_rtf_list.txt" & exit
 ```
 
-注意，不要忘记使用 exit 退出终端窗口；
+注意，不要忘记使用 `exit` 退出终端窗口；
 
 在 SAS 中，上述命令改写为：
 
@@ -134,7 +134,7 @@ X " del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
 
 该正则表达式包含 3 个 buffer，各自含义如下：
 
-- buffer1 : 文件名类型，如：列表、表、清单
+- buffer1 : 文件名类型，如：`列表`、`表`、`清单`
 - buffer2 : 文件名序号，如：7.1.1
 - buffer3 : 文件名主体，如：受试者分布 筛选人群
 
@@ -146,7 +146,7 @@ X " del ""&vd:\_tmp_rtf_list.txt"" & subst &vd: /D & exit";
 的值为 `Y` 的观测，然后通过使用 `call execute` 调用宏 `%ReadRTF()`，具体如下：
 
 ```
-call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || '(label = "' || ref_label || '"), compress = yes' || '));');
+call execute('%nrstr(%ReadRTF(file = ' || fileref || ', outdata = ' || outdata_name || '(label = "' || ref_label || '"), compress = true' || '));');
 ```
 
 注意：需要给输出数据集添加标签，因此参数 `outdata` 需要添加数据集选项 `label = "xxx"`。
@@ -174,12 +174,12 @@ libname qc "D:\qc";
 
 %ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc, vd = X);
 
-%ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc, vd = X, compress = yes);
+%ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc, vd = X, compress = true);
 
-%ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc, vd = X, compress = yes, del_rtf_ctrl = yes);
+%ReadAllRTF(dir = "D:\~\TFL\table", outlib = qc, vd = X, compress = true, del_rtf_ctrl = true);
 
-%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X, compress = yes, del_rtf_ctrl = yes);
+%ReadAllRTF(dir = %str(D:\~\TFL\table), outlib = qc, vd = X, compress = true, del_rtf_ctrl = true);
 
 filename dirref "D:\~\TFL\table";
-%ReadAllRTF(dir = dirref, outlib = qc, vd = X, compress = yes, del_rtf_ctrl = yes);
+%ReadAllRTF(dir = dirref, outlib = qc, vd = X, compress = true, del_rtf_ctrl = true);
 ```

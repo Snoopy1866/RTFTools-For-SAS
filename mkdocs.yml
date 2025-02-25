@@ -10,17 +10,17 @@ copyright: Copyright © 2024 Snoopy1866
 
 # 导航信息
 nav:
-  - 主页: index.md
+  - 主页: ../README.md
   - 文档:
-    - 'Transcode': Transcode.md
-    - '%ReadRTF': ReadRTF.md
-    - '%ReadAllRTF': ReadAllRTF.md
-    - '%MergeRTF': MergeRTF.md
-    - '%CompareRTF': CompareRTF.md
-    - '%CompareAllRTF': CompareAllRTF.md
-    - '%CompareRTFWithDataset': CompareRTFWithDataset.md
-    - '%DeletePicInHeader': DeletePicInHeader.md
-    - '%MixCWFont': MixCWFont.md
+      - "Transcode": Transcode.md
+      - "%ReadRTF": ReadRTF.md
+      - "%ReadAllRTF": ReadAllRTF.md
+      - "%MergeRTF": MergeRTF.md
+      - "%CompareRTF": CompareRTF.md
+      - "%CompareAllRTF": CompareAllRTF.md
+      - "%CompareRTFWithDataset": CompareRTFWithDataset.md
+      - "%DeletePicInHeader": DeletePicInHeader.md
+      - "%MixCWFont": MixCWFont.md
 
 # 右下角展示的图标
 extra:
@@ -71,7 +71,7 @@ markdown_extensions:
   - pymdownx.tilde
   - pymdownx.details
   - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji 
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true

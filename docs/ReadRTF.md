@@ -65,26 +65,26 @@ OUTDATA = t_7_1_1
 
 ### COMPRESS
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否对临时数据集进行压缩
 
-**Default** : YES
+**Default** : `true`
 
 > [!NOTE]
 >
-> - 绝大部分情况下，参数 COMPRESS 都应当保持默认值，这虽然会增加一点点 CPU 时间，但可以节省大量磁盘占用空间，特别是在读取的 RTF 文件数据量特别大的情况下。经过测试，使用 COMPRESS = YES 平均可节省 95% 以上的磁盘占用空间。
-> - 宏程序为保证读取的变量值不会被截断，读取时采用了 SAS 支持的最大变量长度 32767，在未指定 COMPRESS = YES 的情况下，几乎每张表格读取后所占用的磁盘空间都将超过 1G，这非常容易导致磁盘可用空间的急剧下滑，甚至会导致磁盘空间不足而报错，同时频繁大量读写也会迅速减少磁盘寿命。使用 COMPRESS = YES 通过略微牺牲 CPU 时间，获得低负载的磁盘读写，延长使用寿命。
+> - 绝大部分情况下，参数 `COMPRESS` 都应当保持默认值，这虽然会增加一点点 CPU 时间，但可以节省大量磁盘占用空间，特别是在读取的 RTF 文件数据量特别大的情况下。经过测试，使用 `COMPRESS = true` 平均可节省 95% 以上的磁盘占用空间。
+> - 宏程序为保证读取的变量值不会被截断，读取时采用了 SAS 支持的最大变量长度 32767，在未指定 `COMPRESS = true` 的情况下，几乎每张表格读取后所占用的磁盘空间都将超过 1G，这非常容易导致磁盘可用空间的急剧下滑，甚至会导致磁盘空间不足而报错，同时频繁大量读写也会迅速减少磁盘寿命。使用 `COMPRESS = true` 通过略微牺牲 CPU 时间，获得低负载的磁盘读写，延长使用寿命。
 
 ---
 
 ### DEL_RTF_CTRL
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否删除单元格中的控制字
 
-**Default** : YES
+**Default** : `true`
 
 默认情况下，宏程序将在输出的 SAS 数据集中自动删除下表中的控制字：
 
@@ -99,11 +99,11 @@ OUTDATA = t_7_1_1
 
 ### DEL_TEMP_DATA
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否删除宏程序运行过程产生的临时数据集
 
-**Default** : YES
+**Default** : `true`
 
 > [!NOTE]
 >
@@ -160,7 +160,7 @@ OUTDATA = t_7_1_1
 
 SAS ODS RTF 使用 RTF 1.6 specification 输出 RTF 文件，本质上是一些纯文本标记（markup）字符。使用 `infile` 读取 RTF 文件，并存储在临时数据集 `_tmp_rtf_data` 中。
 
-RTF 文件单行字符串没有限制长度，为确保读取的 RTF 标记字符不会被截断，数据集 `_tmp_rtf_data` 中的变量均使用 SAS 允许的最大长度 32767，同时默认使用 `compress = yes` 数据集选项，防止因磁盘空间不足导致程序无法运行。
+RTF 文件单行字符串没有限制长度，为确保读取的 RTF 标记字符不会被截断，数据集 `_tmp_rtf_data` 中的变量均使用 SAS 允许的最大长度 32767，同时默认使用 `compress = true` 数据集选项，防止因磁盘空间不足导致程序无法运行。
 
 ### 3. 如何解决表头内嵌换行符导致的 RTF 标记字符跨越多行的问题
 
@@ -252,7 +252,7 @@ RTF 文件本身不含原始的 SAS 变量名，因此程序只能根据变量�
 
 ### 7. 如何识别单元格中的控制字
 
-指定参数 `DEL_RTF_CTRL = YES` 将删除单元格内的控制字。SAS 输出 RTF 时可能会为某些文字添加格式，这些格式通常以控制字的方式存储在 RTF 文件中，本宏程序可以将这些控制字删除，已支持的控制字及使用的正则表达式如下：
+指定参数 `DEL_RTF_CTRL = true` 将删除单元格内的控制字。SAS 输出 RTF 时可能会为某些文字添加格式，这些格式通常以控制字的方式存储在 RTF 文件中，本宏程序可以将这些控制字删除，已支持的控制字及使用的正则表达式如下：
 
 - 空的分组：`{\s*}|(?<!\\)[{}]`
 - 缩进：`\\li\d+`
@@ -270,11 +270,11 @@ s/(?:<reg_ctrl>)\s*//o
 ```sas
 %ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1);
 
-%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = yes);
+%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = true);
 
-%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = yes, del_rtf_ctrl = yes);
+%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = true, del_rtf_ctrl = true);
 
-%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = yes, del_rtf_ctrl = yes, del_temp_data = yes);
+%ReadRTF(file = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = true, del_rtf_ctrl = true, del_temp_data = true);
 
 %ReadRTF(file = %str(D:\~\表7.1.1 受试者分布 筛选人群.rtf), outdata = t_7_1_1);
 
