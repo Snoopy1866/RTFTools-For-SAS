@@ -75,75 +75,75 @@ BASE = cmpref
 
 ### IGNORECREATIM
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略文件创建时间。
 
-RTF 文件元信息中包含文件创建时间，指定 `IGNORECREATIM = YES` 可以防止因创建时间不同而产生无意义的比较结果。
+RTF 文件元信息中包含文件创建时间，指定 `IGNORECREATIM = true` 可以防止因创建时间不同而产生无意义的比较结果。
 
-**Default** : YES
+**Default** : `true`
 
 **Example** :
 
 ```sas
-IGNORECREATIM = NO
+IGNORECREATIM = false
 ```
 
 ---
 
 ### IGNOREHEADER
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略页眉。
 
-**Default** : YES
+**Default** : `true`
 
 **Example** :
 
 ```sas
-IGNOREHEADER = NO
+IGNOREHEADER = false
 ```
 
 ---
 
 ### IGNOREFOOTER
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略页脚。
 
-**Default** : YES
+**Default** : `true`
 
 **Example** :
 
 ```sas
-IGNOREFOOTER = NO
+IGNOREFOOTER = false
 ```
 
 ### IGNORECELLSTYLE
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略单元格样式。
 
-**Default** : YES
+**Default** : `true`
 
 **Example** :
 
 ```sas
-IGNORECELLSTYLE = NO
+IGNORECELLSTYLE = false
 ```
 
 ---
 
 ### IGNOREFONTTABLE
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略字体表。
 
-**Default** : YES
+**Default** : `true`
 
 > [!IMPORTANT]
 >
@@ -152,14 +152,14 @@ IGNORECELLSTYLE = NO
 **Example** :
 
 ```sas
-IGNOREFONTTABLE = NO
+IGNOREFONTTABLE = false
 ```
 
 ---
 
 ### IGNORECOLORTABLE
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略颜色表。
 
@@ -167,12 +167,12 @@ IGNOREFONTTABLE = NO
 >
 > - 忽略颜色表并不代表会忽略文本颜色差异，若颜色表相同，但实际文本内容使用了颜色表中的不同颜色，则宏程序仍然会检测出差异。
 
-**Default** : YES
+**Default** : `true`
 
 **Example** :
 
 ```sas
-IGNORECOLORTABLE = NO
+IGNORECOLORTABLE = false
 ```
 
 ---
@@ -199,7 +199,7 @@ _dataset-options_: 数据集选项，兼容 SAS 系统支持的所有数据集�
 | COMPARE_NAME | compare 文件名   |
 | DIFFYN       | 存在差异         |
 
-**Default** : DIFF
+**Default** : `DIFF`
 
 **Example** :
 
@@ -213,11 +213,11 @@ INDATA = CMP.DIFF(keep = BASE_NAME DIFFYN)
 
 ### DEL_TEMP_DATA
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
-指定是否删除宏程序运行过程产生的临时数据集，可选 YES | NO
+指定是否删除宏程序运行过程产生的临时数据集。
 
-**Default** : YES
+**Default** : `true`
 
 > [!NOTE]
 >

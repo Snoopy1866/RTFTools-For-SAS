@@ -40,7 +40,7 @@
 
 > [!IMPORTANT]
 >
-> - 当指定的物理路径太长时，应当使用 filename 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
+> - 当指定的物理路径太长时，应当使用 `filename` 语句建立文件引用，然后传入文件引用，否则会导致 SAS 无法正确读取。
 
 **Example** :
 
@@ -57,11 +57,11 @@ DIR = ref;
 
 ### OUT
 
-**Syntax** : _filename_
+**Syntax** : _filename_ | `#auto`
 
 指定合并后的 RTF 文件名称，需包含扩展名。合并后的 RTF 文件将保存在参数 [DIR](#dir) 指定的文件夹下。
 
-**Default** : #AUTO
+**Default** : `#auto`
 
 默认文件名为：merged-_yyyy-mm-dd hh-mm-ss_.rtf，其中 _`yyyy-mm-dd`_ 表示当前系统日期，_`hh-mm-ss`_ 表示当前系统时间。
 
@@ -75,7 +75,7 @@ OUT = "合并表格.rtf"
 
 ### RTF_LIST
 
-**Syntax** : _filename_
+**Syntax** : _filename_ | `#null`
 
 指定定义合并清单的外部文件名，需包含扩展名。
 
@@ -106,9 +106,9 @@ X:\01 table\表 7.3.9 按系统器官分类、首选术语和严重程度汇总 
 
 宏程序将按照文件 _filename_ 中文本指定的 RTF 路径，从上到下的顺序进行 RTF 文件的合并。
 
-**Default** : #NULL
+**Default** : `#null`
 
-默认情况下，宏程序将根据参数 [AUTOORDER](#autoorder) 的值决定是否进行自动排序或手动排序。若指定 `AUTOORDER = NO`，则弹出窗口要求用户进行手动排序，生成经过排序后的 RTF 文件清单副本，并再次递归调用宏程序自身，递归调用时，指定 `RTF_LIST = rtf_list_copy.txt`。
+默认情况下，宏程序将根据参数 [AUTOORDER](#autoorder) 的值决定是否进行自动排序或手动排序。若指定 `AUTOORDER = false`，则弹出窗口要求用户进行手动排序，生成经过排序后的 RTF 文件清单副本，并再次递归调用宏程序自身，递归调用时，指定 `RTF_LIST = rtf_list_copy.txt`。
 
 **Example** :
 
@@ -118,13 +118,13 @@ rtf_list = rtf_list_copy.txt
 
 > [!TIP]
 >
-> - 一般情况下，可以先指定 `AUTOORDER = NO`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，调用宏程序时可直接指定 `RTF_LIST = rtf_list_copy.txt`。
+> - 一般情况下，可以先指定 `AUTOORDER = false`，在弹出的窗口中对 RTF 文件进行手动排序、删除（或添加 `//` 进行注释），宏程序将在参数 `OUT` 指定的文件夹下生成 `rtf_list_copy.txt` 文件，如 RTF 文件发生变更需再次合并，调用宏程序时可直接指定 `RTF_LIST = rtf_list_copy.txt`。
 
 ---
 
 ### DEPTH
 
-**Syntax** : _numeric_
+**Syntax** : _numeric_ | `max`
 
 指定遍历 RTF 文件的子文件夹深度。取值范围：<img src="https://latex.codecogs.com/svg.image?\{x|x\in\mathbf{N}_&plus;\}" width=8%/>
 
@@ -169,9 +169,9 @@ rtf_list = rtf_list_copy.txt
 
 > [!IMPORTANT]
 >
-> - 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
+> - 当 [RTF_LIST](#rtf_list) 指定了非 `#null` 值时，此参数将被忽略。
 
-**Default** : MAX
+**Default** : `max`
 
 默认情况下，宏程序将合并参数 [DIR](#dir) 指定的文件夹下任何深度的子文件夹内的 RTF 文件。
 
@@ -183,44 +183,44 @@ rtf_list = rtf_list_copy.txt
 
 ### AUTOORDER
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否自动排序
 
-**Default** : YES
+**Default** : `true`
 
-- `AUTOORDER = YES` 时，宏程序根据 RTF 文件名自动排序，排序的具体细节见 [#2](#2-如何对-rtf-文件进行排序)
-- `AUTOORDER = NO` 时，宏程序将弹出提示框，提示用户进行手动排序，同时打开一个包含当前目录下所有 RTF 文档名称的 .txt 文件，用户可调整此 .txt 文件中 RTF 文档名称显示的顺序，通过这种方式完成手动排序，保存此 .txt 文件后，点击确定，宏程序将会继续运行。
+- `AUTOORDER = true` 时，宏程序根据 RTF 文件名自动排序，排序的具体细节见 [#2](#2-如何对-rtf-文件进行排序)
+- `AUTOORDER = false` 时，宏程序将弹出提示框，提示用户进行手动排序，同时打开一个包含当前目录下所有 RTF 文档名称的 .txt 文件，用户可调整此 .txt 文件中 RTF 文档名称显示的顺序，通过这种方式完成手动排序，保存此 .txt 文件后，点击确定，宏程序将会继续运行。
 
 ![](./assets/MergeRTF-autoorder-no.png)
 
 > [!IMPORTANT]
 >
-> - 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
+> - 当 [RTF_LIST](#rtf_list) 指定了非 `#null` 值时，此参数将被忽略。
 
 ---
 
 ### EXCLUDE
 
-**Syntax** : _placeholder_
+**Syntax** : _placeholder_ | `#null`
 
 指定排除名单，暂无作用。
 
-**Default** ：#NULL
+**Default** : `#null`
 
 > [!IMPORTANT]
 >
-> - 当 [RTF_LIST](#rtf_list) 指定了非 `#NULL` 值时，此参数将被忽略。
+> - 当 [RTF_LIST](#rtf_list) 指定了非 `#null` 值时，此参数将被忽略。
 
 ---
 
 ### VD
 
-**Syntax** : _drive_
+**Syntax** : _drive_ | `#auto`
 
 指定临时创建的虚拟磁盘的盘符，该盘符必须是字母 A ~ Z 中未被操作系统使用的一个字符。
 
-**Default** : #AUTO
+**Default** : `#auto`
 
 默认情况下，宏程序将自动选择一个未被操作系统使用的字母作为虚拟磁盘的盘符。
 
@@ -228,17 +228,17 @@ rtf_list = rtf_list_copy.txt
 
 ### MERGE
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否执行合并。
 
-此参数通常用于测试运行，如果你需要合并的 RTF 文件过多，或者你不确定指定的参数（尤其是参数 `DEPTH`）是否正确，可以先指定参数 `MERGE = NO`，此时宏程序将不会执行合并操作，但会输出数据集 `WORK.RTF_LIST`，你可以查看此数据集，了解具体将会被合并的 RTF 文件。在该数据集中，仅当变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 同时为 `Y` 时，对应路径上的 RTF 文件才会被合并。
+此参数通常用于测试运行，如果你需要合并的 RTF 文件过多，或者你不确定指定的参数（尤其是参数 `DEPTH`）是否正确，可以先指定参数 `MERGE = false`，此时宏程序将不会执行合并操作，但会输出数据集 `WORK.RTF_LIST`，你可以查看此数据集，了解具体将会被合并的 RTF 文件。在该数据集中，仅当变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 同时为 `Y` 时，对应路径上的 RTF 文件才会被合并。
 
 > [!NOTE]
 >
 > - 当 [RTF_LIST](#rtf_list) 指定了非 NULL 值时，数据集 `WORK.RTF_LIST` 中变量 `rtf_filename_valid_flag` 和 `rtf_depth_valid_flag` 的值均为 `Y`。
 
-**Default** ：YES
+**Default** : `false`
 
 ---
 
@@ -248,59 +248,59 @@ rtf_list = rtf_list_copy.txt
 
 指定 RTF 文件在日志中显示的路径类型，_`path_type`_ 可取值如下：
 
-- `SHORT`：仅显示文件名
-- `FULL`：显示完整路径
-- `VIRTUAL`：显示虚拟磁盘路径
+- `short`：仅显示文件名
+- `full`：显示完整路径
+- `virtual`：显示虚拟磁盘路径
 
-**Default** ：SHORT
+**Default** : `short`
 
 ---
 
 ### LINK_TO_PREV
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否将第二张及之后的 RTF 文件的页眉页脚链接到前一节
 
-**Default** : NO
+**Default** : `false`
 
 默认情况下，宏程序不会将第二张及之后的 RTF 文件的页眉页脚链接到前一节。
 
-如果待合并的 RTF 文件的页眉或页脚包含相同的图片（例如：企业 logo 图片），则建议指定 `LINK_TO_PREV = YES`，宏程序将仅保留第一张 RTF 文件的页眉页脚，后续 RTF 文件的页眉页脚将自动链接到前一节，以压缩合并后的 RTF 文件的体积。
+如果待合并的 RTF 文件的页眉或页脚包含相同的图片（例如：企业 logo 图片），则建议指定 `LINK_TO_PREV = true`，宏程序将仅保留第一张 RTF 文件的页眉页脚，后续 RTF 文件的页眉页脚将自动链接到前一节，以压缩合并后的 RTF 文件的体积。
 
-以下两种典型情况，指定 `LINK_TO_PREV = YES` 带来的时间成本与收益如下：
+以下两种典型情况，指定 `LINK_TO_PREV = true` 带来的时间成本与收益如下：
 
-| 典型情况         | 参数值             | 运行时间    | 文件体积    |
-| ---------------- | ------------------ | ----------- | ----------- |
-| 页眉页脚包含图片 | LINK_TO_PREV = NO  | 7.20s       | 16510KiB    |
-|                  | LINK_TO_PREV = YES | 8.87s       | 4644KiB     |
-|                  |                    | **+23.19%** | **-71.87%** |
-| 页眉页脚不含图片 | LINK_TO_PREV = NO  | 10.39s      | 14084KiB    |
-|                  | LINK_TO_PREV = YES | 16.27s      | 14006KiB    |
-|                  |                    | **+56.59%** | **-0.55%**  |
+| 典型情况         | 参数值               | 运行时间    | 文件体积    |
+| ---------------- | -------------------- | ----------- | ----------- |
+| 页眉页脚包含图片 | LINK_TO_PREV = false | 7.20s       | 16510KiB    |
+|                  | LINK_TO_PREV = true  | 8.87s       | 4644KiB     |
+|                  |                      | **+23.19%** | **-71.87%** |
+| 页眉页脚不含图片 | LINK_TO_PREV = false | 10.39s      | 14084KiB    |
+|                  | LINK_TO_PREV = true  | 16.27s      | 14006KiB    |
+|                  |                      | **+56.59%** | **-0.55%**  |
 
 \* 上述表格数据是基于 SAS 9.4M7 运行在 Windows 10 上的单次测试结果，仅供参考。
 
-可以发现，并非在所有情况下指定 `LINK_TO_PREV = YES` 都能带来明显收益。
+可以发现，并非在所有情况下指定 `LINK_TO_PREV = true` 都能带来明显收益。
 
-- 当 RTF 文件的页眉、页脚包含图片时，指定 `LINK_TO_PREV = YES` 会增加少量运行时间，文件体积明显减小；
-- 当 RTF 文件的页眉、页脚不含图片时，指定 `LINK_TO_PREV = YES` 会增加大量运行时间，文件体积几乎不变；
+- 当 RTF 文件的页眉、页脚包含图片时，指定 `LINK_TO_PREV = true` 会增加少量运行时间，文件体积明显减小；
+- 当 RTF 文件的页眉、页脚不含图片时，指定 `LINK_TO_PREV = true` 会增加大量运行时间，文件体积几乎不变；
 
 > [!WARNING]
 >
-> - 如果 RTF 文件的页眉、页脚仅包含文本内容，则谨慎指定 `LINK_TO_PREV = YES`；
-> - 如果 RTF 文件的页眉、页脚不一致，请勿指定 `LINK_TO_PREV = YES`；
-> - 如果 RTF 文件的页面布局存在不一致，请勿指定 `LINK_TO_PREV = YES`，否则可能导致部分页面的页眉、页脚超出页面边缘。
+> - 如果 RTF 文件的页眉、页脚仅包含文本内容，则谨慎指定 `LINK_TO_PREV = true`；
+> - 如果 RTF 文件的页眉、页脚不一致，请勿指定 `LINK_TO_PREV = true`；
+> - 如果 RTF 文件的页面布局存在不一致，请勿指定 `LINK_TO_PREV = true`，否则可能导致部分页面的页眉、页脚超出页面边缘。
 
 ---
 
 ### DEL_TEMP_DATA
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否删除宏程序运行产生的中间数据集
 
-**Default** ：YES
+**Default** : `true`
 
 > [!NOTE]
 >
@@ -324,20 +324,20 @@ rtf_list = rtf_list_copy.txt
 
 上述正则表达式中，包含 3 个缓冲区：
 
-缓冲区 1：表、列表、清单、图
+缓冲区 1：`表`、`列表`、`清单`、`图`
 
-缓冲区 2：序号
+缓冲区 2：_序号_
 
-缓冲区 3：标题
+缓冲区 3：_标题_
 
 宏程序将使用缓冲区 2 中的序号对 RTF 文件进行排序，序号通常由若干数字和数字中间的 `.` 组成，这通常是为了表示 RTF 文件之间的相对位置和层级关系，利用这些数字，可以将 RTF 文件进行正确的排序。
 
 若缓冲区 2 中的序号完全一致，则进一步根据缓冲区 1 的 RTF 文件类型进行排序，顺序如下：
 
-- 表
-- 图
-- 列表
-- 清单
+- `表`
+- `图`
+- `列表`
+- `清单`
 
 若缓冲区 1 中的 RTF 文件类型完全一致，则进一步根据缓冲区 3 的 RTF 文件标题进行排序；
 
@@ -433,7 +433,7 @@ run;
 
 %MergeRTF("~\TFL", out = merged.rtf, depth = 2, vd = Y);
 
-%MergeRTF("~\TFL", out = merged.rtf, depth = 2, vd = Y, merge = no);
+%MergeRTF("~\TFL", out = merged.rtf, depth = 2, vd = Y, merge = false);
 
 %MergeRTF("~\TFL", out = merged.rtf, rtf_list = rtf_list_copy.txt);
 ```

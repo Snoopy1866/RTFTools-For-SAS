@@ -76,7 +76,7 @@ DATASET = qc_t_7_1_1
 
 ### IGNORECRLF
 
-**Syntax**: YES | NO
+**Syntax**: `true` | `false`
 
 指定是否忽略 `0D0A`x 字符，其中 `0D`x 表示 `回车`，`0A`x 表示 `换行`，均为不可见的 ASCII 控制字符。
 
@@ -84,55 +84,55 @@ DATASET = qc_t_7_1_1
 >
 > - `strip()` 函数无法去除字符串开头和结尾的 `0D0A`x
 
-**Default** : YES
+**Default** : `true`
 
 **Example** :
 
 ```sas
-IGNORECRLF = NO
+IGNORECRLF = false
 ```
 
 ---
 
 ### IGNORELEADBLANK
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略文本的前置空格。
 
-出于缩进的需要，某些单元格内的文本开头可能包含空格，指定 `IGNORELEADBLANK = YES` 时将忽略这些空格。
+出于缩进的需要，某些单元格内的文本开头可能包含空格，指定 `IGNORELEADBLANK = true` 时将忽略这些空格。
 
-**Default** : YES
+**Default** : `true`
 
 **Example** :
 
 ```sas
-IGNORELEADBLANK = NO
+IGNORELEADBLANK = false
 ```
 
 ---
 
 ### IGNOREEMPTYCOLUMN
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略空列。
 
-出于格式的需要，某些列可能完全为空，指定 `IGNOREEMPTYCOLUMN = YES` 时将忽略这些列。
+出于格式的需要，某些列可能完全为空，指定 `IGNOREEMPTYCOLUMN = true` 时将忽略这些列。
 
-**Default** : YES
+**Default** : `true`
 
 **Example** :
 
 ```sas
-IGNOREEMPTYCOLUMN = NO
+IGNOREEMPTYCOLUMN = false
 ```
 
 ---
 
 ### IGNOREHALFORFULLWIDTH
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略字符的半/全角差异。
 
@@ -235,39 +235,39 @@ IGNOREEMPTYCOLUMN = NO
 |                      | `\|`     | `｜`                       |
 |                      | `_`      | `＿`                       |
 
-**Default** : NO
+**Default** : `false`
 
 **Example** :
 
 ```sas
-IGNOREHALFORFULLWIDTH = YES
+IGNOREHALFORFULLWIDTH = `true`
 ```
 
 ---
 
 ### IGNOREEMBEDDEDBLANK
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否忽略嵌在字符串中间的空白字符。
 
-**Default** : NO
+**Default** : `false`
 
 **Example** :
 
 ```sas
-IGNOREEMBEDDEDBLANK = YES
+IGNOREEMBEDDEDBLANK = `true`
 ```
 
 ---
 
 ### DEL_TEMP_DATA
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
-指定是否删除宏程序运行过程产生的临时数据集，可选 YES | NO
+指定是否删除宏程序运行过程产生的临时数据集。
 
-**Default** : YES
+**Default** : `true`
 
 > [!NOTE]
 >

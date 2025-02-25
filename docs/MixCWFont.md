@@ -55,11 +55,11 @@ RTF = rtfref
 
 ### OUT
 
-**Syntax** : _path_
+**Syntax** : _path_ | `#auto`
 
 指定处理后输出的 RTF 文件路径。
 
-**Default** ：#AUTO
+**Default** : `#auto`
 
 默认情况下，处理后的 RTF 文件名将遵循以下规则：
 
@@ -77,11 +77,11 @@ OUT = ~\表 7.1.1 受试者入组完成情况-ChangeFont.rtf
 
 ### CFONT
 
-**Syntax** : _font_
+**Syntax** : _font_ | `#auto`
 
 指定中文字体。
 
-**Default** : #AUTO
+**Default** : `#auto`
 
 默认情况下，宏程序会查找 RTF 文件的字体表，从字体表已定义的字体中选择第一个匹配程序内部预定义的中文字体作为中文文本显示的字体。
 
@@ -106,11 +106,11 @@ CFONT = Noto Sans SC Regular
 
 ### WFONT
 
-**Syntax** : _font_
+**Syntax** : _font_ | `#auto`
 
 指定西文字体。
 
-**Default** : #AUTO
+**Default** : `#auto`
 
 默认情况下，宏程序会查找 RTF 文件的字体表，从字体表已定义的字体中选择第一个匹配程序内部预定义的西文字体作为西文文本显示的字体。
 
@@ -135,11 +135,11 @@ WFONT = Monoca
 
 ### DEL_TEMP_DATA
 
-**Syntax** : YES | NO
+**Syntax** : `true` | `false`
 
 指定是否删除宏程序运行产生的中间数据集
 
-**Default** ：YES
+**Default** : `true`
 
 > [!NOTE]
 >
