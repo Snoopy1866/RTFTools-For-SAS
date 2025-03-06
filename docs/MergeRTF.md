@@ -28,7 +28,7 @@
 
 ### 调试参数
 
-- [DEL_TEMP_DATA](#del_temp_data)
+- [debug](#debug)
 
 ## 参数说明
 
@@ -294,13 +294,13 @@ rtf_list = rtf_list_copy.txt
 
 ---
 
-### DEL_TEMP_DATA
+### debug
 
 **Syntax** : `true` | `false`
 
 指定是否删除宏程序运行产生的中间数据集
 
-**Default** : `true`
+**Default** : `false`
 
 > [!NOTE]
 >

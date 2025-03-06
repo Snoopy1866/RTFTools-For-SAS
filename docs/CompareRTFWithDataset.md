@@ -25,7 +25,7 @@
 
 ### 调试参数
 
-- [DEL_TEMP_DATA](#del_temp_data)
+- [debug](#debug)
 
 ## 参数说明
 
@@ -267,7 +267,7 @@ IGNOREEMBEDDEDBLANK = `true`
 
 指定是否删除宏程序运行过程产生的临时数据集。
 
-**Default** : `true`
+**Default** : `false`
 
 > [!NOTE]
 >

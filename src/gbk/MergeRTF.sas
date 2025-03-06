@@ -8,17 +8,17 @@
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-%macro MergeRTF(DIR,
-                OUT              = #AUTO,
-                RTF_LIST         = #NULL,
-                DEPTH            = MAX,
-                AUTOORDER        = TRUE,
-                EXCLUDE          = #NULL,
-                VD               = #AUTO,
-                MERGE            = TRUE,
-                MERGED_FILE_SHOW = SHORT,
-                LINK_TO_PREV     = FALSE,
-                DEL_TEMP_DATA    = TRUE)
+%macro MergeRTF(dir,
+                out              = #auto,
+                rtf_list         = #null,
+                depth            = max,
+                autoorder        = true,
+                exclude          = #null,
+                vd               = #auto,
+                merge            = true,
+                merged_file_show = short,
+                link_to_prev     = false,
+                debug            = false)
                 /des = "合并RTF文件" parmbuff;
 
     /*打开帮助文档*/
@@ -210,7 +210,7 @@
                       vd               = &vd,
                       merge            = &merge,
                       merged_file_show = &merged_file_show,
-                      del_temp_data    = &del_temp_data);
+                      debug            = &debug);
             %goto exit_with_recursive_end;
         %end;
     %end;
@@ -589,7 +589,7 @@
 
 
     /*删除临时数据集*/
-    %if %upcase(&del_temp_data) = TRUE and %symexist(rtf_ref_max) %then %do;
+    %if %upcase(&debug) = FALSE and %symexist(rtf_ref_max) %then %do;
         proc datasets library = work nowarn noprint;
             delete %do i = 1 %to &rtf_ref_max;
                        _tmp_rtf&i
@@ -606,7 +606,7 @@
 
 
     /*删除临时数据集*/
-    %if %upcase(&del_temp_data) = TRUE %then %do;
+    %if %upcase(&debug) = FALSE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf_list
                    _tmp_rtf_list_add_lv

@@ -23,7 +23,7 @@
 
 ### 调试参数
 
-- [DEL_TEMP_DATA](#del_temp_data)
+- [debug](#debug)
 
 ## 参数说明
 
@@ -211,13 +211,13 @@ INDATA = CMP.DIFF(keep = BASE_NAME DIFFYN)
 
 ---
 
-### DEL_TEMP_DATA
+### debug
 
 **Syntax** : `true` | `false`
 
 指定是否删除宏程序运行过程产生的临时数据集。
 
-**Default** : `true`
+**Default** : `false`
 
 > [!NOTE]
 >
