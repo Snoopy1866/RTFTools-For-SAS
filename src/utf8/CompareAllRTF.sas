@@ -10,14 +10,14 @@
 
 %macro CompareAllRTF(basedir,
                      comparedir,
-                     ignorecreatim = true,
-                     ignoreheader = true,
-                     ignorefooter = true,
-                     ignorecellstyle = true,
-                     ignorefonttable = true,
+                     ignorecreatim    = true,
+                     ignoreheader     = true,
+                     ignorefooter     = true,
+                     ignorecellstyle  = true,
+                     ignorefonttable  = true,
                      ignorecolortable = true,
-                     outdata = diff,
-                     del_temp_data = true)
+                     outdata          = diff,
+                     debug            = false)
                      / parmbuff;
 
     /*打开帮助文档*/
@@ -224,7 +224,7 @@
 
     %exit:
     /*8. 清除中间数据集*/
-    %if %upcase(&del_temp_data) = TRUE %then %do;
+    %if %upcase(&debug) = FALSE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf_list_base
                    _tmp_rtf_list_compare

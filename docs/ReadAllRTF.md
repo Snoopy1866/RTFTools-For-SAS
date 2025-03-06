@@ -21,6 +21,10 @@
 - [COMPRESS](#compress)
 - [DEL_RTF_CTRL](#del_rtf_ctrl)
 
+### 调试参数
+
+- [debug](#debug)
+
 ## 参数说明
 
 ### DIR
@@ -77,6 +81,20 @@ DIR = ref;
 ### DEL_RTF_CTRL
 
 同 [DEL_RTF_CTRL](./ReadRTF.md#del_rtf_ctrl)
+
+---
+
+### debug
+
+**Syntax** : `true` | `false`
+
+指定是否删除宏程序运行产生的中间数据集
+
+**Default** : `false`
+
+> [!NOTE]
+>
+> - 该参数通常用于调试，用户无需关注。
 
 ---
 
