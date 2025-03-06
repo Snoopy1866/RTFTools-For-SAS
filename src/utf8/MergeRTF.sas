@@ -119,7 +119,7 @@
                 rtf_path_real = cats("&dirloc", substr(rtf_path, 3));
 
                 /*识别表格和清单*/
-                reg_table_id = prxparse("/^.*(((?:列)?表|清单|图)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf)\s*$/o");
+                reg_table_id = prxparse("/^.*((列表|清单|(?<!列)表|图)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf)\s*$/o");
 
                 /*筛选命名规范的 rtf 文件*/
                 if prxmatch(reg_table_id, rtf_path) then do;
