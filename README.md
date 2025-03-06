@@ -20,13 +20,13 @@
 
 ## 详细文档
 
-| 🧩 程序名称              | ✨ 描述                                    | 📚 文档                             |
-| ------------------------ | ------------------------------------------ | ----------------------------------- |
-| `Transcode`              | 一些 Fcmp 函数的封装，其他程序的底层依赖   | [↗️](docs/Transcode.md)             |
-| `%ReadRTF`               | 读取单个 RTF 文件并转为 SAS 数据集         | [↗️](docs/ReadRTF.md)               |
-| `%ReadAllRTF`            | 读取目录中的所有 RTF 文件并转为 SAS 数据集 | [↗️](docs/ReadAllRTF.md)            |
-| `%MergeRTF`              | 合并 RTF 文件                              | [↗️](docs/MergeRTF.md)              |
-| `%CompareRTF`            | 比较两个 RTF 文件                          | [↗️](docs/CompareRTF.md)            |
-| `%CompareAllRTF`         | 比较两个目录中的所有 RTF 文件              | [↗️](docs/CompareAllRTF.md)         |
-| `%CompareRTFWithDataset` | 比较一个 RTF 文件和一个 SAS 数据集         | [↗️](docs/CompareRTFWithDataset.md) |
-| `%MixCWFont`             | 中西文字体混排                             | [↗️](docs/MixCWFont.md)             |
+| 🧩 程序名称                 | ✨ 描述                                    | 📚 文档                                |
+| --------------------------- | ------------------------------------------ | -------------------------------------- |
+| `transcode`                 | 一些 Fcmp 函数的封装，其他程序的底层依赖   | [↗️](docs/transcode.md)                |
+| `%read_rtf`                 | 读取单个 RTF 文件并转为 SAS 数据集         | [↗️](docs/read_rtf.md)                 |
+| `%read_rtf_dir`             | 读取目录中的所有 RTF 文件并转为 SAS 数据集 | [↗️](docs/read_rtf_dir.md)             |
+| `%merge_rtf`                | 合并 RTF 文件                              | [↗️](docs/merge_rtf.md)                |
+| `%compare_rtf`              | 比较两个 RTF 文件                          | [↗️](docs/compare_rtf.md)              |
+| `%compare_rtf_dir`          | 比较两个目录中的所有 RTF 文件              | [↗️](docs/compare_rtf_dir.md)          |
+| `%compare_rtf_with_dataset` | 比较一个 RTF 文件和一个 SAS 数据集         | [↗️](docs/compare_rtf_with_dataset.md) |
+| `%mix_cw_font`              | 中西文字体混排                             | [↗️](docs/mix_cw_font.md)              |
