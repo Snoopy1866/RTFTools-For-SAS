@@ -1,18 +1,12 @@
 /*
- * Macro Name:    MixCWFont
- * Macro Purpose: 中西文字体混排
- * Author:        wtwang
-*/
-
-/*
 详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
 */
 
-%macro MixCWFont(RTF,
-                 OUT              = #AUTO,
-                 CFONT            = #AUTO,
-                 WFONT            = #AUTO,
-                 DEL_TEMP_DATA    = TRUE)
+%macro MixCWFont(rtf,
+                 out              = #auto,
+                 cfont            = #auto,
+                 wfont            = #auto,
+                 debug            = false)
                  /des = "中西文字体混排" parmbuff;
 
     /*打开帮助文档*/
@@ -335,7 +329,7 @@
 
 
     /*9. 删除中间数据集*/
-    %if %qupcase(&del_temp_data) = TRUE %then %do;
+    %if %qupcase(&debug) = FALSE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf
                    _tmp_rtf_font_spec
