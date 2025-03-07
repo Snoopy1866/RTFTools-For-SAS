@@ -2,6 +2,11 @@
 
 ![Github License](https://img.shields.io/github/license/Snoopy1866/RTFTools-For-SAS)
 
+> [!IMPORTANT]
+>
+> [v2](https://github.com/Snoopy1866/RTFTools-For-SAS) 和 [v1](https://github.com/Snoopy1866/RTFTools-For-SAS/tree/v1) 互不兼容，
+> 如果你使用的是 v1 版本，请参考 [v1 帮助文档](https://github.com/Snoopy1866/RTFTools-For-SAS/tree/v1)。
+
 ## 简介
 
 适用于 SAS 的 RTF 文件处理程序。
