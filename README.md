@@ -1,6 +1,7 @@
 # RTFTools for SAS
 
 ![Github License](https://img.shields.io/github/license/Snoopy1866/RTFTools-For-SAS)
+![GitHub Release](https://img.shields.io/github/v/release/Snoopy1866/RTFTools-For-SAS)
 
 > [!IMPORTANT]
 >
