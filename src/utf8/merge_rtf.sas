@@ -470,7 +470,7 @@
                 %end;
 
                 /*分节符处理*/
-                reg_sectd_id = prxparse("/^\\sectd\\linex\d\\endnhere\\pgwsxn\d+\\pghsxn\d+\\lndscpsxn\\headery\d+\\footery\d+\\marglsxn\d+\\margrsxn\d+\\margtsxn\d+\\margbsxn\d+$/o");
+                reg_sectd_id = prxparse("/^\\sectd\\linex\d\\endnhere(\\pgwsxn\d+\\pghsxn\d+\\lndscpsxn)?\\headery\d+\\footery\d+\\marglsxn\d+\\margrsxn\d+\\margtsxn\d+\\margbsxn\d+$/o");
                 if fst_sectd_found = 0 then do; /*首次发现 \sectd，在\sectd 前面添加 \sect，以便生成 rtf 文件之间的分节符*/
                     if prxmatch(reg_sectd_id, strip(line)) then do;
                         line = cats("\sect", strip(line)); 
