@@ -1,12 +1,12 @@
-# RTFTools for SAS
+# sas-rtf-toolkit
 
-![Github License](https://img.shields.io/github/license/Snoopy1866/RTFTools-For-SAS)
-![GitHub Release](https://img.shields.io/github/v/release/Snoopy1866/RTFTools-For-SAS)
+![Github License](https://img.shields.io/github/license/Snoopy1866/sas-rtf-toolkit)
+![GitHub Release](https://img.shields.io/github/v/release/Snoopy1866/sas-rtf-toolkit)
 
 > [!IMPORTANT]
 >
-> [v2](https://github.com/Snoopy1866/RTFTools-For-SAS) 和 [v1](https://github.com/Snoopy1866/RTFTools-For-SAS/tree/v1) 互不兼容，
-> 如果你使用的是 v1 版本，请参考 [v1 帮助文档](https://github.com/Snoopy1866/RTFTools-For-SAS/tree/v1)。
+> [v2](https://github.com/Snoopy1866/sas-rtf-toolkit) 和 [v1](https://github.com/Snoopy1866/sas-rtf-toolkit/tree/v1) 互不兼容，
+> 如果你使用的是 v1 版本，请参考 [v1 帮助文档](https://github.com/Snoopy1866/sas-rtf-toolkit/tree/v1)。
 
 ## 简介
 

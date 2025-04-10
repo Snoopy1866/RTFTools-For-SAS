@@ -1,5 +1,5 @@
 /*
-详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
+详细文档请前往 Github 查阅: https://github.com/Snoopy1866/sas-rtf-toolkit
 */
 
 %macro mix_cw_font(rtf,
@@ -11,7 +11,7 @@
 
     /*打开帮助文档*/
     %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
-        X explorer "https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/docs/mix_cw_font.md";
+        X explorer "https://github.com/Snoopy1866/sas-rtf-toolkit/blob/v2/docs/mix_cw_font.md";
         %goto exit;
     %end;
 
