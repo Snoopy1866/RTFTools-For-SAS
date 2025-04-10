@@ -1,5 +1,5 @@
 /*
-详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
+详细文档请前往 Github 查阅: https://github.com/Snoopy1866/sas-rtf-toolkit
 */
 
 options cmplib = sasuser.func;
@@ -13,7 +13,7 @@ options cmplib = sasuser.func;
 
     /*打开帮助文档*/
     %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
-        X explorer "https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/docs/read_rtf.md";
+        X explorer "https://github.com/Snoopy1866/sas-rtf-toolkit/blob/v2/docs/read_rtf.md";
         %goto exit;
     %end;
 
@@ -349,8 +349,8 @@ options cmplib = sasuser.func;
 
         /*控制字-上标*/
         %let reg_ctrl_4 = %bquote(\{?\\super\s*((?:\\[\\\{\}]|[^\\\{\}])+)\}?); /*
-                                                                               https://github.com/Snoopy1866/RTFTools-For-SAS/issues/20
-                                                                               https://github.com/Snoopy1866/RTFTools-For-SAS/issues/26
+                                                                               https://github.com/Snoopy1866/sas-rtf-toolkit/issues/20
+                                                                               https://github.com/Snoopy1866/sas-rtf-toolkit/issues/26
                                                                               */
 
         /*合并reg_ctrl_1 ~ reg_ctrl_n*/
