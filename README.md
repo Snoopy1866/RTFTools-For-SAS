@@ -2,6 +2,16 @@
 
 ![Github License](https://img.shields.io/github/license/Snoopy1866/RTFTools-For-SAS)
 
+> [!WARNING]
+>
+> [v1](https://github.com/Snoopy1866/RTFTools-For-SAS/tree/v1) 版本已不再维护，请使用 [v2](https://github.com/Snoopy1866/RTFTools-For-SAS/tree/v2) 版本！
+
+以下列举的是一些 v1 版本存在的已知问题，已在 v2 版本中修复：
+
+| 问题                                                                          | 修复 PR                                                       |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `\pgwsxn`, `\pghsxn` 和 `lndscpsxn` 差异导致中间部分的 RTF 文件未被合并的问题 | [#78](https://github.com/Snoopy1866/RTFTools-For-SAS/pull/78) |
+
 ## 简介
 
 适用于 SAS 的 RTF 文件处理程序。
