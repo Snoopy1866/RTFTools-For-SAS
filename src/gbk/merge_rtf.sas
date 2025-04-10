@@ -1,5 +1,5 @@
 /*
-详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
+详细文档请前往 Github 查阅: https://github.com/Snoopy1866/sas-rtf-toolkit
 */
 
 %macro merge_rtf(dir,
@@ -17,7 +17,7 @@
 
     /*打开帮助文档*/
     %if %qupcase(&SYSPBUFF) = %bquote((HELP)) or %qupcase(&SYSPBUFF) = %bquote(()) %then %do;
-        X explorer "https://github.com/Snoopy1866/RTFTools-For-SAS/blob/main/docs/merge_rtf.md";
+        X explorer "https://github.com/Snoopy1866/sas-rtf-toolkit/blob/v2/docs/merge_rtf.md";
         %goto exit;
     %end;
 

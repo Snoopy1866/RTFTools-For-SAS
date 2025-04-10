@@ -1,5 +1,5 @@
 /*
-详细文档请前往 Github 查阅: https://github.com/Snoopy1866/RTFTools-For-SAS
+详细文档请前往 Github 查阅: https://github.com/Snoopy1866/sas-rtf-toolkit
 */
 
 /*删除数据集 SASUSER.FUNC，防止切换编码环境后重新运行无法被覆盖*/
