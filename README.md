@@ -1,6 +1,18 @@
 # RTFTools for SAS
 
-![Github License](https://img.shields.io/github/license/Snoopy1866/RTFTools-For-SAS)
+![Github License](https://img.shields.io/github/license/Snoopy1866/sas-rtf-toolkit)
+
+> [!WARNING]
+>
+> - [v1](https://github.com/Snoopy1866/sas-rtf-toolkit/tree/v1) 版本已不再维护，请使用 [v2](https://github.com/Snoopy1866/sas-rtf-toolkit/tree/v2) 版本；
+> - [v2](https://github.com/Snoopy1866/sas-rtf-toolkit/tree/v2) 版本项目已更名为 **`sas-rtf-toolkit`**。
+
+以下列举的是一些 v1 版本存在的已知问题，已在 v2 版本中修复：
+
+| 宏程序      | 问题                                                                    | PR                                                           |
+| ----------- | ----------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `%MergeRTF` | 正则表达式缺陷导致无法正确识别清单                                      | [#73](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/73) |
+| `%MergeRTF` | `\pgwsxn`, `\pghsxn` 和 `lndscpsxn` 差异导致中间部分的 RTF 文件未被合并 | [#78](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/78) |
 
 ## 简介
 
@@ -22,5 +34,4 @@
 - [CompareRTF.sas](docs/CompareRTF.md)
 - [CompareAllRTF.sas](docs/CompareAllRTF.md)
 - [CompareRTFWithDataset](docs/CompareRTFWithDataset.md)
-- [DeletePicInHeader](docs/assets/DeletePicInHeader.md) （未开发完成）
 - [MixCWFont.sas](docs/MixCWFont.md)
