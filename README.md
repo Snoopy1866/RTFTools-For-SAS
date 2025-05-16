@@ -13,6 +13,7 @@
 | ----------- | ----------------------------------------------------------------------- | ------------------------------------------------------------ |
 | `%MergeRTF` | 正则表达式缺陷导致无法正确识别清单                                      | [#73](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/73) |
 | `%MergeRTF` | `\pgwsxn`, `\pghsxn` 和 `lndscpsxn` 差异导致中间部分的 RTF 文件未被合并 | [#78](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/78) |
+| `%MergeRTF` | `auto_order = false` 时，`link_to_prev = true` 未生效                   | [#82](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/82) |
 
 ## 简介
 
