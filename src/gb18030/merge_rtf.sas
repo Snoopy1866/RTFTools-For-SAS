@@ -204,6 +204,7 @@
                        vd               = &vd,
                        merge            = &merge,
                        merged_file_show = &merged_file_show,
+                       link_to_prev     = &link_to_prev,
                        debug            = &debug);
             %goto exit_with_recursive_end;
         %end;
