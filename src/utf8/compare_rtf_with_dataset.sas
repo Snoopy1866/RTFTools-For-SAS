@@ -81,7 +81,7 @@
     X "copy ""&rtf_loc"" ""&rtf_loc.-copy"" & exit";
 
     /*2.2 调用 %read_rtf 读取文件*/
-    %read_rtf(file = "&rtf_loc.-copy", outdata = _tmp_rtf(drop = obs_seq), compress = true, del_rtf_ctrl = true);
+    %read_rtf(rtf = "&rtf_loc.-copy", outdata = _tmp_rtf(drop = obs_seq), compress = true, del_rtf_ctrl = true);
 
     /*2.3 删除复制的文件*/
     X "del ""&rtf_loc.-copy"" & exit";
