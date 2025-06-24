@@ -27,7 +27,7 @@ options cmplib = sasuser.func;
     %end;
 
     /*声明局部变量*/
-    %local i;
+    %local i rtf_ref rtf_loc;
 
     /*声明全局变量*/
     %if not %symexist(readrtf_exit_with_error) %then %do;
