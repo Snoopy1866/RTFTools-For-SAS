@@ -353,6 +353,9 @@ options cmplib = sasuser.func;
                                                                                https://github.com/Snoopy1866/sas-rtf-toolkit/issues/26
                                                                               */
 
+        /*控制字-转义字符*/
+        %let reg_ctrl_5 = %bquote(\\([\{\}]));
+
         /*合并reg_ctrl_1 ~ reg_ctrl_n*/
         %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 3; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
 
@@ -360,9 +363,11 @@ options cmplib = sasuser.func;
             set _tmp_rtf_raw;
             reg_rtf_del_ctrl_id   = prxparse("s/(?:&reg_ctrl)\s*//o");
             reg_rtf_del_ctrl_id_4 = prxparse("s/(?:&reg_ctrl_4)\s*/$1/o");
+            reg_rtf_del_ctrl_id_5 = prxparse("s/(?:&reg_ctrl_5)\s*/$1/o");
             if flag_header = "Y" or flag_data = "Y" then do;
                 context_raw = prxchange(reg_rtf_del_ctrl_id,   -1, strip(context_raw));
                 context_raw = prxchange(reg_rtf_del_ctrl_id_4, -1, strip(context_raw));
+                context_raw = prxchange(reg_rtf_del_ctrl_id_5, -1, strip(context_raw));
             end;
         run;
     %end;
