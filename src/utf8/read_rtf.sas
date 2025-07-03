@@ -354,7 +354,7 @@ options cmplib = sasuser.func;
                                                                               */
 
         /*控制字-转义字符*/
-        %let reg_ctrl_5 = %bquote(\\([\{\}]));
+        %let reg_ctrl_5 = %bquote(\\([\{\}\\]));
 
         /*合并reg_ctrl_1 ~ reg_ctrl_n*/
         %unquote(%nrstr(%%let reg_ctrl =)) %sysfunc(catx(%bquote(|) %unquote(%do i = 1 %to 3; %bquote(,)%bquote(&&reg_ctrl_&i) %end;)));
