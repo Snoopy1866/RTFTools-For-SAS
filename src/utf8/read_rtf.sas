@@ -343,7 +343,7 @@ options cmplib = sasuser.func;
         /*控制字-空的分组*/
         %let reg_ctrl_1 = %bquote({\s*}|(?<!\\)[{}]);
         /*控制字-缩进*/
-        %let reg_ctrl_2 = %bquote(\\li\d+);
+        %let reg_ctrl_2 = %bquote(\\[flr]i\d+);
         /*控制字-取消上下标*/
         %let reg_ctrl_3 = %bquote(\\nosupersub);
 
