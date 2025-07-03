@@ -17,6 +17,7 @@
 | `%ReadRTF`  | 未声明局部变量 `rtf_ref`, `rtf_loc` 导致被 `%CompareRTFWithDataset` 调用时未删除临时文件 | [#84](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/84) |
 | `%ReadRTF`  | 数据行存在非打印字符 `\x08-\x0d` 导致资源耗尽                                            | [#85](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/85) |
 | `%ReadRTF`  | 数据行存在转义字符 `\{`, `\}` 未处理                                                     | [#86](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/86) |
+| `%ReadRTF`  | 数据行存在缩进控制字 `\ri`, `\fi` 未处理                                                 | [#87](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/87) |
 
 ## 简介
 
