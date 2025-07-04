@@ -213,7 +213,7 @@
     data _tmp_rtf_polish(compress = yes);
         set _tmp_rtf_font_added;
 
-        reg_header_cell_id = prxparse("/\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])+)\{\\line\}/o");
+        reg_header_cell_id = prxparse("/\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{([\x20-\x7e\x08-\x0d]+)\{\\line\}$/o");
 
         length tmp_line $32767;
         retain tmp_line;
@@ -252,30 +252,25 @@
         length context_mixed $32767;
 
         /*修改单元格文本字体*/
-        reg_cell_id = prxparse("/\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])+)\\cell\}/o");
-        reg_cell_inside_id = prxparse("/\\animtext\d*\\ul\d*\\strike\d*\\b\d*\\i\d*\\f\d*\\fs\d*\\cf\d*((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])+)/o");
-        reg_cell_change_font_id = prxparse("s/(?!<\\f&cfont_id )((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};)+)/\\f&cfont_id $1\\f&wfont_id /o");
+        reg_cell_id = prxparse("/\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{([\x20-\x7e\x08-\x0d]+)\\cell\}/o");
+        reg_cell_change_font_id = prxparse("s/(?<!\\f&cfont_id )((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};)+)/\\f&cfont_id $1\\f&wfont_id /o");
         if prxmatch(reg_cell_id, trim(line)) then do;
             call prxposn(reg_cell_id, 1, st, len);
             context_mixed = substr(trim(line), st, len);
 
-            if prxmatch(reg_cell_inside_id, trim(line)) then do; /*表头不止一行，需要进一步定位*/
-                call prxposn(reg_cell_inside_id, 1, st, len);
-                context_mixed = substr(trim(line), st, len);
-            end;
-            
             /*修改字体*/
             call prxchange(reg_cell_change_font_id, -1, trim(context_mixed), context_mixed);
             if find(context_mixed, "\f&cfont_id") ^= 1 then do;
                 context_mixed = "\f&wfont_id " || trim(context_mixed);
             end;
-
+            
             line = substr(line, 1, st - 1) || trim(context_mixed) || substr(line, st + len);
+            
         end;
-
+        
         /*修改标题文本字体*/
-        reg_outllv_id = prxparse("/\\outlinelevel\d*\{((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])+)\}/o");
-        reg_outlnlv_change_font_id = prxparse("s/(?!<\\f&cfont_id )((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};)+)/\\f&cfont_id $1\\f&wfont_id /o");
+        reg_outllv_id = prxparse("/\\outlinelevel\d*\{([\x20-\x7e\x08-\x0d]+)\}/o");
+        reg_outlnlv_change_font_id = prxparse("s/(?<!\\f&cfont_id )((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};)+)/\\f&cfont_id $1\\f&wfont_id /o");
 
         if prxmatch(reg_outllv_id, trim(line)) then do;
             call prxposn(reg_outllv_id, 1, st, len);
@@ -291,8 +286,8 @@
         end;
 
         /*修改脚注文本字体*/
-        reg_ftnt_id = prxparse("/\\pard\\b\d*\\i\d*\\chcbpat\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{\}\\q[lcr]\\fs\d*((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])+)\\cf\d*\\chcbpat\d*/o");
-        reg_ftnt_change_font_id = prxparse("s/(?!<\\f&cfont_id )((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};)+)/\\f&cfont_id $1\\f&wfont_id /o");
+        reg_ftnt_id = prxparse("/\\pard\\b\d*\\i\d*\\chcbpat\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{\}\\q[lcr]\\fs\d*([\x20-\x7e\x08-\x0d]+)\\cf\d*\\chcbpat\d*/o");
+        reg_ftnt_change_font_id = prxparse("s/(?<!\\f&cfont_id )((?:\\\x27[0-9A-F]{2}|\\u\d{1,5};)+)/\\f&cfont_id $1\\f&wfont_id /o");
 
         if prxmatch(reg_ftnt_id, trim(line)) then do;
             call prxposn(reg_ftnt_id, 1, st, len);
