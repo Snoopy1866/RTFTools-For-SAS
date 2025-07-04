@@ -286,7 +286,7 @@ rtf_list = rtf_list_copy.txt
 
 指定合并之后是否需要修改中文和西文的字体。
 
-`mix_cw_font` 指定为 `true` 时，将调用 [%mix_cw_font](mix_cw_font.md)，并传入参数 [cfont](#cfont), [wfont](#wfont), [debug](#debug)。
+`mix_cw_font` 指定为 `true` 时，将调用 [%mix_cw_font](mix_cw_font.md)，并传入参数 [cfont](#cfont)、[wfont](#wfont)、[debug](#debug)。
 
 **Default** : `false`
 
