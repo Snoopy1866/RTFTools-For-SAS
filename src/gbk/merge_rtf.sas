@@ -568,19 +568,7 @@
     run;
 
 
-    /*12. 弹出提示框*/
-    %let run_end_time = %sysfunc(time()); /*记录结束时间*/
-    %let run_spend_time = %sysfunc(putn(%sysevalf(&run_end_time - &run_start_time), 8.2)); /*计算耗时*/
-
-    %if %sysevalf(&mergeable_rtf_ref_max < &rtf_ref_max) %then %do;
-        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！部分已被修改的 rtf 文件未合并，请查看日志详情！",4144,"提示")(window.close);
-    %end;
-    %else %do;
-        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！",4160,"提示")(window.close);
-    %end;
-
-
-    /*13. 修改默认字体*/
+    /*12. 修改默认字体*/
     %if %upcase(&mix_cw_font) = TRUE %then %do;
         proc sql noprint;
             select * from DICTIONARY.CATALOGS where libname = "WORK" and memname = "SASMACR" and objname = "MIX_CW_FONT";
@@ -590,7 +578,23 @@
             %goto exit;
         %end;
 
+        %let mix_cw_font_start_time = %sysfunc(time());
         %mix_cw_font(rtf = "&vd:\&out", out = "&vd:\&out", cfont = &cfont, wfont = &wfont, debug = &debug);
+        %let mix_cw_font_end_time = %sysfunc(time());
+        %let mix_cw_font_spend_time = %sysfunc(putn(%sysevalf(&mix_cw_font_end_time - &mix_cw_font_start_time), 8.2));
+        %put NOTE: 修改字体完成，耗时 &mix_cw_font_spend_time s!;
+    %end;
+
+
+    /*13. 弹出提示框*/
+    %let run_end_time = %sysfunc(time()); /*记录结束时间*/
+    %let run_spend_time = %sysfunc(putn(%sysevalf(&run_end_time - &run_start_time), 8.2)); /*计算耗时*/
+
+    %if %sysevalf(&mergeable_rtf_ref_max < &rtf_ref_max) %then %do;
+        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！部分已被修改的 rtf 文件未合并，请查看日志详情！",4144,"提示")(window.close);
+    %end;
+    %else %do;
+        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！",4160,"提示")(window.close);
     %end;
 
 
