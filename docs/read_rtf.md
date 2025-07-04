@@ -148,7 +148,7 @@ outdata = t_7_1_1
    - **数据行**
 
      ```
-     /^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])*)\\cell\}$/o
+     /^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{([\x20-\x7e\x08-\x0d]*)\\cell\}$/o
      ```
 
    - **分节符标识行**
@@ -259,7 +259,7 @@ RTF 文件单行字符串没有限制长度，为确保读取的 RTF 标记字�
 4. 使用以下正则表达式匹配数据行
 
    ```
-   ^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{((?:\\'[0-9A-F]{2}|\\u\d{1,5};|[\x20-\x7e])*)\\cell\}$/o
+   /^\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*\\fs\d*\\cf\d*\{([\x20-\x7e\x08-\x0d]*)\\cell\}$/o
    ```
 
    上述正则表达式中，包含了 3 种类型的数据编码形式：
@@ -290,21 +290,6 @@ RTF 文件本身不含原始的 SAS 变量名，因此程序只能根据变量�
 
 ![](./assets/read-rtf-detail-column-header.png)
 
-### 如何识别单元格中的控制字
-
-指定参数 `del_rtf_ctrl = true` 将删除单元格内的控制字。SAS 输出 RTF 时可能会为某些文字添加格式，这些格式通常以控制字的方式存储在 RTF 文件中，本宏程序可以将这些控制字删除，已支持的控制字及使用的正则表达式如下：
-
-- 空的分组：`{\s*}|(?<!\\)[{}]`
-- 缩进：`\\li\d+`
-- 上标：`{\\super.*?}|\\super[^\\\{\}]+`
-- 取消上下标：`\\nosupersub`
-
-宏程序使用下面的正则表达式将上述控制字替换为空字符，其中 `<reg_ctrl>` 表示上述合并后的正则表达式：
-
-```
-s/(?:<reg_ctrl>)\s*//o
-```
-
 ## 示例程序
 
 ```sas
@@ -314,7 +299,7 @@ s/(?:<reg_ctrl>)\s*//o
 
 %read_rtf(rtf = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = true, del_rtf_ctrl = true);
 
-%read_rtf(rtf = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = true, del_rtf_ctrl = true, del_temp_data = true);
+%read_rtf(rtf = "D:\~\表7.1.1 受试者分布 筛选人群.rtf", outdata = t_7_1_1, compress = true, del_rtf_ctrl = true, debug = true);
 
 %read_rtf(rtf = %str(D:\~\表7.1.1 受试者分布 筛选人群.rtf), outdata = t_7_1_1);
 
