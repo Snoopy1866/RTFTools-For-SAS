@@ -336,11 +336,11 @@
         quit;
     %end;
 
+
+    %exit:
     %if %qupcase(&out) ^= #AUTO %then %do;
         X "del ""&rtf_loc_mixed"" & exit";
     %end;
 
-
-    %exit:
     %put NOTE: 宏 mix_cw_font 已结束运行！;
 %mend;
