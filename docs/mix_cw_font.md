@@ -4,11 +4,6 @@
 
 **Compatibility** : RTF 1.6 specification
 
-> [!Caution]
->
-> - 若在已经使用 `%mix_cw_font` 处理后生成的 RTF 文件上再次使用此宏，则会发生堆栈溢出错误。
-> - 若某个单元格或段落中的字符数量超出 700（GBK）或 350（UTF8），则会发生堆栈溢出错误。
-
 ## 语法
 
 ### 必选参数
@@ -132,7 +127,7 @@ wfont = Monoca
 
 **Syntax** : `true` | `false`
 
-指定是否删除宏程序运行产生的中间数据集
+指定是否删除宏程序运行产生的中间数据集。
 
 **Default** : `false`
 
