@@ -20,6 +20,9 @@
 - [merge](#merge)
 - [merged_file_show](#merged_file_show)
 - [link_to_prev](#link_to_prev)
+- [mix_cw_font]()
+- [cfont]()
+- [wfont]()
 
 ### 调试参数
 
@@ -274,6 +277,36 @@ rtf_list = rtf_list_copy.txt
 >
 > - 如果 RTF 文件的页眉、页脚不一致，请勿指定 `link_to_prev = true`，否则可能导致第二张及之后的 RTF 文件的页眉、页脚被替换；
 > - 如果 RTF 文件的页面布局存在不一致，请勿指定 `link_to_prev = true`，否则可能导致部分页面的页眉、页脚超出页面边缘。
+
+---
+
+### mix_cw_font
+
+**Syntax** : `true` | `false`
+
+指定合并之后是否需要修改中文和西文的字体。
+
+`mix_cw_font` 指定为 `true` 时，将调用 [%mix_cw_font](mix_cw_font.md)，并传入参数 [cfont](#cfont), [wfont](#wfont), [debug](#debug)。
+
+**Default** : `false`
+
+---
+
+### cfont
+
+用法同 [cfont](mix_cw_font.md#cfont)
+
+> [!NOTE]
+>
+> `mix_cw_font = false` 时，参数 `cfont` 无效。
+
+### wfont
+
+用法同 [wfont](mix_cw_font.md#wfont)
+
+> [!NOTE]
+>
+> `mix_cw_font = false` 时，参数 `wfont` 无效。
 
 ---
 
