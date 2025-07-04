@@ -12,6 +12,9 @@
                  merge            = true,
                  merged_file_show = short,
                  link_to_prev     = false,
+                 mix_cw_font      = false,
+                 cfont            = #auto,
+                 wfont            = #auto,
                  debug            = false
                 ) / parmbuff;
 
@@ -574,6 +577,20 @@
     %end;
     %else %do;
         X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！",4160,"提示")(window.close);
+    %end;
+
+
+    /*13. 修改默认字体*/
+    %if %upcase(&mix_cw_font) = TRUE %then %do;
+        proc sql noprint;
+            select * from DICTIONARY.CATALOGS where libname = "WORK" and memname = "SASMACR" and objname = "MIX_CW_FONT";
+        quit;
+        %if &SQLOBS = 0 %then %do;
+            %put ERROR: 前置依赖缺失，请先加载宏程序 %nrstr(%%)mix_cw_font;
+            %goto exit;
+        %end;
+
+        %mix_cw_font(rtf = "&vd:\&out", out = "&vd:\&out", cfont = &cfont, wfont = &wfont, debug = &debug);
     %end;
 
 

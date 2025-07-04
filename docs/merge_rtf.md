@@ -20,6 +20,9 @@
 - [merge](#merge)
 - [merged_file_show](#merged_file_show)
 - [link_to_prev](#link_to_prev)
+- [mix_cw_font](#mix_cw_font)
+- [cfont](#cfont)
+- [wfont](#wfont)
 
 ### 调试参数
 
@@ -277,6 +280,36 @@ rtf_list = rtf_list_copy.txt
 
 ---
 
+### mix_cw_font
+
+**Syntax** : `true` | `false`
+
+指定合并之后是否需要修改中文和西文的字体。
+
+`mix_cw_font` 指定为 `true` 时，将调用 [%mix_cw_font](mix_cw_font.md)，并传入参数 [cfont](#cfont)、[wfont](#wfont)、[debug](#debug)。
+
+**Default** : `false`
+
+---
+
+### cfont
+
+用法同 [cfont](mix_cw_font.md#cfont)
+
+> [!NOTE]
+>
+> `mix_cw_font = false` 时，参数 `cfont` 无效。
+
+### wfont
+
+用法同 [wfont](mix_cw_font.md#wfont)
+
+> [!NOTE]
+>
+> `mix_cw_font = false` 时，参数 `wfont` 无效。
+
+---
+
 ### debug
 
 **Syntax** : `true` | `false`
@@ -429,4 +462,6 @@ MD5 的计算很快，增加的运算时间完全可以通过需比较字符串�
 %merge_rtf("~\TFL", out = merged.rtf, depth = 2, vd = Y, merge = false);
 
 %merge_rtf("~\TFL", out = merged.rtf, rtf_list = rtf_list_copy.txt);
+
+%merge_rtf("~\TFL", out = merged.rtf, rtf_list = rtf_list_copy.txt, mix_cw_font = true, cfont = simsun);
 ```
