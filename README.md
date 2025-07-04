@@ -18,6 +18,7 @@
 | `%ReadRTF`  | 数据行存在非打印字符 `\x08-\x0d` 导致资源耗尽                                            | [#85](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/85)                                                               |
 | `%ReadRTF`  | 数据行存在转义字符 `\{`, `\}`, `\\` 未处理                                               | [#86](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/86), [#88](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/88) |
 | `%ReadRTF`  | 数据行存在缩进控制字 `\ri`, `\fi` 未处理                                                 | [#87](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/87)                                                               |
+| `%ReadRTF`  | 在超长字符串上递归过深导致堆栈溢出                                                       | [#89](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/89)                                                               |
 
 ## 简介
 
