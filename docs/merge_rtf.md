@@ -20,9 +20,9 @@
 - [merge](#merge)
 - [merged_file_show](#merged_file_show)
 - [link_to_prev](#link_to_prev)
-- [mix_cw_font]()
-- [cfont]()
-- [wfont]()
+- [mix_cw_font](#mix_cw_font)
+- [cfont](#cfont)
+- [wfont](#wfont)
 
 ### 调试参数
 
@@ -462,4 +462,6 @@ MD5 的计算很快，增加的运算时间完全可以通过需比较字符串�
 %merge_rtf("~\TFL", out = merged.rtf, depth = 2, vd = Y, merge = false);
 
 %merge_rtf("~\TFL", out = merged.rtf, rtf_list = rtf_list_copy.txt);
+
+%merge_rtf("~\TFL", out = merged.rtf, rtf_list = rtf_list_copy.txt, mix_cw_font = true, cfont = simsun);
 ```
