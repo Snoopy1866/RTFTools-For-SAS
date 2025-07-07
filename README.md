@@ -20,6 +20,7 @@
 | `%ReadRTF`   | 数据行存在缩进控制字 `\ri`, `\fi` 未处理                                                 | [#87](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/87)                                                               |
 | `%ReadRTF`   | 在超长字符串上递归过深导致堆栈溢出                                                       | [#89](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/89)                                                               |
 | `%MixCWFont` | 在超长字符串上递归过深导致堆栈溢出                                                       | [#91](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/91)                                                               |
+| `%MixCWFont` | 未指定 `cfont`, `wfont` 且 `out` 的值不是 `#auto` 时，结束程序前没有删除复制的 rtf 文件  | [#94](https://github.com/Snoopy1866/sas-rtf-toolkit/pull/94)                                                               |
 
 ## 简介
 
