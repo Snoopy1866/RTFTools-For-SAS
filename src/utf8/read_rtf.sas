@@ -363,7 +363,7 @@ options cmplib = sasuser.func;
             set _tmp_rtf_raw;
             reg_rtf_del_ctrl_id   = prxparse("s/(?:&reg_ctrl)\s*//o");
             reg_rtf_del_ctrl_id_4 = prxparse("s/(?:&reg_ctrl_4)\s*/$1/o");
-            reg_rtf_del_ctrl_id_5 = prxparse("s/(?:&reg_ctrl_5)\s*/$1/o");
+            reg_rtf_del_ctrl_id_5 = prxparse("s/(?:&reg_ctrl_5)/$1/o");
             if flag_header = "Y" or flag_data = "Y" then do;
                 context_raw = prxchange(reg_rtf_del_ctrl_id,   -1, strip(context_raw));
                 context_raw = prxchange(reg_rtf_del_ctrl_id_4, -1, strip(context_raw));
