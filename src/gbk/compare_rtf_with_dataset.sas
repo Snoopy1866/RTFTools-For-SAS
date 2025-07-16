@@ -9,6 +9,7 @@
                                 ignore_empty_column       = true,
                                 ignore_half_or_full_width = false,
                                 ignore_embedded_blank     = false,
+                                empty_placeholder_text    = %str(未发生),
                                 debug                     = false
                                 ) / parmbuff;
 
@@ -92,11 +93,28 @@
     %end;
 
 
-    /*3. 复制 dataset，使用 sql into 语句创建宏变量*/
+    /*3. 复制 dataset*/
     data _tmp_dataset;
         set &dataset;
     run;
 
+
+    /*4. 检查是否为空表*/
+    proc sql noprint;
+        select nobs, nvar into :rtf_nobs,     :rtf_nvar     from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_RTF";
+        select nobs, nvar into :dataset_nobs, :dataset_nvar from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_DATASET";
+        %if &rtf_nobs = 1 and &rtf_nvar = 1 and &dataset_nobs = 0 %then %do;
+            select COL1 into :rtf_only_one_row_text from _tmp_rtf;
+
+            %if %bquote(&rtf_only_one_row_text) = %bquote(&empty_placeholder_text) %then %do;
+                %put NOTE: 数据集和 RTF 文件均为空表，无需比较！;
+                %goto exit;
+            %end;
+        %end;
+    quit;
+
+
+    /*5. 使用 sql into 语句创建宏变量*/
     proc sql noprint;
         select name into : dataset_col_1- from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_DATASET"; /*dataset 变量名*/
         %let dataset_col_n = &SQLOBS;
@@ -115,8 +133,8 @@
     quit;
 
 
-    /*4. 预处理*/
-    /*4.1 dataset 将数值转换成字符串*/
+    /*6. 预处理*/
+    /*6.1 dataset 将数值转换成字符串*/
     proc sql noprint;
         create table _tmp_dataset_char_ver as
             select
@@ -133,7 +151,7 @@
             from _tmp_dataset;
     quit;
 
-    /*4.2 dataset 忽略CRLF字符*/
+    /*6.2 dataset 忽略CRLF字符*/
     %if %upcase(&ignore_crlf) = TRUE %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -143,7 +161,7 @@
         run;
     %end;
 
-    /*4.3 dataset 忽略前置空格*/
+    /*6.3 dataset 忽略前置空格*/
     %if %upcase(&ignore_lead_blank) = TRUE %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -153,7 +171,7 @@
         run;
     %end;
 
-    /*4.4 rtf 忽略全角半角符号*/
+    /*6.4 rtf 忽略全角半角符号*/
     %if %upcase(&ignore_half_or_full_width) = TRUE %then %do;
         %let half_or_full_width_translation = %nrstr(
                                                     /*标点符号（不含引号）*/
@@ -226,7 +244,7 @@
         run;
     %end;
 
-    /*4.5 忽略内嵌空格*/
+    /*6.5 忽略内嵌空格*/
     %if %upcase(&ignore_embedded_blank = true) %then %do;
         data _tmp_dataset_char_ver;
             set _tmp_dataset_char_ver;
@@ -243,7 +261,7 @@
         run;
     %end;
 
-    /*4.6 rtf 忽略空列*/
+    /*6.6 rtf 忽略空列*/
     %if %upcase(&ignore_empty_column) = TRUE %then %do;
         %if &rtf_col_eq1_n > 0 %then %do;
             %do i = 1 %to &rtf_col_eq1_n;
@@ -259,7 +277,7 @@
     %end;
 
 
-    /*5. 同步变量名*/
+    /*7. 同步变量名*/
     proc sql noprint;
         select name into : rtf_col_1-     from DICTIONARY.COLUMNS where libname = "WORK" and memname = "_TMP_RTF"; /*rtf 变量名*/
         %let rtf_col_n = &SQLOBS;
@@ -282,13 +300,13 @@
     %end;
 
 
-    /*6. 比较 RTF 文件与数据集*/
+    /*8. 比较 RTF 文件与数据集*/
     proc compare base = _tmp_rtf_rename compare = _tmp_dataset_char_ver;
     run;
 
 
     %exit:
-    /*7. 清除中间数据集*/
+    /*9. 清除中间数据集*/
     %if %upcase(&debug) = FALSE %then %do;
         proc datasets library = work nowarn noprint;
             delete _tmp_rtf
