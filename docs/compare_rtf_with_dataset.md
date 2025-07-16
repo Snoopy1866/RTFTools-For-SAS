@@ -22,6 +22,7 @@
 - [ignore_empty_column](#ignore_empty_column)
 - [ignore_half_or_full_width](#ignore_half_or_full_width)
 - [ignore_embedded_blank](#ignore_embedded_blank)
+- [empty_placeholder_text](#empty_placeholder_text)
 
 ### 调试参数
 
@@ -257,6 +258,24 @@ ignore_half_or_full_width = true
 
 ```sas
 ignore_embedded_blank = true
+```
+
+---
+
+### empty_placeholder_text
+
+**Syntax** : _string_
+
+指定空表占位字符串。
+
+当 [dataset](#dataset) 为空表时，如果 [rtf](#rtf) 文件中的表格只有一行一列，即只有一个单元格，且这个单元格中的文本内容与参数 [empty_placeholder_text](#empty_placeholder_text) 指定的值完全一致时，则认为数据集与 RTF 文件内容一致，无需进一步比较。
+
+**Default** : `未发生`
+
+**Example** :
+
+```sas
+empty_placeholder_text = %str(无)
 ```
 
 ---
