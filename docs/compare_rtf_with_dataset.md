@@ -268,7 +268,7 @@ ignore_embedded_blank = true
 
 指定空表占位字符串。
 
-当 [dataset](#dataset) 为空表时，如果 [rtf](#rtf) 文件中的表格只有一行一列，即只有一个单元格，且这个单元格中的文本内容与参数 [empty_placeholder_text](#empty_placeholder_text) 指定的值完全一致时，则认为数据集与 RTF 文件内容一致，无需进一步比较。
+当 [dataset](#dataset) 为空表时，如果 [rtf](#rtf) 文件中的表格只有一行一列，即只有一个单元格，且这个单元格中的文本内容与参数 [empty_placeholder_text](#empty_placeholder_text) 指定的值完全一致时，则认为 [dataset](#dataset) 与 [rtf](#rtf) 文件内容一致，无需进一步比较。
 
 **Default** : `未发生`
 
