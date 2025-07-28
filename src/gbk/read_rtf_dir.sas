@@ -20,19 +20,18 @@ options cmplib = sasuser.func;
 
     /*¼ì²âÐéÄâ´ÅÅÌÅÌ·ûÊ¹ÓÃ×´Ì¬*/
     %let is_disk_symbol_all_used = FALSE;
-    filename dlist pipe "wmic logicaldisk get deviceid";
-    data a;
-        infile dlist truncover end = end;
-        input disk_symbol $1.;
-        retain unused_disk_symbol 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        unused_disk_symbol = transtrn(unused_disk_symbol, disk_symbol, trimn(''));
-        if end then do;
-            if length(unused_disk_symbol) = 0 then do;
-                call symputx('is_disk_symbol_all_used', 'TRUE');
-            end;
-            else do;
-                call symputx('unused_disk_symbol', unused_disk_symbol);
-            end;
+    filename dinfo pipe "fsutil fsinfo drives";
+    data _null_;
+        infile dinfo truncover firstobs = 2 end = end;
+        input @"Çý¶¯Æ÷:" disk_symbol $200.;
+
+        disk_symbol = compress(disk_symbol, ":\ ");
+        unused_disk_symbol = compress('ABCDEFGHIJKLMNOPQRSTUVWXYZ', disk_symbol);
+        if length(unused_disk_symbol) = 0 then do;
+            call symputx('is_disk_symbol_all_used', 'TRUE');
+        end;
+        else do;
+            call symputx('unused_disk_symbol', unused_disk_symbol);
         end;
     run;
 

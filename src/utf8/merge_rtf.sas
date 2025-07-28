@@ -63,19 +63,18 @@
     /*2. 建立虚拟磁盘*/
     %if %sysmexecname(%sysmexecdepth - 1) ^= MERGE_RTF %then %do;
         %let is_disk_symbol_all_used = FALSE;
-        filename dlist pipe "wmic logicaldisk get deviceid";
+        filename dinfo pipe "fsutil fsinfo drives";
         data _null_;
-            infile dlist truncover end = end;
-            input disk_symbol $1.;
-            retain unused_disk_symbol 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            unused_disk_symbol = transtrn(unused_disk_symbol, disk_symbol, trimn(''));
-            if end then do;
-                if length(unused_disk_symbol) = 0 then do;
-                    call symputx('is_disk_symbol_all_used', 'TRUE');
-                end;
-                else do;
-                    call symputx('unused_disk_symbol', unused_disk_symbol);
-                end;
+            infile dinfo truncover firstobs = 2 end = end;
+            input @"驱动器:" disk_symbol $200.;
+
+            disk_symbol = compress(disk_symbol, ":\ ");
+            unused_disk_symbol = compress('ABCDEFGHIJKLMNOPQRSTUVWXYZ', disk_symbol);
+            if length(unused_disk_symbol) = 0 then do;
+                call symputx('is_disk_symbol_all_used', 'TRUE');
+            end;
+            else do;
+                call symputx('unused_disk_symbol', unused_disk_symbol);
             end;
         run;
 
