@@ -101,8 +101,8 @@
 
     /*4. 检查是否为空表*/
     proc sql noprint;
-        select nobs, nvar into :rtf_nobs,     :rtf_nvar     from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_RTF";
-        select nobs, nvar into :dataset_nobs, :dataset_nvar from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_DATASET";
+        select nlobs, nvar into :rtf_nobs,     :rtf_nvar     from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_RTF";
+        select nlobs, nvar into :dataset_nobs, :dataset_nvar from DICTIONARY.TABLES where libname = "WORK" and memname = "_TMP_DATASET";
         %if &rtf_nobs = 1 and &rtf_nvar = 1 and &dataset_nobs = 0 %then %do;
             select COL1 into :rtf_only_one_row_text from _tmp_rtf;
 
