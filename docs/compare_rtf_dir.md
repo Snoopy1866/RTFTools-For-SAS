@@ -24,6 +24,7 @@
 - [ignore_font_table](#ignore_font_table)
 - [ignore_font_size](#ignore_font_size)
 - [ignore_color_table](#ignore_color_table)
+- [ignore_page_information](#ignore_page_information)
 - [outdata](#outdata)
 
 ### 调试参数
@@ -117,6 +118,12 @@ compare_dir = cdir
 ### ignore_color_table
 
 用法同 [ignore_color_table](./compare_rtf.md#ignore_color_table)
+
+---
+
+### ignore_page_information
+
+用法同 [ignore_page_information](./compare_rtf.md#ignore_page_information)
 
 ---
 
