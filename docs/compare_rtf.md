@@ -18,6 +18,7 @@
 - [ignore_footer](#ignore_footer)
 - [ignore_cell_style](#ignore_cell_style)
 - [ignore_font_table](#ignore_font_table)
+- [ignore_font_size](#ignore_font_size)
 - [ignore_color_table](#ignore_color_table)
 - [outdata](#outdata)
 
@@ -153,6 +154,22 @@ ignore_cell_style = false
 
 ```sas
 ignore_font_table = false
+```
+
+---
+
+### ignore_font_size
+
+**Syntax** : `true` | `false`
+
+指定是否忽略字体大小。
+
+**Default** : `true`
+
+**Example** :
+
+```sas
+ignore_font_size = false
 ```
 
 ---
