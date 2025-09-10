@@ -4,15 +4,16 @@
 
 %macro compare_rtf(base,
                    compare,
-                   outdata            = diff,
-                   ignore_create_time = true,
-                   ignore_header      = true,
-                   ignore_footer      = true,
-                   ignore_cell_style  = true,
-                   ignore_font_table  = true,
-                   ignore_font_size   = true,
-                   ignore_color_table = true,
-                   debug              = false
+                   outdata                 = diff,
+                   ignore_create_time      = true,
+                   ignore_header           = true,
+                   ignore_footer           = true,
+                   ignore_cell_style       = true,
+                   ignore_font_table       = true,
+                   ignore_font_size        = true,
+                   ignore_color_table      = true,
+                   ignore_page_information = true,
+                   debug                   = false
                    ) / parmbuff;
 
     /*打开帮助文档*/
@@ -339,6 +340,25 @@
             reg_font_size_id = prxparse("&reg_font_size_expr");
 
             line = prxchange(reg_font_size_id, -1, strip(line));
+        run;
+    %end;
+
+    /*3.8 忽略页面信息*/
+    %if %upcase(&ignore_page_information) = TRUE %then %do;
+        %let reg_page_information_expr = %bquote(s/(?:\\paper[wh]|\\pg[wh]sxn)\d+|\\lndscpsxn//o);
+
+        data _tmp_rtf_data_base;
+            set _tmp_rtf_data_base;
+            reg_page_information_id = prxparse("&reg_page_information_expr");
+
+            line = prxchange(reg_page_information_id, -1, strip(line));
+        run;
+
+        data _tmp_rtf_data_compare;
+            set _tmp_rtf_data_compare;
+            reg_page_information_id = prxparse("&reg_page_information_expr");
+
+            line = prxchange(reg_page_information_id, -1, strip(line));
         run;
     %end;
 
