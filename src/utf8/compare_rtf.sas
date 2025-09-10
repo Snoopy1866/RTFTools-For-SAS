@@ -10,6 +10,7 @@
                    ignore_footer      = true,
                    ignore_cell_style  = true,
                    ignore_font_table  = true,
+                   ignore_font_size   = true,
                    ignore_color_table = true,
                    debug              = false
                    ) / parmbuff;
@@ -319,6 +320,25 @@
             reg_cellstyle_id = prxparse("&reg_cellstyle_expr");
 
             if prxmatch(reg_cellstyle_id, strip(line)) then delete;
+        run;
+    %end;
+
+    /*3.7 忽略字体大小*/
+    %if %upcase(&ignore_font_size) = TRUE %then %do;
+        %let reg_font_size_expr = %bquote(s/\\fs\d+//o);
+
+        data _tmp_rtf_data_base;
+            set _tmp_rtf_data_base;
+            reg_font_size_id = prxparse("&reg_font_size_expr");
+
+            line = prxchange(reg_font_size_id, -1, strip(line));
+        run;
+
+        data _tmp_rtf_data_compare;
+            set _tmp_rtf_data_compare;
+            reg_font_size_id = prxparse("&reg_font_size_expr");
+
+            line = prxchange(reg_font_size_id, -1, strip(line));
         run;
     %end;
 
