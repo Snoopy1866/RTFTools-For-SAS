@@ -20,6 +20,7 @@
 - [ignore_font_table](#ignore_font_table)
 - [ignore_font_size](#ignore_font_size)
 - [ignore_color_table](#ignore_color_table)
+- [ignore_page_information](#ignore_page_information)
 - [outdata](#outdata)
 
 ### 调试参数
@@ -190,6 +191,28 @@ ignore_font_size = false
 
 ```sas
 ignore_color_table = false
+```
+
+---
+
+### ignore_page_information
+
+**Syntax** : `true` | `false`
+
+指定是否忽略页面信息，支持的控制字如下：
+
+- \paperw*N*
+- \paperh*N*
+- \pgwsxn*N*
+- \pghsxn*N*
+- \lndscpsxn
+
+**Default** : `true`
+
+**Example** :
+
+```sas
+ignore_page_information = false
 ```
 
 ---
