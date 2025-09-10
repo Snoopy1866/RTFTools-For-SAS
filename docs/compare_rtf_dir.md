@@ -22,6 +22,7 @@
 - [ignore_footer](#ignore_footer)
 - [ignore_cell_style](#ignore_cell_style)
 - [ignore_font_table](#ignore_font_table)
+- [ignore_font_size](#ignore_font_size)
 - [ignore_color_table](#ignore_color_table)
 - [outdata](#outdata)
 
@@ -104,6 +105,12 @@ compare_dir = cdir
 ### ignore_font_table
 
 用法同 [ignore_font_table](./compare_rtf.md#ignore_font_table)
+
+---
+
+### ignore_font_size
+
+用法同 [ignore_font_size](./compare_rtf.md#ignore_font_size)
 
 ---
 
