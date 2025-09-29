@@ -13,6 +13,7 @@
                    ignore_font_size        = true,
                    ignore_color_table      = true,
                    ignore_page_information = true,
+                   ignore_line_break       = true,
                    debug                   = false
                    ) / parmbuff;
 
@@ -362,9 +363,85 @@
         run;
     %end;
 
+    /*3.9 忽略软回车换行符*/
+    %if %upcase(&ignore_line_break) = TRUE %then %do;
+        data _tmp_rtf_data_base;
+            set _tmp_rtf_data_base;
+
+            len = length(line);
+
+            length break_line $32767.;
+
+            reg_header_break_id = prxparse("/^(\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*(?:\\fs\d*)?\\cf\d*\{.*){\\line}$/o");
+            reg_header_break_continue_id = prxparse("/^(.*){\\line}$/o");
+            reg_header_break_end_id = prxparse("/^(.*\\cell})$/o");
+
+            retain break_line "";
+            retain break_line_found 0;
+
+            if prxmatch(reg_header_break_id, strip(line)) then do; /*发现表头出现折行问题*/
+                break_line = catt(break_line, prxposn(reg_header_break_id, 1, strip(line)));
+                break_line_found = 1;
+                delete;
+            end;
+            else if prxmatch(reg_header_break_continue_id, strip(line)) then do; /*发现连续折行*/
+                if break_line_found = 1 then do;
+                    break_line = catt(break_line, prxposn(reg_header_break_continue_id, 1, strip(line)));
+                    delete;
+                end;
+            end;
+            else if prxmatch(reg_header_break_end_id, strip(line)) then do; /*折行结束*/
+                if break_line_found = 1 then do;
+                    break_line = catt(break_line, prxposn(reg_header_break_end_id, 1, strip(line)));
+                    line = break_line;
+
+                    break_line_found = 0;
+                    break_line = "";
+                end;
+            end;
+        run;
+
+        data _tmp_rtf_data_compare;
+            set _tmp_rtf_data_compare;
+
+            len = length(line);
+
+            length break_line $32767.;
+
+            reg_header_break_id = prxparse("/^(\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*(?:\\fs\d*)?\\cf\d*\{.*){\\line}$/o");
+            reg_header_break_continue_id = prxparse("/^(.*){\\line}$/o");
+            reg_header_break_end_id = prxparse("/^(.*\\cell})$/o");
+
+            retain break_line "";
+            retain break_line_found 0;
+
+            if prxmatch(reg_header_break_id, strip(line)) then do; /*发现表头出现折行问题*/
+                break_line = catt(break_line, prxposn(reg_header_break_id, 1, strip(line)));
+                break_line_found = 1;
+                delete;
+            end;
+            else if prxmatch(reg_header_break_continue_id, strip(line)) then do; /*发现连续折行*/
+                if break_line_found = 1 then do;
+                    break_line = catt(break_line, prxposn(reg_header_break_continue_id, 1, strip(line)));
+                    delete;
+                end;
+            end;
+            else if prxmatch(reg_header_break_end_id, strip(line)) then do; /*折行结束*/
+                if break_line_found = 1 then do;
+                    break_line = catt(break_line, prxposn(reg_header_break_end_id, 1, strip(line)));
+                    line = break_line;
+
+                    break_line_found = 0;
+                    break_line = "";
+                end;
+            end;
+        run;
+    %end;
+
 
     /*4. 比较新旧数据集*/
     proc compare base = _tmp_rtf_data_base compare = _tmp_rtf_data_compare noprint;
+        var line;
     run;
 
 

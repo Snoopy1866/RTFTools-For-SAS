@@ -4,14 +4,17 @@
 
 %macro compare_rtf_dir(base_dir,
                        compare_dir,
-                       ignore_create_time = true,
-                       ignore_header      = true,
-                       ignore_footer      = true,
-                       ignore_cell_style  = true,
-                       ignore_font_table  = true,
-                       ignore_color_table = true,
-                       outdata            = diff,
-                       debug              = false
+                       ignore_create_time      = true,
+                       ignore_header           = true,
+                       ignore_footer           = true,
+                       ignore_cell_style       = true,
+                       ignore_font_table       = true,
+                       ignore_font_size        = true,
+                       ignore_color_table      = true,
+                       ignore_page_information = true,
+                       ignore_line_break       = true,
+                       outdata                 = diff,
+                       debug                   = false
                        ) / parmbuff;
 
     /*´ò¿ª°ïÖúÎÄµµ*/
@@ -162,7 +165,10 @@
                                            ', ignore_footer = ' || "&ignore_footer" ||
                                            ', ignore_cell_style = ' || "&ignore_cell_style" ||
                                            ', ignore_font_table = ' || "&ignore_font_table" ||
+                                           ', ignore_font_size = ' || "&ignore_font_size" ||
                                            ', ignore_color_table = ' || "&ignore_color_table" ||
+                                           ', ignore_page_information = ' || "&ignore_page_information" ||
+                                           ', ignore_line_break = ' || "&ignore_line_break" ||
                                            ', outdata = _tmp_diff_' || strip(n) || '));');
         end;
         call symputx("diff_n_max", n);

@@ -21,6 +21,7 @@
 - [ignore_font_size](#ignore_font_size)
 - [ignore_color_table](#ignore_color_table)
 - [ignore_page_information](#ignore_page_information)
+- [ignore_line_break](#ignore_line_break)
 - [outdata](#outdata)
 
 ### 调试参数
@@ -213,6 +214,26 @@ ignore_color_table = false
 
 ```sas
 ignore_page_information = false
+```
+
+---
+
+### ignore_line_break
+
+**Syntax** : `true` | `false`
+
+指定是否忽略软回车换行符
+
+> [!NOTE]
+>
+> 软回车换行符在 RTF 中用控制字 `\line` 表示。
+
+**Default** : `true`
+
+**Example** :
+
+```sas
+ignore_line_break = false
 ```
 
 ---
