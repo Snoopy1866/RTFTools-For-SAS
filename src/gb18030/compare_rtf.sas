@@ -28,7 +28,11 @@
     %let reg_file_id = %sysfunc(prxparse(%superq(reg_file_expr)));
 
     /*base*/
-    %if %sysfunc(prxmatch(&reg_file_id, %superq(base))) %then %do;
+    %if %superq(base) = %bquote() %then %do;
+        %put ERROR: BASE 参数为空！;
+        %goto exit;
+    %end;
+    %else %if %sysfunc(prxmatch(&reg_file_id, %superq(base))) %then %do;
         %let base_ref = %sysfunc(prxposn(&reg_file_id, 1, %superq(base)));
         %let base_loc = %sysfunc(prxposn(&reg_file_id, 2, %superq(base)));
 
@@ -61,7 +65,11 @@
     %end;
 
     /*compare*/
-    %if %sysfunc(prxmatch(&reg_file_id, %superq(compare))) %then %do;
+    %if %superq(compare) = %bquote() %then %do;
+        %put ERROR: COMPARE 参数为空！;
+        %goto exit;
+    %end;
+    %else %if %sysfunc(prxmatch(&reg_file_id, %superq(compare))) %then %do;
         %let compare_ref = %sysfunc(prxposn(&reg_file_id, 1, %superq(compare)));
         %let compare_loc = %sysfunc(prxposn(&reg_file_id, 2, %superq(compare)));
 
