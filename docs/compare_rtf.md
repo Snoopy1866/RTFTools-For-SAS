@@ -206,6 +206,16 @@ ignore_color_table = false
 - \paperh*N*
 - \pgwsxn*N*
 - \pghsxn*N*
+- \margl*N*
+- \margr*N*
+- \margt*N*
+- \margb*N*
+- \marglsxn*N*
+- \margrsxn*N*
+- \margtsxn*N*
+- \margbsxn*N*
+- \headery*N*
+- \footery*N*
 - \lndscpsxn
 
 **Default** : `true`

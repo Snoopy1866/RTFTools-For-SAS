@@ -354,7 +354,7 @@
 
     /*3.8 ∫ˆ¬‘“≥√Ê–≈œ¢*/
     %if %upcase(&ignore_page_information) = TRUE %then %do;
-        %let reg_page_information_expr = %bquote(s/(?:\\paper[wh]|\\pg[wh]sxn)\d+|\\lndscpsxn//o);
+        %let reg_page_information_expr = %bquote(s/(?:\\paper[wh]|\\pg[wh]sxn)\d+|\\marg[lrtb](?:sxn)?\d+|\\headery\d+|\\footery\d+|\\lndscpsxn//o);
 
         data _tmp_rtf_data_base;
             set _tmp_rtf_data_base;
