@@ -26,6 +26,8 @@
 - [ignore_color_table](#ignore_color_table)
 - [ignore_page_information](#ignore_page_information)
 - [ignore_line_break](#ignore_line_break)
+- [ignore_standalone_chars](#ignore_standalone_chars)
+- [standalone_chars](#standalone_chars)
 - [outdata](#outdata)
 
 ### 调试参数
@@ -133,6 +135,14 @@ compare_dir = cdir
 用法同 [ignore_line_break](./compare_rtf.md#ignore_line_break)
 
 ---
+
+### ignore_standalone_chars
+
+用法同 [ignore_standalone_chars](./compare_rtf.md#ignore_standalone_chars)
+
+### standalone_chars
+
+用法同 [standalone_chars](./compare_rtf.md#standalone_chars)
 
 ### outdata
 
