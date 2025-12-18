@@ -140,9 +140,13 @@ compare_dir = cdir
 
 用法同 [ignore_standalone_chars](./compare_rtf.md#ignore_standalone_chars)
 
+---
+
 ### standalone_chars
 
 用法同 [standalone_chars](./compare_rtf.md#standalone_chars)
+
+---
 
 ### outdata
 
