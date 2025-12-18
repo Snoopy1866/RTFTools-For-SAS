@@ -13,6 +13,8 @@
                        ignore_color_table      = true,
                        ignore_page_information = true,
                        ignore_line_break       = true,
+                       ignore_standalone_chars = false,
+                       standalone_chars        = %nrstr(-),
                        outdata                 = diff,
                        debug                   = false
                        ) / parmbuff;
@@ -169,6 +171,8 @@
                                            ', ignore_color_table = ' || "&ignore_color_table" ||
                                            ', ignore_page_information = ' || "&ignore_page_information" ||
                                            ', ignore_line_break = ' || "&ignore_line_break" ||
+                                           ', ignore_standalone_chars = ' || "%superq(ignore_standalone_chars)" ||
+                                           ', standalone_chars = ' || "%superq(standalone_chars)" ||
                                            ', outdata = _tmp_diff_' || strip(n) || '));');
         end;
         call symputx("diff_n_max", n);
