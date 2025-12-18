@@ -306,8 +306,8 @@ ignore_standalone_chars = true
 
 ```sas
 standalone_chars = %nrstr(!@#%&)
-standalone_chars = %nrstr(-\+\*\/\\\{\\\})
-standalone_chars = %nrstr(-\+\*\/\\\{\\\}\%()
+standalone_chars = %nrstr(-\+\*\/\\\{\\\}) -> -+*/{}
+standalone_chars = %nrstr(-\+\*\/\\\{\\\}\%() -> -+*/{}(
 ```
 
 ---
