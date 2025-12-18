@@ -22,6 +22,8 @@
 - [ignore_color_table](#ignore_color_table)
 - [ignore_page_information](#ignore_page_information)
 - [ignore_line_break](#ignore_line_break)
+- [ignore_standalone_chars](#ignore_standalone_chars)
+- [standalone_chars](#standalone_chars)
 - [outdata](#outdata)
 
 ### 调试参数
@@ -244,6 +246,68 @@ ignore_page_information = false
 
 ```sas
 ignore_line_break = false
+```
+
+---
+
+### ignore_standalone_chars
+
+指定是否忽略孤立字符
+
+> [!NOTE]
+>
+> `孤立字符` 指的是那些单元格中仅存的单个字符，在某些情况下出于格式要求，会用到孤立字符起到占位作用，例如 [Fisher 精确检验的统计量值](https://github.com/Snoopy1866/sas-summarize/blob/v2/docs/qualify_multi_test/readme.md#fisher_stat_ph)。
+
+**Syntax** : `true` | `false`
+
+**Default** : `false`
+
+**Example** :
+
+```sas
+ignore_standalone_chars = true
+```
+
+---
+
+### standalone_chars
+
+指定孤立字符集合
+
+**Syntax** : _charset_
+
+> [!IMPORTANT]
+>
+> 在 RTF、正则表达式、SAS 宏中有特殊含义的字符需要进行转义，具体转义规则如下：
+>
+> | 原始字符 | RTF 层转义 | Regex 层转义      | Macro 层转义              | 类型          |
+> | -------- | ---------- | ----------------- | ------------------------- | ------------- |
+> | `.`      | `.`        | `\.`              | `%nrstr(\.)`              | Regex         |
+> | `*`      | `*`        | `\*`              | `%nrstr(\*)`              | Regex         |
+> | `?`      | `?`        | `\?`              | `%nrstr(\?)`              | Regex         |
+> | `+`      | `+`        | `\+`              | `%nrstr(\+)`              | Regex         |
+> | `^`      | `^`        | `\^`              | `%nrstr(\^)`              | Regex         |
+> | `$`      | `$`        | `\$`              | `%nrstr(\$)`              | Regex         |
+> | `(`      | `(`        | `\(`              | `%nrstr(\%()`             | Regex + Macro |
+> | `)`      | `)`        | `\)`              | `%nrstr(\%))`             | Regex + Macro |
+> | `[`      | `[`        | `\[`              | `%nrstr(\[)`              | Regex         |
+> | `]`      | `]`        | `\]`              | `%nrstr(\])`              | Regex         |
+> | `{`      | `\{`       | `\\\{`            | `%nrstr(\\\{)`            | Regex + RTF   |
+> | `}`      | `\}`       | `\\\}`            | `%nrstr(\\\})`            | Regex + RTF   |
+> | `\|`     | `\|`       | <code>\\\|</code> | <code>%nrstr(\\\|)</code> | Regex         |
+> | `\`      | `\\`       | `\\\\`            | `%nrstr(\\\\)`            | Regex + RTF   |
+> | `/`      | `/`        | `\/`              | `%nrstr(\/)`              | Regex         |
+> | `'`      | `'`        | `'`               | `%nrstr(%')`              | Macro         |
+> | `"`      | `"`        | `"`               | `%nrstr(%")`              | Macro         |
+
+**Default** : `%nrstr(-)`
+
+**Example** :
+
+```sas
+standalone_chars = %nrstr(!@#%&)
+standalone_chars = %nrstr(-\+\*\/\\\{\\\}) -> -+*/{}
+standalone_chars = %nrstr(-\+\*\/\\\{\\\}\%() -> -+*/{}(
 ```
 
 ---

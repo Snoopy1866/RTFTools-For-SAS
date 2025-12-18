@@ -14,6 +14,8 @@
                    ignore_color_table      = true,
                    ignore_page_information = true,
                    ignore_line_break       = true,
+                   ignore_standalone_chars = false,
+                   standalone_chars        = %nrstr(-),
                    debug                   = false
                    ) / parmbuff;
 
@@ -444,6 +446,33 @@
                 end;
             end;
         run;
+    %end;
+
+    /*3.10 忽略孤立字符*/
+    %if %upcase(&ignore_standalone_chars) = TRUE %then %do;
+        %if %superq(standalone_chars) = %bquote() %then %do;
+            %put ERROR: IGNORE_STANDALONE_CHARS = TRUE 时，STANDALONE_CHARS 的值不能为空！;
+            %goto exit;
+        %end;
+        %else %do;
+            %let reg_standalone_chars_expr = %bquote(s/(\\pard\\plain\\intbl(?:\\keepn)?\\sb\d*\\sa\d*\\q[lcr]\\f\d*(?:\\fs\d*)?\\cf\d*{)([%superq(standalone_chars)])(\\cell})/$1$3/o);
+
+            data _tmp_rtf_data_base;
+                set _tmp_rtf_data_base;
+
+                reg_standalone_chars_id = prxparse("&reg_standalone_chars_expr");
+
+                line = prxchange(reg_standalone_chars_id, -1, strip(line));
+            run;
+
+            data _tmp_rtf_data_compare;
+                set _tmp_rtf_data_compare;
+
+                reg_standalone_chars_id = prxparse("&reg_standalone_chars_expr");
+
+                line = prxchange(reg_standalone_chars_id, -1, strip(line));
+            run;
+        %end;
     %end;
 
 
