@@ -72,7 +72,7 @@ options cmplib = sasuser.func;
                 %goto exit;
             %end;
             %else %if %sysfunc(fileref(&rtf_ref)) = 0 %then %do;
-                %let fileloc = %qsysfunc(pathname(&rtf_ref, F));
+                %let rtf_loc = %qsysfunc(pathname(&rtf_ref, F));
             %end;
         %end;
 
