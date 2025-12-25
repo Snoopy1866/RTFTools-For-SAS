@@ -135,7 +135,7 @@ options cmplib = sasuser.func;
 
         if rtf_valid_flag = "Y" then do;
             call_macro_n + 1;
-            call_macro_expr = '%read_rtf(file = ' || strip(fileref) || ', outdata = ' || strip(outdata_name) || '(label = "' || strip(ref_label) || '"), compress = ' || "&compress" || ', del_rtf_ctrl = ' || "&del_rtf_ctrl" || ');';
+            call_macro_expr = '%read_rtf(rtf = ' || strip(fileref) || ', outdata = ' || strip(outdata_name) || '(label = "' || strip(ref_label) || '"), compress = ' || "&compress" || ', del_rtf_ctrl = ' || "&del_rtf_ctrl" || ');';
 
             call symputx(cats("call_macro_expr_", call_macro_n), call_macro_expr);
         end;
