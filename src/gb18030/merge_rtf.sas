@@ -595,7 +595,7 @@
 
     %exit:
     /*----------------临时调整日志等级------------------*/
-    proc nonotes;
+    options nonotes;
 
 
     /*删除临时数据集*/
@@ -611,7 +611,7 @@
 
     %exit_with_no_merge:
     /*----------------临时调整日志等级------------------*/
-    proc nonotes;
+    options nonotes;
 
 
     /*删除临时数据集*/
@@ -628,7 +628,7 @@
     
 
     /*----------------恢复日志等级------------------*/
-    proc notes;
+    options notes;
 
 
     /*删除 _tmp_rtf_list.txt*/
