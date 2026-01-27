@@ -144,7 +144,7 @@
         /*字体表未定义中文字体*/
         %if &SQLOBS = 0 %then %do;
             %let is_cw_font_found = FALSE;
-            X mshta vbscript:msgbox("未找到字体表中的中文字体，请手动指定参数 CFONT 为一个合适的中文字体名称！",4112,"提示")(window.close);
+            X powershell -Command "$ws = New-Object -ComObject WScript.Shell; $result = $ws.Popup('未找到字体表中的中文字体，请手动指定参数 CFONT 为一个合适的中文字体名称！', 0, '提示', 0+16+4096)";
         %end;
     %end;
     %else %do;
@@ -173,7 +173,7 @@
         /*字体表未定义西文字体*/
         %if &SQLOBS = 0 %then %do;
             %let is_cw_font_found = FALSE;
-            X mshta vbscript:msgbox("未找到字体表中的西文字体，请手动指定参数 WFONT 为一个合适的西文字体名称！",4112,"提示")(window.close);
+            X powershell -Command "$ws = New-Object -ComObject WScript.Shell; $result = $ws.Popup('未找到字体表中的西文字体，请手动指定参数 WFONT 为一个合适的西文字体名称！', 0, '提示', 0+16+4096)";
         %end;
     %end;
     %else %do;
