@@ -191,7 +191,7 @@
         %end;
         %else %if %upcase(&auto_order) = FALSE %then %do; /*手动排序*/
             X explorer "&vd:\_tmp_rtf_list.txt";
-            X mshta vbscript:msgbox("请在弹出的窗口中手动调整 RTF 文件的合并顺序，保存后回到此弹窗，按确认按钮继续。对于无需合并的 RTF 文件，您可以在对应行的开头使用 '//' 进行注释，或直接删除对应行，空行将被忽略。",4160,"提示")(window.close);
+            X powershell -Command "$ws = New-Object -ComObject WScript.Shell; $result = $ws.Popup('请在弹出的窗口中手动调整 RTF 文件的合并顺序，保存后回到此弹窗，按确认按钮继续。对于无需合并的 RTF 文件，您可以在对应行的开头使用 ''//'' 进行注释，或直接删除对应行，空行将被忽略。', 0, '提示', 0+64+4096)";
 
             /*手动排序后，保存一份副本，以供后续调用时指定参数 RTF_LIST = rtf_list_copy.txt*/
             X "copy ""&vd:\_tmp_rtf_list.txt"" ""&vd:\rtf_list_copy.txt"" & exit";
@@ -255,10 +255,8 @@
     %end;
 
 
-    /*----------------临时关闭日志输出------------------*/
-    proc printto log=_null_;
-    run;
-
+    /*----------------临时调整日志等级------------------*/
+    options nonotes;
 
     /*5. 构造 filename 语句，建立文件引用*/
     data _tmp_rtf_list_fnst;
@@ -285,7 +283,8 @@
     %else %do;
         %do i = 1 %to &rtf_ref_max;
             %if %sysfunc(fileref(rtf&i)) < 0 %then %do;
-                X mshta vbscript:msgbox("合并失败，文件 %qsysfunc(pathname(rtf&i, F)) 不存在！",4112,"提示")(window.close);
+                X powershell -Command "$ws = New-Object -ComObject WScript.Shell; $result = $ws.Popup('合并失败，文件 %qsysfunc(pathname(rtf&i, F)) 不存在！', 0, '提示', 0+16+4096)";
+
                 %goto exit_with_no_merge;
             %end;
             %else %do;
@@ -344,9 +343,8 @@
     %let unmergeable_rtf_sum = &unmergeable_rtf_index;
 
 
-    /*----------------恢复日志输出------------------*/
-    proc printto log=log;
-    run;
+    /*----------------恢复日志等级------------------*/
+    options notes;
 
 
     %if &mergeable_rtf_list = %bquote() %then %do;
@@ -358,9 +356,8 @@
         %put ERROR: 文件 %superq(unmergeable_rtf_file_&i) 似乎被修改了，已跳过该文件！;
     %end;
 
-    /*----------------临时关闭日志输出------------------*/
-    proc printto log=_null_;
-    run;
+    /*----------------临时调整日志等级------------------*/
+    options nonotes;
 
 
     /*9. 处理 rtf 文件*/
@@ -533,9 +530,8 @@
     run;
 
 
-    /*----------------恢复日志输出------------------*/
-    proc printto log=log;
-    run;
+    /*----------------恢复日志等级------------------*/
+    options notes;
 
 
     %do i = 1 %to &mergeable_rtf_ref_max;
@@ -590,17 +586,16 @@
     %let run_spend_time = %sysfunc(putn(%sysevalf(&run_end_time - &run_start_time), 8.2)); /*计算耗时*/
 
     %if %sysevalf(&mergeable_rtf_ref_max < &rtf_ref_max) %then %do;
-        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！部分已被修改的 rtf 文件未合并，请查看日志详情！",4144,"提示")(window.close);
+        X powershell -Command "$ws = New-Object -ComObject WScript.Shell; $result = $ws.Popup('合并成功，耗时 %superq(run_spend_time) s！部分已被修改的 rtf 文件未合并，请查看日志详情！', 0, '提示', 0+48+4096)";
     %end;
     %else %do;
-        X mshta vbscript:msgbox("合并成功，耗时 &run_spend_time s！",4160,"提示")(window.close);
+        X powershell -Command "$ws = New-Object -ComObject WScript.Shell; $result = $ws.Popup('合并成功，耗时 %superq(run_spend_time) s！', 0, '提示', 0+64+4096)";
     %end;
 
 
     %exit:
-    /*----------------临时关闭日志输出------------------*/
-    proc printto log=_null_;
-    run;
+    /*----------------临时调整日志等级------------------*/
+    options nonotes;
 
 
     /*删除临时数据集*/
@@ -615,9 +610,8 @@
 
 
     %exit_with_no_merge:
-    /*----------------临时关闭日志输出------------------*/
-    proc printto log=_null_;
-    run;
+    /*----------------临时调整日志等级------------------*/
+    options nonotes;
 
 
     /*删除临时数据集*/
@@ -633,9 +627,8 @@
     %end;
     
 
-    /*----------------恢复日志输出------------------*/
-    proc printto log=log;
-    run;
+    /*----------------恢复日志等级------------------*/
+    options notes;
 
 
     /*删除 _tmp_rtf_list.txt*/
