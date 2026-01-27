@@ -88,7 +88,7 @@
     X "del ""&rtf_loc.-copy"" & exit";
 
     %if &readrtf_exit_with_error = TRUE %then %do;
-        X mshta vbscript:msgbox("&readrtf_exit_with_error_text",4144,"错误信息")(window.close);
+        X powershell -Command "$ws = New-Object -ComObject WScript.Shell; $result = $ws.Popup('合并成功，耗时 %superq(readrtf_exit_with_error_text) s！', 0, '提示', 0+48+4096)";
         %goto exit;
     %end;
 
