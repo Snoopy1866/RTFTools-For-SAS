@@ -499,7 +499,12 @@
                 drop fst_sectd_found reg_sectd_id;
 
             %if %sysevalf(&i < &mergeable_rtf_ref_max) %then %do; /*删除末尾的 }（结尾的 rtf 文件保留 }）*/
-                if end then delete;
+                if end then do;
+                    if line = "}" then delete;
+                    else do;
+                        line = substr(line, 1, length(line) - 1); /*gh-114：不能直接删除末尾整行，应当只删除末尾最后一个 } 字符*/
+                    end;
+                end;
             %end;
         run;
 
