@@ -204,7 +204,7 @@ rtf_list = rtf_list_copy.txt
 
 指定一个正则表达式 _regex_，若子目录相对 [dir](#dir) 的路径可以匹配 _regex_，则该目录下的 RTF 文件将不会被合并。
 
-假设 [dir](#dir) 指定的目录为 `D:\Project\TFL`，该目录结构如下：
+举例：假设 [dir](#dir) 指定的目录为 `D:\Project\TFL`，该目录结构如下：
 
 ```
 D:.
