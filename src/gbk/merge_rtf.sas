@@ -3,19 +3,20 @@
 */
 
 %macro merge_rtf(dir,
-                 out              = #auto,
-                 rtf_list         = #null,
-                 depth            = max,
-                 auto_order       = true,
-                 exclude          = #null,
-                 vd               = #auto,
-                 merge            = true,
-                 merged_file_show = short,
-                 link_to_prev     = false,
-                 mix_cw_font      = false,
-                 cfont            = #auto,
-                 wfont            = #auto,
-                 debug            = false
+                 out                = #auto,
+                 rtf_list           = #null,
+                 depth              = max,
+                 auto_order         = true,
+                 exclude_dir_regex  = #null,
+                 exclude_file_regex = #null,
+                 vd                 = #auto,
+                 merge              = true,
+                 merged_file_show   = short,
+                 link_to_prev       = false,
+                 mix_cw_font        = false,
+                 cfont              = #auto,
+                 wfont              = #auto,
+                 debug              = false
                 ) / parmbuff;
 
     /*打开帮助文档*/
@@ -127,6 +128,9 @@
                     rtf_filename_valid_flag = "Y";
                 end;
 
+                /*文件所在目录*/
+                rtf_dir_path = prxchange("s/[A-Z]:(.+)\\[^\\]+\.rtf/$1/", 1, rtf_path);
+
                 /*文件类型衍生编码*/
                 select (rtf_type);
                     when ("表") rtf_type_n = 1;
@@ -146,6 +150,14 @@
                 %else %do;
                     if rtf_dir_depth <= &depth then do;
                         rtf_depth_valid_flag = "Y";
+                    end;
+                %end;
+
+                /*排除指定文件夹的 rtf 文件*/
+                %if %qupcase(&exclude_dir_regex) ^= #NULL %then %do;
+                    reg_exclude_dir = prxparse("/%superq(exclude_dir_regex)/o");
+                    if prxmatch(reg_exclude_dir, rtf_dir_path) or prxmatch(reg_exclude_dir, substr(rtf_dir_path, 2)) then do;
+                        rtf_exclude_dir_flag = "Y";
                     end;
                 %end;
             run;
@@ -233,6 +245,7 @@
 
             rtf_filename_valid_flag = "Y";
             rtf_depth_valid_flag = "Y";
+            rtf_exclude_dir_flag = "";
         run;
     %end;
 
@@ -248,8 +261,9 @@
                   rtf_path_real = "物理磁盘路径"
                   rtf_name = "文件名"
                   rtf_filename_valid_flag = "文件名是否规范"
-                  rtf_depth_valid_flag = "文件是否在指定深度内";
-            keep rtf_name rtf_path rtf_path_real rtf_filename_valid_flag rtf_depth_valid_flag;
+                  rtf_depth_valid_flag = "文件是否在指定深度内"
+                  rtf_exclude_dir_flag = "是否在排除目录中";
+            keep rtf_name rtf_path rtf_path_real rtf_filename_valid_flag rtf_depth_valid_flag rtf_exclude_dir_flag;
         run;
         %goto exit_with_no_merge;
     %end;
@@ -260,7 +274,7 @@
 
     /*5. 构造 filename 语句，建立文件引用*/
     data _tmp_rtf_list_fnst;
-        set _tmp_rtf_list_add_lv_sorted(where = (rtf_filename_valid_flag = "Y" and rtf_depth_valid_flag = "Y")) end = end;
+        set _tmp_rtf_list_add_lv_sorted(where = (rtf_filename_valid_flag = "Y" and rtf_depth_valid_flag = "Y" and rtf_exclude_dir_flag ^= "Y")) end = end;
 
         fileref = 'rtf' || strip(put(_n_, 8.));
         fnstm = 'filename ' || strip(fileref) || ' "' || strip(rtf_path) || '";';

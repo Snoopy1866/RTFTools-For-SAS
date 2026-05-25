@@ -16,6 +16,7 @@
 - [rtf_list](#rtf_list)
 - [depth](#depth)
 - [auto_order](#auto_order)
+- [exclude_dir_regex]()
 - [vd](#vd)
 - [merge](#merge)
 - [merged_file_show](#merged_file_show)
@@ -194,6 +195,35 @@ rtf_list = rtf_list_copy.txt
 > [!NOTE]
 >
 > - 当 [rtf_list](#rtf_list) 指定了非 `#null` 值时，此参数将被忽略。
+
+---
+
+### exclude_dir_regex
+
+**Syntax** : _regex_ | `#null`
+
+指定一个正则表达式 _regex_，若目录相对 [dir](#dir) 的路径匹配 _regex_，则该目录下的 RTF 文件将不会被合并。
+
+假设 [dir](#dir) 指定的目录为 `D:\Project\TFL`，该目录结构如下：
+
+```
+D:.
+└─TFL
+  ├─01 table
+  │ └─draft
+  ├─02 figure
+  ├─03 listing
+  │ └─draft
+  └─04 other
+```
+
+指定 `exclude_dir_regex = %str(other|draft)` 具有以下效果：
+
+- `D:\Project\TFL\01 table\draft` 目录下的 RTF 文件将不会被合并
+- `D:\Project\TFL\03 listing\draft` 目录下的 RTF 文件将不会被合并
+- `D:\Project\TFL\04 other` 目录下的 RTF 文件将不会被合并
+
+**Default** : `#null`
 
 ---
 
