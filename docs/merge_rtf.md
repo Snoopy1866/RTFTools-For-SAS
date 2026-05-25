@@ -214,7 +214,8 @@ D:.
   ├─02 figure
   ├─03 listing
   │ └─draft
-  └─04 other
+  ├─04 other
+  └─05 draft
 ```
 
 指定 `exclude_dir_regex = %str(other|draft)` 具有以下效果：
@@ -222,6 +223,7 @@ D:.
 - `D:\Project\TFL\01 table\draft` 目录下的 RTF 文件将不会被合并
 - `D:\Project\TFL\03 listing\draft` 目录下的 RTF 文件将不会被合并
 - `D:\Project\TFL\04 other` 目录下的 RTF 文件将不会被合并
+- `D:\Project\TFL\05 draft` 目录下的 RTF 文件将不会被合并
 
 **Default** : `#null`
 
