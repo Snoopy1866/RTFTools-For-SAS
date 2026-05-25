@@ -16,7 +16,7 @@
 - [rtf_list](#rtf_list)
 - [depth](#depth)
 - [auto_order](#auto_order)
-- [exclude_dir_regex]()
+- [exclude_dir_regex](#exclude_dir_regex)
 - [vd](#vd)
 - [merge](#merge)
 - [merged_file_show](#merged_file_show)
