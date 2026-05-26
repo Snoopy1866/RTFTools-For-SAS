@@ -16,6 +16,7 @@
 - [rtf_list](#rtf_list)
 - [depth](#depth)
 - [auto_order](#auto_order)
+- [exclude_dir_regex](#exclude_dir_regex)
 - [vd](#vd)
 - [merge](#merge)
 - [merged_file_show](#merged_file_show)
@@ -197,6 +198,73 @@ rtf_list = rtf_list_copy.txt
 
 ---
 
+### exclude_dir_regex
+
+**Syntax** : _regex_ | `#null`
+
+指定一个正则表达式 _regex_，用于排除额外的子目录，若某个子目录基于 [dir](#dir) 的相对路径可以匹配 _regex_，则该目录下的 RTF 文件将不会被合并。
+
+举例：假设 [dir](#dir) 指定的目录为 `D:\Project\TFL`，该目录结构如下：
+
+```
+D:.
+└─TFL
+  ├─01 table
+  │ └─draft
+  ├─02 figure
+  ├─03 listing
+  │ └─draft
+  ├─04 other
+  └─05 draft
+```
+
+上述目录结构中，各目录相对 [dir](#dir) 的路径如下表：
+
+| 目录绝对路径                      | 基于 [dir](#dir) 的相对路径 |
+| --------------------------------- | --------------------------- |
+| `D:\Project\TFL\01 table`         | `\01 table`                 |
+| `D:\Project\TFL\01 table\draft`   | `\01 table\draft`           |
+| `D:\Project\TFL\02 figure`        | `\02 figure`                |
+| `D:\Project\TFL\03 listing `      | `\03 listing`               |
+| `D:\Project\TFL\03 listing\draft` | `\03 listing\draft`         |
+| `D:\Project\TFL\04 other`         | `\04 other`                 |
+| `D:\Project\TFL\05 draft`         | `\05 draft`                 |
+
+如果指定 `exclude_dir_regex = %str(other|draft)`，则以下目录中的 RTF 文件将不会被合并：
+
+- `D:\Project\TFL\01 table\draft`
+- `D:\Project\TFL\03 listing\draft`
+- `D:\Project\TFL\04 other`
+- `D:\Project\TFL\05 draft`
+
+如果指定 `exclude_dir_regex = %str(.*\\draft)`，则以下目录中的 RTF 文件将不会被合并：
+
+- `D:\Project\TFL\01 table\draft`
+- `D:\Project\TFL\03 listing\draft`
+
+如果指定 `exclude_dir_regex = %str(\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft)`，则以下目录中的 RTF 文件将不会被合并：
+
+- `D:\Project\TFL\01 table\draft`
+- `D:\Project\TFL\03 listing\draft`
+- `D:\Project\TFL\04 other`
+- `D:\Project\TFL\05 draft`
+
+> [!IMPORTANT]
+>
+> `exclude_dir_regex` 指定的正则表达式无需考虑相对路径开头的反斜杠 `\`，故以下调用方式是等价的：
+>
+> - `exclude_dir_regex = %str(\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft)`
+> - `exclude_dir_regex = %str(\\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft)`
+> - `exclude_dir_regex = %str(\d{2}\sother|\\(?:\d{2}\s|[^\\].*\\)draft)`
+> - `exclude_dir_regex = %str(\\\d{2}\sother|\\(?:\d{2}\s|[^\\].*\\)draft)`
+> - `exclude_dir_regex = %str(\\(?:\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft))`
+
+**Default** : `#null`
+
+默认情况下，宏程序不会额外排除任何子目录中的 RTF 文件，除非该文件不满足[命名规范](#rtf-文件命名规范)，或该文件所在文件夹不满足 [depth](#depth) 指定的深度。
+
+---
+
 ### vd
 
 **Syntax** : _driver_ | `#auto`
@@ -336,9 +404,25 @@ dir "X:\*.rtf" /b/on/s > "X:\_tmp_rtf_list.txt"
 
 使用 SAS 中的 `infile` 语句读取 `_tmp_rtf_list.txt`，文件路径中的 `\` 的数量可以帮助确定文件所处子文件夹的深度，假设指定 `depth = n`，宏程序将筛选出路径包含的 `\` （路径中参数 `DIR` 部分的 `\` 不计入）的数量不超过 `n` 的文件，仅对筛选出的文件进行后续的处理。
 
-### 如何对 RTF 文件进行排序
+### RTF 文件命名规范
 
-使用以下正则表达式筛选需要合并的 RTF 文件：
+为保证宏程序能够发挥预期作用，RTF 文件的命名必须遵守如下规则：
+
+- 必须在某个位置包含 `表`、`图`、`列表`、`清单` 字样
+- 在 `表`、`图`、`列表`、`清单` 之后，必须是文件序号，文件序号格式可以是 `x`、`x.x`、`x.x.x`、……，其中 `x` 是数字
+
+合法的 RTF 文件命名示例：
+
+```
+表1 受试者分布.rtf
+表 2 方案偏离清单.rtf
+表 2.1 方案偏离清单（长期随访）.rtf
+图 6.1 IPSS 评分随访视变化图.rtf
+列表 7.3.1不良事件.rtf
+列表 7.3.1.1. 不良事件（长期随访）.rtf
+```
+
+宏程序内部使用以下正则表达式筛选需要合并的 RTF 文件：
 
 ```
 /^.*((列表|清单|(?<!列)表|图)\s*(\d+(?:\.\d+)*)\.?\s*(.*)\.rtf)\s*$/o
