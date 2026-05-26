@@ -242,7 +242,7 @@ D:.
 - `D:\Project\TFL\01 table\draft`
 - `D:\Project\TFL\03 listing\draft`
 
-如果指定 `exclude_dir_regex = %str(\d{2} other|(?:\d{2} |[^\\]*\\)draft)`，则以下目录中的 RTF 文件将不会被合并：
+如果指定 `exclude_dir_regex = %str(\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft)`，则以下目录中的 RTF 文件将不会被合并：
 
 - `D:\Project\TFL\01 table\draft`
 - `D:\Project\TFL\03 listing\draft`
@@ -253,11 +253,11 @@ D:.
 >
 > `exclude_dir_regex` 指定的正则表达式无需考虑相对路径开头的反斜杠 `\`，以下调用方式是等价的：
 >
-> - `exclude_dir_regex = %str(\d{2} other|.*\\draft)`
-> - `exclude_dir_regex = %str(\\\d{2} other|.*\\draft)`
-> - `exclude_dir_regex = %str(\d{2} other|\\.*\\draft)`
-> - `exclude_dir_regex = %str(\\\d{2} other|\\.*\\draft)`
-> - `exclude_dir_regex = %str(\\(?:other|draft))`
+> - `exclude_dir_regex = %str(\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft)`
+> - `exclude_dir_regex = %str(\\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft)`
+> - `exclude_dir_regex = %str(\d{2}\sother|\\(?:\d{2}\s|[^\\].*\\)draft)`
+> - `exclude_dir_regex = %str(\\\d{2}\sother|\\(?:\d{2}\s|[^\\].*\\)draft)`
+> - `exclude_dir_regex = %str(\\(?:\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft))`
 
 **Default** : `#null`
 
