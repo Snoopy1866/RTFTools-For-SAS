@@ -202,7 +202,7 @@ rtf_list = rtf_list_copy.txt
 
 **Syntax** : _regex_ | `#null`
 
-指定一个正则表达式 _regex_，用于排除额外的子目录，若某个子目录相对 [dir](#dir) 的路径可以匹配 _regex_，则该目录下的 RTF 文件将不会被合并。
+指定一个正则表达式 _regex_，用于排除额外的子目录，若某个子目录基于 [dir](#dir) 的相对路径可以匹配 _regex_，则该目录下的 RTF 文件将不会被合并。
 
 举例：假设 [dir](#dir) 指定的目录为 `D:\Project\TFL`，该目录结构如下：
 
@@ -220,7 +220,7 @@ D:.
 
 上述目录结构中，各目录相对 [dir](#dir) 的路径如下表：
 
-| 目录绝对路径                      | 相对 [dir](#dir) 的路径 |
+| 目录绝对路径                      | 基于 [dir](#dir) 的相对路径 |
 | --------------------------------- | ----------------------- |
 | `D:\Project\TFL\01 table`         | `\01 table`             |
 | `D:\Project\TFL\01 table\draft`   | `\01 table\draft`       |
