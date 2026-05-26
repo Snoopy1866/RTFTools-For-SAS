@@ -221,14 +221,14 @@ D:.
 上述目录结构中，各目录相对 [dir](#dir) 的路径如下表：
 
 | 目录绝对路径                      | 基于 [dir](#dir) 的相对路径 |
-| --------------------------------- | ----------------------- |
-| `D:\Project\TFL\01 table`         | `\01 table`             |
-| `D:\Project\TFL\01 table\draft`   | `\01 table\draft`       |
-| `D:\Project\TFL\02 figure`        | `\02 figure`            |
-| `D:\Project\TFL\03 listing `      | `\03 listing`           |
-| `D:\Project\TFL\03 listing\draft` | `\03 listing\draft`     |
-| `D:\Project\TFL\04 other`         | `\04 other`             |
-| `D:\Project\TFL\05 draft`         | `\05 draft`             |
+| --------------------------------- | --------------------------- |
+| `D:\Project\TFL\01 table`         | `\01 table`                 |
+| `D:\Project\TFL\01 table\draft`   | `\01 table\draft`           |
+| `D:\Project\TFL\02 figure`        | `\02 figure`                |
+| `D:\Project\TFL\03 listing `      | `\03 listing`               |
+| `D:\Project\TFL\03 listing\draft` | `\03 listing\draft`         |
+| `D:\Project\TFL\04 other`         | `\04 other`                 |
+| `D:\Project\TFL\05 draft`         | `\05 draft`                 |
 
 如果指定 `exclude_dir_regex = %str(other|draft)`，则以下目录中的 RTF 文件将不会被合并：
 
@@ -260,6 +260,8 @@ D:.
 > - `exclude_dir_regex = %str(\\(?:\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft))`
 
 **Default** : `#null`
+
+默认情况下，宏程序不会额外排除任何子目录中的 RTF 文件，除非该文件不满足命名规范，或该文件所在文件夹不满足 [depth](#depth) 指定的深度。
 
 ---
 
