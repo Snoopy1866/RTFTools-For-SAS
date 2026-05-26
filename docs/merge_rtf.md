@@ -218,6 +218,18 @@ D:.
   └─05 draft
 ```
 
+上述目录结构中，各目录相对 [dir](#dir) 的路径如下表：
+
+| 目录绝对路径                    | 相对 [dir](#dir) 的路径 |
+| ------------------------------- | ----------------------- |
+| D:\Project\TFL\01 table         | \01 table               |
+| D:\Project\TFL\01 table\draft   | \01 table\draft         |
+| D:\Project\TFL\02 figure        | \02 figure              |
+| D:\Project\TFL\03 listing       | \03 listing             |
+| D:\Project\TFL\03 listing\draft | \03 listing\draft       |
+| D:\Project\TFL\04 other         | \04 other               |
+| D:\Project\TFL\05 draft         | \05 draft               |
+
 如果指定 `exclude_dir_regex = %str(other|draft)`，则以下目录中的 RTF 文件将不会被合并：
 
 - `D:\Project\TFL\01 table\draft`
@@ -230,6 +242,14 @@ D:.
 - `D:\Project\TFL\01 table\draft`
 - `D:\Project\TFL\03 listing\draft`
 
+> [!IMPORTANT]
+>
+> `exclude_dir_regex` 指定的正则表达式无需考虑相对路径开头的反斜杠 `\`，以下调用方式是等价的：
+>  - `exclude_dir_regex = %str(other|draft)`
+>  - `exclude_dir_regex = %str(\\other|\\draft)`
+>  - `exclude_dir_regex = %str(\\other|draft)`
+>  - `exclude_dir_regex = %str(other|\\draft)`
+>  - `exclude_dir_regex = %str(\\(?:other|draft))`
 
 **Default** : `#null`
 
