@@ -218,12 +218,18 @@ D:.
   └─05 draft
 ```
 
-指定 `exclude_dir_regex = %str(other|draft)` 具有以下效果：
+如果指定 `exclude_dir_regex = %str(other|draft)`，则以下目录中的 RTF 文件将不会被合并：
 
-- `D:\Project\TFL\01 table\draft` 目录下的 RTF 文件将不会被合并
-- `D:\Project\TFL\03 listing\draft` 目录下的 RTF 文件将不会被合并
-- `D:\Project\TFL\04 other` 目录下的 RTF 文件将不会被合并
-- `D:\Project\TFL\05 draft` 目录下的 RTF 文件将不会被合并
+- `D:\Project\TFL\01 table\draft`
+- `D:\Project\TFL\03 listing\draft`
+- `D:\Project\TFL\04 other`
+- `D:\Project\TFL\05 draft`
+
+如果指定 `exclude_dir_regex = %str(.*\\draft)`，则以下目录中的 RTF 文件将不会被合并：
+
+- `D:\Project\TFL\01 table\draft`
+- `D:\Project\TFL\03 listing\draft`
+
 
 **Default** : `#null`
 
