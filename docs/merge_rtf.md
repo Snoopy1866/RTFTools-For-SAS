@@ -251,7 +251,7 @@ D:.
 
 > [!IMPORTANT]
 >
-> `exclude_dir_regex` 指定的正则表达式无需考虑相对路径开头的反斜杠 `\`，以下调用方式是等价的：
+> `exclude_dir_regex` 指定的正则表达式无需考虑相对路径开头的反斜杠 `\`，故以下调用方式是等价的：
 >
 > - `exclude_dir_regex = %str(\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft)`
 > - `exclude_dir_regex = %str(\\d{2}\sother|(?:\d{2}\s|[^\\].*\\)draft)`
