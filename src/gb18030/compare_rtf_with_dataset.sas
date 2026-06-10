@@ -79,13 +79,16 @@
 
     /*2. 读取RTF文件*/
     /*2.1 复制一份文件，规避文件已被外部打开导致读取冲突的问题*/
-    X "copy ""&rtf_loc"" ""&rtf_loc.-copy"" & exit";
+    %let rtf_loc_name = %qscan(%superq(rtf_loc), -1, %bquote(/\));
+    %let rtf_loc_copy = %qsysfunc(transtrn(%superq(rtf_loc), %superq(rtf_loc_name), %bquote(~$%superq(rtf_loc_name))));
+
+    X "copy ""&rtf_loc"" ""&rtf_loc_copy"" & exit";
 
     /*2.2 调用 %read_rtf 读取文件*/
-    %read_rtf(rtf = "&rtf_loc.-copy", outdata = _tmp_rtf(drop = obs_seq), compress = true, del_rtf_ctrl = true);
+    %read_rtf(rtf = "&rtf_loc_copy", outdata = _tmp_rtf(drop = obs_seq), compress = true, del_rtf_ctrl = true);
 
     /*2.3 删除复制的文件*/
-    X "del ""&rtf_loc.-copy"" & exit";
+    X "del ""&rtf_loc_copy"" & exit";
 
     %if &readrtf_exit_with_error = TRUE %then %do;
         X powershell -Command "$ws = New-Object -ComObject WScript.Shell; $result = $ws.Popup('合并成功，耗时 %superq(readrtf_exit_with_error_text) s！', 0, '提示', 0+48+4096)";
