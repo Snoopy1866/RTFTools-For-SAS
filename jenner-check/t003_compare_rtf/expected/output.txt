@@ -1,0 +1,5 @@
+
+        base文件路径          compare文件路径        base文件名        compare文件名          存在差异
+----------------  -------------------  -------------  ----------------  ------------
+./base.rtf        ./compare.rtf        ./base.rtf     ./compare.rtf     Y
+

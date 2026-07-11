@@ -1,0 +1,213 @@
+
+NOTE: Option OBS changed to 100.
+NOTE: DATA _null_
+
+NOTE: Writing to fileref base.rtf (/tmp/work/r_66a1dd1e083742ab89ef02927c081198/base.rtf)
+NOTE: Processing inline DATALINES (7 lines)
+
+NOTE: Read 7 rows from DATALINES.
+NOTE: Wrote _null_ (7 rows, 0 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _null_
+
+NOTE: Writing to fileref compare.rtf (/tmp/work/r_66a1dd1e083742ab89ef02927c081198/compare.rtf)
+NOTE: Processing inline DATALINES (7 lines)
+
+NOTE: Read 7 rows from DATALINES.
+NOTE: Wrote _null_ (7 rows, 0 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: Fileref BASERTF assigned to base.rtf.
+NOTE: Fileref CMPRTF assigned to compare.rtf.
+NOTE: 宏 compare_rtf 已结束运行！
+NOTE: DATA _tmp_rtf_data_base
+
+NOTE: Reading from fileref ./base.rtf (base.rtf)
+
+NOTE: Read 7 rows from ./base.rtf.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 1 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+NOTE: Reading from fileref ./compare.rtf (compare.rtf)
+
+NOTE: Read 7 rows from ./compare.rtf.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 1 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 6 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 6 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 7 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 7 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 11 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 11 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 15 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 15 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 16 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 16 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 17 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 17 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 18 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 18 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_base
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_base.
+NOTE: Wrote _tmp_rtf_data_base (7 rows, 24 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA _tmp_rtf_data_compare
+
+
+NOTE: Read 7 rows from _tmp_rtf_data_compare.
+NOTE: Wrote _tmp_rtf_data_compare (7 rows, 24 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC COMPARE base=_tmp_rtf_data_base compare=_tmp_rtf_data_compare
+
+NOTE: DATA _tmp_outdata
+
+
+NOTE: Wrote _tmp_outdata (1 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA rtf_diff
+
+
+NOTE: Read 1 rows from _tmp_outdata.
+NOTE: Wrote rtf_diff (1 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC DATASETS library=WORK
+
+NOTE: Deleting _TMP_RTF_DATA_BASE (memtype=DATA).
+NOTE: Deleting _TMP_RTF_DATA_COMPARE (memtype=DATA).
+NOTE: Deleting _TMP_OUTDATA (memtype=DATA).
+NOTE: 3 dataset(s) deleted.
+NOTE: PROC PRINT data=rtf_diff
+
+NOTE: PROC PRINT completed: 1 observations printed, 5 variables

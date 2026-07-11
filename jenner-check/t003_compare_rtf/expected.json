@@ -1,0 +1,14 @@
+{
+  "_captured_at": "2026-07-11T06:05:59Z",
+  "_captured_run_id": "r_66a1dd1e083742ab89ef02927c081198",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Fileref BASERTF assigned to base.rtf.",
+    "NOTE: Fileref CMPRTF assigned to compare.rtf.",
+    "NOTE: PROC COMPARE base=_tmp_rtf_data_base compare=_tmp_rtf_data_compare",
+    "NOTE: Wrote rtf_diff (1 rows, 5 columns)."
+  ],
+  "log_does_not_contain": ["ERROR:", "[JENNER-ERROR"],
+  "diagnostics": {"parse_warnings": [], "runtime_warnings": []}
+}

@@ -1,0 +1,14 @@
+{
+  "_captured_at": "2026-07-11T05:51:00Z",
+  "_captured_run_id": "r_f111c73ecf914a5fa1db9937e8e98ff4",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Function transcode stored to sasuser.func.rtf.",
+    "NOTE: Function cell_transcode stored to sasuser.func.rtf.",
+    "NOTE: Wrote transcode_check (1 rows, 3 columns).",
+    "NOTE: Wrote cell_transcode_check (1 rows, 2 columns)."
+  ],
+  "log_does_not_contain": ["ERROR:", "[JENNER-ERROR"],
+  "diagnostics": {"parse_warnings": [], "runtime_warnings": []}
+}

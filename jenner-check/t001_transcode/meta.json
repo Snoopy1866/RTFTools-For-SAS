@@ -1,0 +1,7 @@
+{
+  "bundle": "t001_transcode",
+  "source_file": "src/utf8/transcode.sas",
+  "source_blob_sha": "4ba57a81efd84226a1bc44f67908561af87abf73",
+  "source_commit": "a1a62b0a510ae48d550a6fdccdc1e0fe02c97545",
+  "notes": "transcode.sas defines the two PROC FCMP functions transcode() and cell_transcode() that every other macro in the toolkit depends on. Shipped verbatim. The caller exercises the UTF-8 code path with the exact example from docs/transcode.md (the NCR sequence &#35797;&#39564;&#32452; and its RTF-cell-escaped form \\u35797;\\u39564;\\u32452;), both of which decode to 试验组 (\"trial group\", a real clinical-trial term) -- the toolkit's own documented example, unmodified."
+}

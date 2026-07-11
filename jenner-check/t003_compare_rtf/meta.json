@@ -1,0 +1,7 @@
+{
+  "bundle": "t003_compare_rtf",
+  "source_file": "src/utf8/compare_rtf.sas",
+  "source_blob_sha": "dc97f40423cb8d1c49eed1fb59028c88684a94e2",
+  "source_commit": "a1a62b0a510ae48d550a6fdccdc1e0fe02c97545",
+  "notes": "compare_rtf.sas shipped verbatim. The caller writes two small RTF-shaped fixtures to disk from inline DATALINES (so the bundle stays self-contained -- the shipped runner uploads only script text, no data files) before compare_rtf() reads them back via its own documented filename-fileref calling convention. The two fixtures differ in exactly one data cell (22 vs 23 subjects), exercising the macro's real line-by-line PROC COMPARE diff logic and its SYSINFO-derived diffyn flag."
+}
