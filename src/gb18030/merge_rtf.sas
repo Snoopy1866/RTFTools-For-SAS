@@ -112,6 +112,11 @@
                 infile "&vd:\_tmp_rtf_list.txt" truncover encoding = 'gbke';
                 input rtf_path $char1000.;
 
+                /*初始化标识符*/
+                rtf_filename_valid_flag = "";
+                rtf_depth_valid_flag = "";
+                rtf_exclude_dir_flag = "";
+
                 /*真实路径*/
                 rtf_path_real = cats("&dir_loc", substr(rtf_path, 3));
 
